@@ -3,12 +3,13 @@ package com.example.micro.controllers;
 import com.example.micro.domain.Matching;
 import com.example.micro.repositories.MatchingRepository;
 import com.example.micro.services.MatchingServiceImpl;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
+import java.util.List;
 
 @RestController
 public class RandomController {
@@ -30,10 +31,9 @@ public class RandomController {
     }
 
 
-    @GetMapping("/findAll")
-    public ResponseEntity<String> findAllMatchings() {
-        String findings = matchingRepository.findAll().toString();
-        return ResponseEntity.ok(findings);
+    @GetMapping(value = "/findAll", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Matching>> findAllMatchings() {
+       return ResponseEntity.ok(matchingRepository.findAll());
     }
 
     @PostMapping("/save")
@@ -44,6 +44,5 @@ public class RandomController {
                 matchingRepository.save(matching)
         );
     }
-
 
 }

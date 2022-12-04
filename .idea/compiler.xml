@@ -13,6 +13,12 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="11">
+      <module name="demo" target="17" />
+      <module name="demo.main" target="17" />
+      <module name="demo.test" target="17" />
+      <module name="demo1" target="17" />
+      <module name="demo1.main" target="17" />
+      <module name="demo1.test" target="17" />
       <module name="micro" target="17" />
       <module name="micro.main" target="17" />
       <module name="micro.test" target="17" />

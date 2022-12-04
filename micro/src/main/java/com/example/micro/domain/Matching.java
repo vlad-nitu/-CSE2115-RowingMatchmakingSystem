@@ -1,16 +1,20 @@
 package com.example.micro.domain;
 
-import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+
 @Entity
-@Table(name = "matching-auto")
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name = "matching", schema = "projects_MatchingMicroservice")
 @Getter
 @Setter
-@EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
 @ToString
 public class Matching {
     @Id
