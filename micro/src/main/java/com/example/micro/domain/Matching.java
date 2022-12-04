@@ -5,7 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
-@Table(name = "Matching")
+@Table(name = "matching-auto")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
