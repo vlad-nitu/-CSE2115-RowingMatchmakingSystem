@@ -1,6 +1,7 @@
 package com.example.micro.controllers;
 
 import com.example.micro.domain.Matching;
+import com.example.micro.repositories.MatchingRepository;
 import com.example.micro.services.MatchingServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,17 +9,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 
 @RestController
 public class RandomController {
 
-    private final MatchingServiceImpl matchingService;
+    private final MatchingRepository matchingRepository;
 
-    public RandomController(MatchingServiceImpl matchingService) {
-        this.matchingService = matchingService;
+    public RandomController(MatchingRepository matchingRepository) {
+        this.matchingRepository = matchingRepository;
     }
-
 
     /**
      * Gets example by id.
@@ -33,7 +32,7 @@ public class RandomController {
 
     @GetMapping("/findAll")
     public ResponseEntity<String> findAllMatchings() {
-        String findings = matchingService.findAll().toString();
+        String findings = matchingRepository.findAll().toString();
         return ResponseEntity.ok(findings);
     }
 
@@ -42,7 +41,7 @@ public class RandomController {
             @RequestBody Matching matching
     ) {
         return ResponseEntity.ok(
-                matchingService.save(matching)
+                matchingRepository.save(matching)
         );
     }
 
