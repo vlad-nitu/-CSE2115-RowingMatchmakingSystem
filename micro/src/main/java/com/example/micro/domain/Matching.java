@@ -1,6 +1,7 @@
 package com.example.micro.domain;
 
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -24,7 +25,9 @@ public class Matching {
     @Id
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
+    @Column(name = "userid")
     private String userId;
+    @Column(name = "activityid")
     private Long activityId;
     private String position;
     private boolean pending;
