@@ -1,12 +1,11 @@
 package com.example.micro.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 
 @Entity
+@Table(name = "Matching")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -15,7 +14,8 @@ import lombok.*;
 @ToString
 public class Matching {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(generator="system-uuid")
+    @GenericGenerator(name="system-uuid", strategy = "uuid")
     private String userID;
     private Long activityID;
     private String position;

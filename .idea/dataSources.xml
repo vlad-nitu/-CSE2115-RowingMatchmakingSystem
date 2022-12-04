@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="MySQL" uuid="04580fbc-3146-4efe-b39c-ec2ddfd57251">
+    <data-source source="LOCAL" name="projects_MatchingMicroservice@projects-db.ewi.tudelft.nl" uuid="f3c1d784-cd25-4077-9e6b-12cd0a63e516">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://projects-db.ewi.tudelft.nl :3306</jdbc-url>
+      <jdbc-url>jdbc:mysql://projects-db.ewi.tudelft.nl:3306/projects_MatchingMicroservice</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>
