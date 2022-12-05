@@ -71,8 +71,12 @@ dependencies {
 	testImplementation('org.junit.jupiter:junit-jupiter:5.8.2')
 	testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.12.4'
 	testImplementation('org.assertj:assertj-core:3.23.1')
-    implementation 'jakarta.activation:jakarta.activation-api:2.1.0'
-    implementation 'jakarta.ws.rs:jakarta.ws.rs-api:3.0.0'
+
+
+    implementation group: 'org.glassfish.jersey.core', name: 'jersey-client', version: '3.1.0'
+    implementation group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '3.1.0'
+    implementation group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '3.1.0'
+    implementation 'org.jboss.resteasy:resteasy-client:3.0.2.Final'
 }
 
 test {

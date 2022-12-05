@@ -2,18 +2,23 @@ package com.example.micro.publishers;
 
 import com.example.micro.utils.MatchingUtils;
 import com.example.micro.utils.TimeSlot;
-import jakarta.ws.rs.core.GenericType;
-import jakarta.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.Response;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+
+
 
 
 @Service
 public class ActivityPublisher {
 
     private static final MatchingUtils matchingUtils = new MatchingUtils("http://localhost:8084/");
+
+    public ActivityPublisher() {
+    }
 
     /**
      * Obtained timeslots of all activityIds.

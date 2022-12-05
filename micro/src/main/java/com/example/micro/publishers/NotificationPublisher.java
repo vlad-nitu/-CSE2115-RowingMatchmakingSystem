@@ -2,14 +2,16 @@ package com.example.micro.publishers;
 
 import com.example.micro.utils.BaseNotification;
 import com.example.micro.utils.MatchingUtils;
-import jakarta.ws.rs.core.Response;
-import java.util.List;
-import org.springframework.data.util.Pair;
+import javax.ws.rs.core.Response;
 import org.springframework.stereotype.Service;
 
 @Service
 public class NotificationPublisher {
     private static final MatchingUtils matchingUtils = new MatchingUtils("http://localhost:8086/");
+
+    public NotificationPublisher() {
+    }
+
 
     /**
      * Creates a notification for a matching.

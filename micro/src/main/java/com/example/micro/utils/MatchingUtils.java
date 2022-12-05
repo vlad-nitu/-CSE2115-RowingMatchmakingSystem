@@ -1,21 +1,22 @@
 package com.example.micro.utils;
 
-import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Response;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+
 
 public class MatchingUtils {
 
-    protected String server;
+    protected final transient String server;
 
-    protected Client client;
+    protected final transient  ResteasyClient client;
 
     public MatchingUtils(String server) {
         this.server = server;
-        client = ClientBuilder.newClient();
+        this.client = new ResteasyClientBuilder().build();
     }
 
     /**
@@ -61,6 +62,5 @@ public class MatchingUtils {
             throw new Exception(e.getMessage());
         }
     }
-
 
 }
