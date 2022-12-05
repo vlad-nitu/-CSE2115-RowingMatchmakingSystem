@@ -1,13 +1,13 @@
 package com.example.micro.utils;
 
+import java.io.Serializable;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Service;
 
-import java.io.Serializable;
-import java.util.Objects;
 
 @AllArgsConstructor
 @Getter

@@ -2,12 +2,10 @@ package com.example.micro.services;
 
 import com.example.micro.domain.Matching;
 import com.example.micro.repositories.MatchingRepository;
-
+import com.example.micro.utils.CompositeKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.example.micro.utils.CompositeKey;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,9 +25,15 @@ public class MatchingServiceImpl {
         return matchingRepository.save(matching);
     }
 
+    /**
+     * Finds the activities that the user has been enrolled to.
+     *
+     * @param userId the id of the user
+     * @return the list of activities
+     */
     public List<Long> findActivitiesByUserId(String userId) {
         return matchingRepository.findMatchingsByUserId(userId)
-                .orElse( new ArrayList<Matching>())
+                .orElse(new ArrayList<Matching>())
                 .stream()
                 .map(Matching::getActivityId)
                 .collect(Collectors.toList());

@@ -14,6 +14,11 @@ public class UserPublisher {
 
     private static final MatchingUtils matchingUtils = new MatchingUtils("http://localhost:8085/");
 
+    /**
+     * Tells the user of the available Activities.
+     *
+     * @param possibleMatchings a list of possible activities
+     */
     public void sendAvailableActivities(List<Pair<Long, String>> possibleMatchings) {
         try {
             Response res = matchingUtils.postRequest("/getAvailableActivities", possibleMatchings);

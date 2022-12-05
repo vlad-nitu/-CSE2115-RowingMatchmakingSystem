@@ -5,6 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FunctionUtils {
+    /**
+     * Eliminates the time slots that overlap with already existing ones.
+     *
+     * @param timeSlots the time slots that should be checked
+     * @param occTimeSlots existing time slots
+     * @return a list of non-overlapping times lots
+     */
     public static List<TimeSlot> filterTimeSlots(List<TimeSlot> timeSlots, List<TimeSlot> occTimeSlots) {
         List<TimeSlot> filtered = new ArrayList<>();
         for (TimeSlot t : timeSlots) {

@@ -18,6 +18,12 @@ public class MatchingUtils {
         client = ClientBuilder.newClient();
     }
 
+    /**
+     * This method is a generic method for a get request.
+     *
+     * @param path The url/path needed for the specific request.
+     * @return the response of the server.
+     */
     public Response getRequest(String path) throws Exception {
         try {
             Response res = client.target(server).path(path)
@@ -33,6 +39,14 @@ public class MatchingUtils {
         }
     }
 
+    /**
+     * This method is a generic method for a post request.
+     *
+     * @param <T>  Allows this method to use a generic data type, instead of being specific
+     * @param path The url/path needed for the specific request
+     * @param data The data that you want to post on the server
+     * @return response
+     */
     public <T> Response postRequest(String path, T data) throws Exception {
         try {
             Response res = client.target(server).path(path)

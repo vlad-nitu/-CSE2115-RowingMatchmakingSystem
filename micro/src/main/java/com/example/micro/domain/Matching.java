@@ -1,9 +1,11 @@
 package com.example.micro.domain;
 
-
-import javax.persistence.*;
-
 import com.example.micro.utils.CompositeKey;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
