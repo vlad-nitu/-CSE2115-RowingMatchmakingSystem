@@ -10,5 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface MatchingRepository extends JpaRepository<Matching, CompositeKey> {
-    Optional<List<Matching>> findMatchingByUserId(String userId);
+    Optional<List<Matching>> findMatchingsByUserId(String userId);
+
+    Optional<Matching> findMatchingByUserIdAndActivityId(String userId, Long activityId);
 }

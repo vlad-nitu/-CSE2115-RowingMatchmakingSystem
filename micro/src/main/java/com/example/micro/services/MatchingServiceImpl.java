@@ -28,16 +28,19 @@ public class MatchingServiceImpl {
     }
 
     public List<Long> findActivitiesByUserId(String userId) {
-        return matchingRepository.findMatchingByUserId(userId)
+        return matchingRepository.findMatchingsByUserId(userId)
                 .orElse( new ArrayList<Matching>())
                 .stream()
                 .map(Matching::getActivityId)
                 .collect(Collectors.toList());
     }
 
-    public void deleteById(String userId, Long activityId, String position){
+    public void deleteById(String userId, Long activityId, String position) {
         matchingRepository.deleteById(new CompositeKey(userId, activityId, position));
     }
 
+    public String findPosition(String userId, Long activityId) {
+        return matchingRepository.findMatchingByUserIdAndActivityId(userId, activityId).get().getPosition();
+    }
 
 }

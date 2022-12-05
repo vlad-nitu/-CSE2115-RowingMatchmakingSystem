@@ -61,6 +61,20 @@ public class MatchingController {
         return ResponseEntity.ok(savedMatching);
     }
 
+    @GetMapping("/getUserActivities/{userId}")
+    public ResponseEntity<List<Long>> getUserActivities(@PathVariable String userId) {
+        return ResponseEntity.ok(matchingServiceImpl.findActivitiesByUserId(userId));
+    }
+
+    @PostMapping("/unenroll")
+    public ResponseEntity<Pair<String, Long>> unenroll(@RequestBody Pair<String, Long> userIdActivityIdPair) {
+        String userId = userIdActivityIdPair.getFirst();
+        Long activityId = userIdActivityIdPair.getSecond();
+        String position = matchingServiceImpl.findPosition(userId, activityId);
+        activityPublisher.unenroll(userIdActivityIdPair.getSecond(), position);
+        matchingServiceImpl.deleteById(userId, activityId, position);
+        return ResponseEntity.ok(userIdActivityIdPair);
+    }
 
     /**
      * Gets example by id.

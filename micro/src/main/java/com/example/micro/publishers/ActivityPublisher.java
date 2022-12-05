@@ -65,4 +65,14 @@ public class ActivityPublisher {
             System.out.println(e.getMessage());
         }
     }
+
+    public void unenroll(Long activityId, String position) {
+        try {
+            Pair<Long, String> posTaken = Pair.of(activityId, position);
+            Response res = matchingUtils.postRequest("/unenrollPosition", posTaken);
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
 }
