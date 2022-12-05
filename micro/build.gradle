@@ -71,6 +71,8 @@ dependencies {
 	testImplementation('org.junit.jupiter:junit-jupiter:5.8.2')
 	testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.12.4'
 	testImplementation('org.assertj:assertj-core:3.23.1')
+    implementation 'jakarta.activation:jakarta.activation-api:2.1.0'
+    implementation 'jakarta.ws.rs:jakarta.ws.rs-api:3.0.0'
 }
 
 test {

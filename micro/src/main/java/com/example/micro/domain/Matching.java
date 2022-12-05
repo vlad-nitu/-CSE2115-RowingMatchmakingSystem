@@ -1,11 +1,9 @@
 package com.example.micro.domain;
 
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+
+import com.example.micro.utils.CompositeKey;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +14,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table(name = "matching", schema = "projects_MatchingMicroservice")
+@IdClass(CompositeKey.class)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,12 +22,13 @@ import org.hibernate.annotations.GenericGenerator;
 @ToString
 public class Matching {
     @Id
-    @GeneratedValue(generator = "system-uuid")
-    @GenericGenerator(name = "system-uuid", strategy = "uuid")
     @Column(name = "userid")
     private String userId;
+    @Id
     @Column(name = "activityid")
     private Long activityId;
+    @Column(name = "position")
     private String position;
+    @Column(name = "pending")
     private boolean pending;
 }

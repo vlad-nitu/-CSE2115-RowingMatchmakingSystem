@@ -2,7 +2,11 @@ package com.example.micro.services;
 
 import com.example.micro.domain.Matching;
 import com.example.micro.repositories.MatchingRepository;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,6 +24,14 @@ public class MatchingServiceImpl {
 
     public Matching save(Matching matching) {
         return matchingRepository.save(matching);
+    }
+
+    public List<Long> findActivitiesByUserId(String userId) {
+        return matchingRepository.findMatchingByUserId(userId)
+                .orElse( new ArrayList<Matching>())
+                .stream()
+                .map(Matching::getActivityId)
+                .collect(Collectors.toList());
     }
 
 }
