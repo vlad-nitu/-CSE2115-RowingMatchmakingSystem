@@ -1,19 +1,21 @@
 package com.example.micro.controllers;
 
 import com.example.micro.domain.Matching;
-
-import java.util.List;
-
 import com.example.micro.publishers.ActivityPublisher;
 import com.example.micro.publishers.NotificationPublisher;
 import com.example.micro.publishers.UserPublisher;
 import com.example.micro.services.MatchingServiceImpl;
-import com.example.micro.utils.TimeSlot;
 import com.example.micro.utils.FunctionUtils;
+import com.example.micro.utils.TimeSlot;
+import java.util.List;
 import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class MatchingController {
@@ -23,15 +25,35 @@ public class MatchingController {
     private final transient UserPublisher userPublisher;
     private final transient NotificationPublisher notificationPublisher;
 
-    public MatchingController(MatchingServiceImpl matchingServiceImpl, ActivityPublisher activityPublisher, UserPublisher userPublisher, NotificationPublisher notificationPublisher) {
+    /**
+     * All arguments constructor, injects the main service component and all 3 publishers into controller.
+     *
+     * @param matchingServiceImpl - matching service implementation
+     * @param activityPublisher - for communication with Activity microservice through API Endpoints
+     * @param userPublisher - for communication with User microservice through API Endpoints
+     * @param notificationPublisher - for communication with Notification microservice through API Endpoints
+     */
+    public MatchingController(MatchingServiceImpl matchingServiceImpl,
+                              ActivityPublisher activityPublisher,
+                              UserPublisher userPublisher,
+                              NotificationPublisher notificationPublisher) {
         this.matchingServiceImpl = matchingServiceImpl;
         this.activityPublisher = activityPublisher;
         this.userPublisher = userPublisher;
         this.notificationPublisher = notificationPublisher;
     }
 
+    /**
+     * API Endpoint that performs a GET request in order to obtain all the available activities a user can be matched to,
+     * based on his/her specified timeslot.
+     *
+     * @param userId - String object representing the User's ID
+     * @param timeSlots - Timeslot object representing the start time and end time a user is available between
+     * @return - ResponseEntity object with a message composed of all the possible activities a user can be matched to.
+     */
     @GetMapping("/getAvailableActivities/{userId}/{timeSlots}")
-    public ResponseEntity<List<Pair<Long, String>>> getAvailableActivities(@PathVariable String userId, @PathVariable List<TimeSlot> timeSlots) {
+    public ResponseEntity<List<Pair<Long, String>>> getAvailableActivities(@PathVariable String userId,
+                                                                           @PathVariable List<TimeSlot> timeSlots) {
         List<Long> selectedActivities = matchingServiceImpl.findActivitiesByUserId(userId);
         List<TimeSlot> occTimeSlots = activityPublisher.getTimeSlots(selectedActivities);
         List<TimeSlot> newTimeSlots = FunctionUtils.filterTimeSlots(timeSlots, occTimeSlots);
@@ -40,6 +62,14 @@ public class MatchingController {
         return ResponseEntity.ok(possibleActivities);
     }
 
+    /**
+     * API Endpoint that performs a POST request in order to specify the activity that he wants to take part in, after
+     * being matched as a result of his previous request.
+     * Note: If a user chooses multiple activities, there will be created a single request per activity
+     *
+     * @param matching - Matching object representing the User-Activity pair
+     * @return - ResponseEntity object with a message composed of the saved matching.
+     */
     @PostMapping("/chooseActivity")
     public ResponseEntity<Matching> chooseActivity(@RequestBody Matching matching) {
         matching.setPending(true);
@@ -49,6 +79,13 @@ public class MatchingController {
         return ResponseEntity.ok(savedMatching);
     }
 
+    /**
+     * API Endpoint that performs a POST request in order for an owner of a specific activity
+     * to specify the decision of an user asking to take part in his/her activity in a previous request.
+     *
+     * @param matching - Matching object representing the User-Activity pair
+     * @return - ResponseEntity object with a message composed of the matching that was accepted or declined
+     */
     @PostMapping("/decideMatch")
     public ResponseEntity<Matching> chooseMatch(@RequestBody Matching matching) {
         matchingServiceImpl.deleteById(matching.getUserId(), matching.getActivityId(), matching.getPosition());
@@ -61,11 +98,26 @@ public class MatchingController {
         return ResponseEntity.ok(savedMatching);
     }
 
+    /**
+     * API Endpoint that performs a GET request in order to obtain all the activities that an user was mapped to.
+     *
+     * @param userId - String object representing the unique identifier of an User
+     * @return - ResponseEntity object with a message composed of a List of activityID's (which are represented as Longs)
+     */
     @GetMapping("/getUserActivities/{userId}")
     public ResponseEntity<List<Long>> getUserActivities(@PathVariable String userId) {
         return ResponseEntity.ok(matchingServiceImpl.findActivitiesByUserId(userId));
     }
 
+    /**
+     * API Endpoint that performs a POST request in order to let a user unenroll from an activity that he / she
+     * was previously assigned to.
+     *
+     * @param userIdActivityIdPair - Pair object of (userId, activityId) that represents that: the user with 'id' "userID"
+     *      wants to unenroll from activity with 'id' "activityId".
+     *
+     * @return - ResponseEntity object with a message composed of the previously described Pair object
+     */
     @PostMapping("/unenroll")
     public ResponseEntity<Pair<String, Long>> unenroll(@RequestBody Pair<String, Long> userIdActivityIdPair) {
         String userId = userIdActivityIdPair.getFirst();
