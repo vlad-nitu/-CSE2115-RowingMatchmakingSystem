@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class NotificationPublisher {
     private static final MatchingUtils matchingUtils = new MatchingUtils("http://localhost:8086/");
 
-    public void NotifyUser(String userId, String targetId, Long activityId, String position) {
+    public void notifyUser(String userId, String targetId, Long activityId, String position) {
         try {
             BaseNotification notification = new BaseNotification(userId, targetId, activityId, position);
             Response res = matchingUtils.postRequest("/notifyUser", notification);

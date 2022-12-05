@@ -27,6 +27,7 @@ public class Matching {
     @Id
     @Column(name = "activityid")
     private Long activityId;
+    @Id
     @Column(name = "position")
     private String position;
     @Column(name = "pending")

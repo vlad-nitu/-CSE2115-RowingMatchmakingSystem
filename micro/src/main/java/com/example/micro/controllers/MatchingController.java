@@ -30,7 +30,7 @@ public class MatchingController {
         this.notificationPublisher = notificationPublisher;
     }
 
-    @GetMapping ("/getAvailableActivities/{userId}/{timeSlots}")
+    @GetMapping("/getAvailableActivities/{userId}/{timeSlots}")
     public ResponseEntity<List<Pair<Long, String>>> getAvailableActivities(@PathVariable String userId, @PathVariable List<TimeSlot> timeSlots) {
         List<Long> selectedActivities = matchingServiceImpl.findActivitiesByUserId(userId);
         List<TimeSlot> occTimeSlots = activityPublisher.getTimeSlots(selectedActivities);
@@ -38,6 +38,27 @@ public class MatchingController {
         List<Pair<Long, String>> possibleActivities = activityPublisher.getAvailableActivities(userId, newTimeSlots);
         userPublisher.sendAvailableActivities(possibleActivities);
         return ResponseEntity.ok(possibleActivities);
+    }
+
+    @PostMapping("/chooseActivity")
+    public ResponseEntity<Matching> chooseActivity(@RequestBody Matching matching) {
+        matching.setPending(true);
+        Matching savedMatching = matchingServiceImpl.save(matching);
+        String targetId = activityPublisher.getOwnerId(matching.getActivityId());
+        notificationPublisher.notifyUser(matching.getUserId(), targetId, matching.getActivityId(), matching.getPosition());
+        return ResponseEntity.ok(savedMatching);
+    }
+
+    @PostMapping("/decideMatch")
+    public ResponseEntity<Matching> chooseMatch(@RequestBody Matching matching) {
+        matchingServiceImpl.deleteById(matching.getUserId(), matching.getActivityId(), matching.getPosition());
+        matching.setPending(false);
+        Matching savedMatching = matchingServiceImpl.save(matching);
+        activityPublisher.takeAvailableSpot(matching.getActivityId(), matching.getPosition());
+        // User is also the target
+        String userId = matching.getUserId();
+        notificationPublisher.notifyUser(userId, userId, matching.getActivityId(), matching.getPosition());
+        return ResponseEntity.ok(savedMatching);
     }
 
 

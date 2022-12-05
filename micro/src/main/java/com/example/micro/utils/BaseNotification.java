@@ -9,4 +9,6 @@ public class BaseNotification {
     private Long activityId;
     private String position;
 
+
+
 }

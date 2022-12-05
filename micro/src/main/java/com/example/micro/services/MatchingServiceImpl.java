@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.example.micro.utils.CompositeKey;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,5 +34,10 @@ public class MatchingServiceImpl {
                 .map(Matching::getActivityId)
                 .collect(Collectors.toList());
     }
+
+    public void deleteById(String userId, Long activityId, String position){
+        matchingRepository.deleteById(new CompositeKey(userId, activityId, position));
+    }
+
 
 }
