@@ -53,9 +53,9 @@ public class MatchingController {
      * @param timeSlots - Timeslot object representing the start time and end time a user is available between
      * @return - ResponseEntity object with a message composed of all the possible activities a user can be matched to.
      */
-    @GetMapping("/getAvailableActivities/{userId}/{timeSlots}")
+    @PostMapping("/getAvailableActivities/{userId}")
     public ResponseEntity<List<Pair<Long, String>>> getAvailableActivities(@PathVariable String userId,
-                                                                           @PathVariable List<TimeSlot> timeSlots) {
+                                                                           @RequestBody List<TimeSlot> timeSlots) {
         List<Long> selectedActivities = matchingServiceImpl.findActivitiesByUserId(userId);
         List<TimeSlot> occTimeSlots = activityPublisher.getTimeSlots(selectedActivities);
         List<TimeSlot> newTimeSlots = FunctionUtils.filterTimeSlots(timeSlots, occTimeSlots);
@@ -122,7 +122,7 @@ public class MatchingController {
     @PostMapping("/decideMatchDecline/{senderId}")
     public ResponseEntity<Matching> chooseMatchDecline(@RequestBody Matching matching, @PathVariable String senderId) {
         String ownerId = activityPublisher.getOwnerId(matching.getActivityId());
-        if (!Objects.equals(ownerId, senderId)
+        if (! ownerId.equals(senderId)
                 || !matchingServiceImpl.checkId(matching.getUserId(), matching.getActivityId(), matching.getPosition())) {
             return ResponseEntity.badRequest().build();
         }

@@ -51,7 +51,7 @@ public class ActivityPublisher {
     public List<Pair<Long, String>> getAvailableActivities(String userId, List<TimeSlot> timeSlots) {
         try {
             @Cleanup
-            Response res = matchingUtils.getRequest("/sendAvailableActivities/" + userId + "/" + timeSlots);
+            Response res = matchingUtils.postRequest("/sendAvailableActivities/" + userId, timeSlots);
             List<Pair<Long, String>> possibleMatchings = res.readEntity(new GenericType<>() {});
             return possibleMatchings;
 
