@@ -15,16 +15,11 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-abstract class Activity {
+public abstract class Activity {
     @Id
-    @Column(name = "activityID")
-    private Long activityID;
-    @Column(name = "ownerID")
-    private String ownerID;
-    @Column(name = "timeslot")
+    private Long activityId;
+    private String ownerId;
     private TimeSlot timeSlot;
-    @Column(name = "availablePosiitons")
     private List<String> availablePositions;
-    @Column(name = "certificate")
     private String certificate;
 }
