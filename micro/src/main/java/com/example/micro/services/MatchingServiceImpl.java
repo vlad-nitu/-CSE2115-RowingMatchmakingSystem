@@ -46,7 +46,7 @@ public class MatchingServiceImpl {
     }
 
     public Optional<Matching> findMatchingWithPendingTrue(String userId, Long activityId) {
-        return matchingRepository.findMatchingByUserIdAndActivityIdAndPending(userId, activityId,true);
+        return matchingRepository.findMatchingByUserIdAndActivityIdAndPending(userId, activityId, true);
     }
 
     public Boolean checkId(String userId, long activityId, String position) {

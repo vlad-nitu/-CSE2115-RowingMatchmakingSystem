@@ -6,11 +6,11 @@ import com.example.micro.publishers.NotificationPublisher;
 import com.example.micro.publishers.UserPublisher;
 import com.example.micro.services.MatchingServiceImpl;
 import com.example.micro.utils.FunctionUtils;
+import com.example.micro.utils.Pair;
 import com.example.micro.utils.TimeSlot;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -98,7 +98,7 @@ public class MatchingController {
     @PostMapping("/decideMatchAccept/{senderId}")
     public ResponseEntity<Matching> chooseMatchAccept(@RequestBody Matching matching, @PathVariable String senderId) {
         String ownerId = activityPublisher.getOwnerId(matching.getActivityId());
-        if (!Objects.equals(ownerId, senderId)
+        if (ownerId.equals(senderId)
                 || !matchingServiceImpl.checkId(matching.getUserId(), matching.getActivityId(), matching.getPosition())) {
             return ResponseEntity.badRequest().build();
         }
@@ -163,16 +163,6 @@ public class MatchingController {
         activityPublisher.unenroll(userIdActivityIdPair.getSecond(), position);
         matchingServiceImpl.deleteById(userId, activityId, position);
         return ResponseEntity.ok(userIdActivityIdPair);
-    }
-
-    /**
-     * Gets example by id.
-     *
-     * @return the example found in the database with the given id
-     */
-    @GetMapping("/hello")
-    public ResponseEntity<String> helloWorld() {
-        return ResponseEntity.ok("Hello world!");
     }
 
 

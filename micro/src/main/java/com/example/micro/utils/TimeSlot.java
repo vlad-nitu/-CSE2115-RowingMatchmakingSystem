@@ -1,9 +1,8 @@
 package com.example.micro.utils;
 
-import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.Objects;
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class TimeSlot {

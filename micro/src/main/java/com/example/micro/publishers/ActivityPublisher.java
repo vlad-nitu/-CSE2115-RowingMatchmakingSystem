@@ -2,13 +2,13 @@ package com.example.micro.publishers;
 
 import com.example.micro.domain.Matching;
 import com.example.micro.utils.MatchingUtils;
+import com.example.micro.utils.Pair;
 import com.example.micro.utils.TimeSlot;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 import lombok.Cleanup;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 
@@ -88,7 +88,7 @@ public class ActivityPublisher {
      */
     public void takeAvailableSpot(Long activityId, String position) {
         try {
-            Pair<Long, String> posTaken = Pair.of(activityId, position);
+            Pair<Long, String> posTaken = new Pair(activityId, position);
             matchingUtils.postRequest("/takeAvailableSpot", posTaken);
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -103,7 +103,7 @@ public class ActivityPublisher {
      */
     public void unenroll(Long activityId, String position) {
         try {
-            Pair<Long, String> posTaken = Pair.of(activityId, position);
+            Pair<Long, String> posTaken = new Pair(activityId, position);
             matchingUtils.postRequest("/unenrollPosition", posTaken);
         } catch (Exception e) {
             System.out.println(e.getMessage());
