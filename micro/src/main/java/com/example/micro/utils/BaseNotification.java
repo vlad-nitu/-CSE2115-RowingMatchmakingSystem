@@ -8,6 +8,7 @@ public class BaseNotification {
     private String targetId;
     private Long activityId;
     private String position;
+    private String type;
 
 
 

@@ -75,7 +75,7 @@ public class MatchingController {
         matching.setPending(true);
         Matching savedMatching = matchingServiceImpl.save(matching);
         String targetId = activityPublisher.getOwnerId(matching.getActivityId());
-        notificationPublisher.notifyUser(matching.getUserId(), targetId, matching.getActivityId(), matching.getPosition());
+        notificationPublisher.notifyUser(matching.getUserId(), targetId, matching.getActivityId(), matching.getPosition(),"notifyOwner");
         return ResponseEntity.ok(savedMatching);
     }
 
@@ -86,16 +86,23 @@ public class MatchingController {
      * @param matching - Matching object representing the User-Activity pair
      * @return - ResponseEntity object with a message composed of the matching that was accepted or declined
      */
-    @PostMapping("/decideMatch")
-    public ResponseEntity<Matching> chooseMatch(@RequestBody Matching matching) {
+    @PostMapping("/decideMatchAccept")
+    public ResponseEntity<Matching> chooseMatchAccept(@RequestBody Matching matching) {
         matchingServiceImpl.deleteById(matching.getUserId(), matching.getActivityId(), matching.getPosition());
         matching.setPending(false);
         Matching savedMatching = matchingServiceImpl.save(matching);
         activityPublisher.takeAvailableSpot(matching.getActivityId(), matching.getPosition());
         // User is also the target
         String userId = matching.getUserId();
-        notificationPublisher.notifyUser(userId, userId, matching.getActivityId(), matching.getPosition());
+        notificationPublisher.notifyUser(userId, userId, matching.getActivityId(), matching.getPosition(),"notifyUser");
         return ResponseEntity.ok(savedMatching);
+    }
+
+    @PostMapping("/decideMatchDecline")
+    public ResponseEntity<Matching> chooseMatchDecline(@RequestBody Matching matching) {
+        matchingServiceImpl.deleteById(matching.getUserId(), matching.getActivityId(), matching.getPosition());
+        matching.setPending(true);
+        return ResponseEntity.ok(matching);
     }
 
     /**

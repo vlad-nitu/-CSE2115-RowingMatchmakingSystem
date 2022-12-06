@@ -22,9 +22,9 @@ public class NotificationPublisher {
      * @param activityId the activity id of the match
      * @param position the position chosen for the match
      */
-    public void notifyUser(String userId, String targetId, Long activityId, String position) {
+    public void notifyUser(String userId, String targetId, Long activityId, String position, String type) {
         try {
-            BaseNotification notification = new BaseNotification(userId, targetId, activityId, position);
+            BaseNotification notification = new BaseNotification(userId, targetId, activityId, position, type);
             matchingUtils.postRequest("/notifyUser", notification);
         } catch (Exception e) {
             System.out.println(e.getMessage());
