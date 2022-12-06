@@ -18,7 +18,7 @@ public class FunctionUtils {
             boolean isOverlap = false;
             for (TimeSlot o : occTimeSlots) {
                 if (t.overlaps(o)) {
-                    isOverlap = true;
+                    isOverlap ^= true;
                     break;
                 }
             }

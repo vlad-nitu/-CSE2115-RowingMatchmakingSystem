@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
+import lombok.Cleanup;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,7 @@ public class ActivityPublisher {
      */
     public List<TimeSlot> getTimeSlots(List<Long> activityIds) {
         try {
+            @Cleanup
             Response res = matchingUtils.getRequest("/sendTimeSlots/" + activityIds);
             ArrayList<TimeSlot> timeSlots = res.readEntity(new GenericType<>() {});
             return timeSlots;
@@ -47,6 +49,7 @@ public class ActivityPublisher {
      */
     public List<Pair<Long, String>> getAvailableActivities(String userId, List<TimeSlot> timeSlots) {
         try {
+            @Cleanup
             Response res = matchingUtils.getRequest("/sendAvailableActivities/" + userId + "/" + timeSlots);
             List<Pair<Long, String>> possibleMatchings = res.readEntity(new GenericType<>() {});
             return possibleMatchings;
@@ -65,6 +68,7 @@ public class ActivityPublisher {
      */
     public String getOwnerId(Long activityId) {
         try {
+            @Cleanup
             Response res = matchingUtils.getRequest("/sendOwnerId/" + activityId);
             String ownerId = res.readEntity(new GenericType<>() {});
             return ownerId;
@@ -84,8 +88,7 @@ public class ActivityPublisher {
     public void takeAvailableSpot(Long activityId, String position) {
         try {
             Pair<Long, String> posTaken = Pair.of(activityId, position);
-            Response res = matchingUtils.postRequest("/takeAvailableSpot", posTaken);
-
+            matchingUtils.postRequest("/takeAvailableSpot", posTaken);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -100,8 +103,7 @@ public class ActivityPublisher {
     public void unenroll(Long activityId, String position) {
         try {
             Pair<Long, String> posTaken = Pair.of(activityId, position);
-            Response res = matchingUtils.postRequest("/unenrollPosition", posTaken);
-
+            matchingUtils.postRequest("/unenrollPosition", posTaken);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

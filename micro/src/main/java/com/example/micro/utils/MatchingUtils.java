@@ -4,6 +4,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
+import lombok.Cleanup;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 
@@ -27,16 +28,14 @@ public class MatchingUtils {
      */
     public Response getRequest(String path) throws Exception {
         try {
+            @Cleanup
             Response res = client.target(server).path(path)
                     .request(APPLICATION_JSON)
                     .accept(APPLICATION_JSON)
                     .get(Response.class);
-            if ((res.getStatus() / 100) != 2) {
-                throw new Exception("Bad request");
-            }
             return res;
         } catch (Exception e) {
-            throw new Exception(e.getMessage());
+            throw new Exception("Bad request");
         }
     }
 
@@ -50,16 +49,14 @@ public class MatchingUtils {
      */
     public <T> Response postRequest(String path, T data) throws Exception {
         try {
+            @Cleanup
             Response res = client.target(server).path(path)
                     .request(APPLICATION_JSON)
                     .accept(APPLICATION_JSON)
                     .post(Entity.entity(data, APPLICATION_JSON), Response.class);
-            if ((res.getStatus() / 100) != 2) {
-                throw new Exception("Bad request");
-            }
             return res;
         } catch (Exception e) {
-            throw new Exception(e.getMessage());
+            throw new Exception("Bad request");
         }
     }
 

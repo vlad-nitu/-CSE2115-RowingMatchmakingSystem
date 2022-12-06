@@ -21,8 +21,7 @@ public class UserPublisher {
      */
     public void sendAvailableActivities(List<Pair<Long, String>> possibleMatchings) {
         try {
-            Response res = matchingUtils.postRequest("/getAvailableActivities", possibleMatchings);
-
+            matchingUtils.postRequest("/getAvailableActivities", possibleMatchings);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
