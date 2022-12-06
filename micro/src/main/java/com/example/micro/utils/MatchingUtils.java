@@ -28,7 +28,6 @@ public class MatchingUtils {
      */
     public Response getRequest(String path) throws Exception {
         try {
-            @Cleanup
             Response res = client.target(server).path(path)
                     .request(APPLICATION_JSON)
                     .accept(APPLICATION_JSON)
@@ -49,7 +48,6 @@ public class MatchingUtils {
      */
     public <T> Response postRequest(String path, T data) throws Exception {
         try {
-            @Cleanup
             Response res = client.target(server).path(path)
                     .request(APPLICATION_JSON)
                     .accept(APPLICATION_JSON)
