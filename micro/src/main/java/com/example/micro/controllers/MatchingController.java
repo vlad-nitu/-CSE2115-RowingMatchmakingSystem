@@ -72,16 +72,20 @@ public class MatchingController {
      */
     @PostMapping("/chooseActivity")
     public ResponseEntity<Matching> chooseActivity(@RequestBody Matching matching) {
+        if (!activityPublisher.check(matching)) {
+            return ResponseEntity.badRequest().build();
+        }
         matching.setPending(true);
         Matching savedMatching = matchingServiceImpl.save(matching);
         String targetId = activityPublisher.getOwnerId(matching.getActivityId());
-        notificationPublisher.notifyUser(matching.getUserId(), targetId, matching.getActivityId(), matching.getPosition(),"notifyOwner");
+        notificationPublisher.notifyUser(matching.getUserId(), targetId,
+                matching.getActivityId(), matching.getPosition(), "notifyOwner");
         return ResponseEntity.ok(savedMatching);
     }
 
     /**
      * API Endpoint that performs a POST request in order for an owner of a specific activity
-     * to specify the decision of an user asking to take part in his/her activity in a previous request.
+     * to specify that it accepts a user who is asking to take part in his/her activity in a previous request.
      *
      * @param matching - Matching object representing the User-Activity pair
      * @return - ResponseEntity object with a message composed of the matching that was accepted or declined
@@ -94,10 +98,17 @@ public class MatchingController {
         activityPublisher.takeAvailableSpot(matching.getActivityId(), matching.getPosition());
         // User is also the target
         String userId = matching.getUserId();
-        notificationPublisher.notifyUser(userId, userId, matching.getActivityId(), matching.getPosition(),"notifyUser");
+        notificationPublisher.notifyUser(userId, userId, matching.getActivityId(), matching.getPosition(), "notifyUser");
         return ResponseEntity.ok(savedMatching);
     }
 
+    /**
+     * API Endpoint that performs a POST request in order for an owner of a specific activity
+     * to specify that it decline a user who is asking to take part in his/her activity in a previous request.
+     *
+     * @param matching - Matching object representing the User-Activity pair
+     * @return - ResponseEntity object with a message composed of the matching that was accepted or declined
+     */
     @PostMapping("/decideMatchDecline")
     public ResponseEntity<Matching> chooseMatchDecline(@RequestBody Matching matching) {
         matchingServiceImpl.deleteById(matching.getUserId(), matching.getActivityId(), matching.getPosition());

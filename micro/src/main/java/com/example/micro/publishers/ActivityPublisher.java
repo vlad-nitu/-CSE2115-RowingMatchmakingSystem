@@ -1,5 +1,6 @@
 package com.example.micro.publishers;
 
+import com.example.micro.domain.Matching;
 import com.example.micro.utils.MatchingUtils;
 import com.example.micro.utils.TimeSlot;
 import java.util.ArrayList;
@@ -106,6 +107,25 @@ public class ActivityPublisher {
             matchingUtils.postRequest("/unenrollPosition", posTaken);
         } catch (Exception e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     * Checks if a matching is possible.
+     *
+     * @param matching The properties of the matching
+     * @return true of false if it is possible
+     */
+    public Boolean check(Matching matching) {
+        try {
+            @Cleanup
+            Response res = matchingUtils.getRequest("/check/" + matching.getUserId() + "/" + matching.getActivityId());
+            Boolean check = res.readEntity(new GenericType<>() {});
+            return check;
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return false;
         }
     }
 }
