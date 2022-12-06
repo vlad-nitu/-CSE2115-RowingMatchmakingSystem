@@ -11,5 +11,5 @@ import org.springframework.stereotype.Repository;
 public interface MatchingRepository extends JpaRepository<Matching, CompositeKey> {
     Optional<List<Matching>> findMatchingsByUserId(String userId);
 
-    Optional<Matching> findMatchingByUserIdAndActivityId(String userId, Long activityId);
+    Optional<Matching> findMatchingByUserIdAndActivityIdAndPending(String userId, Long activityId, Boolean pending);
 }

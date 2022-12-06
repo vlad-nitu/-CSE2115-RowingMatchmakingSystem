@@ -1,10 +1,12 @@
 package com.example.micro.services;
 
 import com.example.micro.domain.Matching;
+import com.example.micro.publishers.ActivityPublisher;
 import com.example.micro.repositories.MatchingRepository;
 import com.example.micro.utils.CompositeKey;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
@@ -43,8 +45,24 @@ public class MatchingServiceImpl {
         matchingRepository.deleteById(new CompositeKey(userId, activityId, position));
     }
 
-    public String findPosition(String userId, Long activityId) {
-        return matchingRepository.findMatchingByUserIdAndActivityId(userId, activityId).get().getPosition();
+    public Optional<Matching> findMatchingWithPendingTrue(String userId, Long activityId) {
+        return matchingRepository.findMatchingByUserIdAndActivityIdAndPending(userId, activityId,true);
     }
 
+    public Boolean checkId(String userId, long activityId, String position) {
+        return matchingRepository.findById(new CompositeKey(userId, activityId, position)).isPresent();
+    }
+
+    /**
+     * Returns the pending status of a matching.
+     *
+     * @param userId the id of the user
+     * @param activityId the id of the activity
+     * @param position the position of the match
+     * @return the pending status of a match or false if the match does not exist
+     */
+    public Boolean findPending(String userId, long activityId, String position) {
+        Optional<Matching> matching = matchingRepository.findById(new CompositeKey(userId, activityId, position));
+        return matching.map(Matching::isPending).orElse(false);
+    }
 }

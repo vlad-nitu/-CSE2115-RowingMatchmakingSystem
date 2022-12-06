@@ -8,6 +8,8 @@ import com.example.micro.services.MatchingServiceImpl;
 import com.example.micro.utils.FunctionUtils;
 import com.example.micro.utils.TimeSlot;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -72,9 +74,12 @@ public class MatchingController {
      */
     @PostMapping("/chooseActivity")
     public ResponseEntity<Matching> chooseActivity(@RequestBody Matching matching) {
-        if (!activityPublisher.check(matching)) {
+        if (!activityPublisher.check(matching)
+                || matchingServiceImpl.findMatchingWithPendingTrue(matching.getUserId(), matching.getActivityId())
+                .isPresent()) {
             return ResponseEntity.badRequest().build();
         }
+
         matching.setPending(true);
         Matching savedMatching = matchingServiceImpl.save(matching);
         String targetId = activityPublisher.getOwnerId(matching.getActivityId());
@@ -90,8 +95,13 @@ public class MatchingController {
      * @param matching - Matching object representing the User-Activity pair
      * @return - ResponseEntity object with a message composed of the matching that was accepted or declined
      */
-    @PostMapping("/decideMatchAccept")
-    public ResponseEntity<Matching> chooseMatchAccept(@RequestBody Matching matching) {
+    @PostMapping("/decideMatchAccept/{senderId}")
+    public ResponseEntity<Matching> chooseMatchAccept(@RequestBody Matching matching, @PathVariable String senderId) {
+        String ownerId = activityPublisher.getOwnerId(matching.getActivityId());
+        if (!Objects.equals(ownerId, senderId)
+                || !matchingServiceImpl.checkId(matching.getUserId(), matching.getActivityId(), matching.getPosition())) {
+            return ResponseEntity.badRequest().build();
+        }
         matchingServiceImpl.deleteById(matching.getUserId(), matching.getActivityId(), matching.getPosition());
         matching.setPending(false);
         Matching savedMatching = matchingServiceImpl.save(matching);
@@ -109,8 +119,13 @@ public class MatchingController {
      * @param matching - Matching object representing the User-Activity pair
      * @return - ResponseEntity object with a message composed of the matching that was accepted or declined
      */
-    @PostMapping("/decideMatchDecline")
-    public ResponseEntity<Matching> chooseMatchDecline(@RequestBody Matching matching) {
+    @PostMapping("/decideMatchDecline/{senderId}")
+    public ResponseEntity<Matching> chooseMatchDecline(@RequestBody Matching matching, @PathVariable String senderId) {
+        String ownerId = activityPublisher.getOwnerId(matching.getActivityId());
+        if (!Objects.equals(ownerId, senderId)
+                || !matchingServiceImpl.checkId(matching.getUserId(), matching.getActivityId(), matching.getPosition())) {
+            return ResponseEntity.badRequest().build();
+        }
         matchingServiceImpl.deleteById(matching.getUserId(), matching.getActivityId(), matching.getPosition());
         matching.setPending(true);
         return ResponseEntity.ok(matching);
@@ -140,7 +155,11 @@ public class MatchingController {
     public ResponseEntity<Pair<String, Long>> unenroll(@RequestBody Pair<String, Long> userIdActivityIdPair) {
         String userId = userIdActivityIdPair.getFirst();
         Long activityId = userIdActivityIdPair.getSecond();
-        String position = matchingServiceImpl.findPosition(userId, activityId);
+        Optional<Matching> matching = matchingServiceImpl.findMatchingWithPendingTrue(userId, activityId);
+        if (matching.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        String position = matching.get().getPosition();
         activityPublisher.unenroll(userIdActivityIdPair.getSecond(), position);
         matchingServiceImpl.deleteById(userId, activityId, position);
         return ResponseEntity.ok(userIdActivityIdPair);
