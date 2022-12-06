@@ -1,5 +1,18 @@
 package com.example.micro.controllers;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.example.micro.domain.Matching;
 import com.example.micro.publishers.ActivityPublisher;
 import com.example.micro.publishers.NotificationPublisher;
@@ -9,9 +22,13 @@ import com.example.micro.utils.FunctionUtils;
 import com.example.micro.utils.Pair;
 import com.example.micro.utils.TimeSlot;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.checkerframework.checker.nullness.Opt;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -22,19 +39,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
 public class MatchingControllerTest {
@@ -66,7 +70,10 @@ public class MatchingControllerTest {
                 LocalDateTime.of(2002, 11, 2, 15, 00)
         ));
         matching = new Matching("Vlad", 1L, "rower", false);
-        this.matchingController = new MatchingController(matchingServiceImpl, activityPublisher, userPublisher, notificationPublisher);
+        this.matchingController = new MatchingController(matchingServiceImpl,
+                activityPublisher,
+                userPublisher,
+                notificationPublisher);
         mockMvc = MockMvcBuilders
                 .standaloneSetup(matchingController)
                 .build();
@@ -121,6 +128,7 @@ public class MatchingControllerTest {
 
         assertThat(mvcResult.getResponse().getContentAsString()).isEmpty(); // no response received
     }
+
     @Test
     public void chooseActivity() throws Exception {
         Matching savedMatching = new Matching("Niq", 2L, "side", true);
@@ -163,8 +171,8 @@ public class MatchingControllerTest {
     }
 
     @Test
-    public void unenrollFail() throws Exception{
-    // Empty matching found -> badRequest
+    public void unenrollFail() throws Exception {
+        // Empty matching found -> badRequest
         MvcResult mvcResult = mockMvc
                 .perform(post("/unenroll"))
                 .andExpect(status().isBadRequest())
@@ -192,7 +200,7 @@ public class MatchingControllerTest {
     }
 
     @Test
-    public void findAllTest() throws Exception{
+    public void findAllTest() throws Exception  {
         List<Matching> expected = List.of(matching);
         when(matchingServiceImpl.findAll()).thenReturn(expected);
         MvcResult mvcResult = mockMvc
