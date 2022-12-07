@@ -1,4 +1,4 @@
-package utils;
+package com.example.micro.utils;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
