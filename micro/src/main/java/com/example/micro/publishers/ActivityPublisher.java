@@ -17,9 +17,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class ActivityPublisher {
 
-    private static final MatchingUtils matchingUtils = new MatchingUtils("http://localhost:8084/");
+    private final transient MatchingUtils matchingUtils;
+
+    public ActivityPublisher(MatchingUtils matchingUtils) {
+        this.matchingUtils = matchingUtils;
+    }
 
     public ActivityPublisher() {
+        this.matchingUtils = new MatchingUtils("http://localhost:8084/");
     }
 
     /**
@@ -31,7 +36,7 @@ public class ActivityPublisher {
     public List<TimeSlot> getTimeSlots(List<Long> activityIds) {
         try {
             @Cleanup
-            Response res = matchingUtils.getRequest("/sendTimeSlots/" + activityIds);
+            Response res = matchingUtils.postRequest("/sendTimeSlots", activityIds);
             ArrayList<TimeSlot> timeSlots = res.readEntity(new GenericType<>() {});
             return timeSlots;
 

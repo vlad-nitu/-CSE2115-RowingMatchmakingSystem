@@ -8,9 +8,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserPublisher {
 
-    private static transient MatchingUtils matchingUtils = new MatchingUtils("http://localhost:8085/");
+    private final transient MatchingUtils matchingUtils;
+
+    public UserPublisher(MatchingUtils matchingUtils) {
+        this.matchingUtils = matchingUtils;
+    }
 
     public UserPublisher() {
+        this.matchingUtils = new MatchingUtils("http://localhost:8085/");
     }
 
     /**

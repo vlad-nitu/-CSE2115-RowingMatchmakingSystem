@@ -20,6 +20,11 @@ public class MatchingUtils {
         this.client = new ResteasyClientBuilder().build();
     }
 
+    public MatchingUtils() {
+        this.server = "";
+        this.client = new ResteasyClientBuilder().build();
+    }
+
     /**
      * This method is a generic method for a get request.
      *

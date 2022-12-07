@@ -51,7 +51,7 @@ public class MatchingServiceImpl {
 
     public Boolean checkId(String userId, long activityId, String position) {
         Optional<Matching> matching = matchingRepository.findById(new CompositeKey(userId, activityId, position));
-        return matching.isPresent() && matching.get().isPending();
+        return matching.isPresent() && matching.get().getPending();
     }
 
     /**
@@ -64,6 +64,6 @@ public class MatchingServiceImpl {
      */
     public Boolean findPending(String userId, long activityId, String position) {
         Optional<Matching> matching = matchingRepository.findById(new CompositeKey(userId, activityId, position));
-        return matching.map(Matching::isPending).orElse(false);
+        return matching.map(Matching::getPending).orElse(false);
     }
 }

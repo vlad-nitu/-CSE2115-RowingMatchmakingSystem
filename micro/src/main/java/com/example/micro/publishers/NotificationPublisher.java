@@ -6,9 +6,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class NotificationPublisher {
-    private static final MatchingUtils matchingUtils = new MatchingUtils("http://localhost:8086/");
+    private final transient MatchingUtils matchingUtils;
+
+    public NotificationPublisher(MatchingUtils matchingUtils) {
+        this.matchingUtils = matchingUtils;
+    }
 
     public NotificationPublisher() {
+        this.matchingUtils = new MatchingUtils("http://localhost:8086/");
     }
 
 

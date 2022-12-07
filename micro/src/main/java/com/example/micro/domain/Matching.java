@@ -34,5 +34,5 @@ public class Matching {
     @Column(name = "position")
     private String position;
     @Column(name = "pending")
-    private boolean pending;
+    private Boolean pending;
 }
