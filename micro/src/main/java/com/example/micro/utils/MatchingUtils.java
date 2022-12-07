@@ -4,11 +4,12 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
-import lombok.Cleanup;
+import lombok.AllArgsConstructor;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 
 
+@AllArgsConstructor
 public class MatchingUtils {
 
     protected final transient String server;
@@ -62,5 +63,6 @@ public class MatchingUtils {
             throw new Exception("Bad request");
         }
     }
+
 
 }
