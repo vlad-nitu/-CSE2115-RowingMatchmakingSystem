@@ -5,9 +5,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -237,5 +235,23 @@ public class MatchingControllerTest {
         Matching obtained = objectMapper.readValue(contentAsString, Matching.class);
         assertThat(obtained).isEqualTo(savedMatching);
 
+    }
+
+    @Test
+    public void decideMatchAcceptFails1() throws Exception {
+
+        String ownerId = "Vlad";
+        lenient()
+                .when(activityPublisher.getOwnerId(matching.getActivityId())).thenReturn(ownerId);
+
+        MvcResult mvcResult = mockMvc
+                .perform(post("/decideMatchDecline/Vlad"))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).isEqualTo(""); // no response
+
+        verify(matchingServiceImpl, never()).deleteById(anyString(), anyLong(), anyString());
     }
 }
