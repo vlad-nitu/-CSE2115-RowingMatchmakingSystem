@@ -118,7 +118,7 @@ public class MatchingControllerTest {
     @Test
     public void chooseActivityFail2() throws Exception {
         when(activityPublisher.check(any(Matching.class))).thenReturn(true);
-        when(matchingServiceImpl.findMatchingWithPendingTrue(anyString(), anyLong())).thenReturn(Optional.of(matching));
+        when(matchingServiceImpl.findMatchingWithPendingFalse(anyString(), anyLong())).thenReturn(Optional.of(matching));
 
         MvcResult mvcResult = mockMvc
                 .perform(post("/chooseActivity")
@@ -136,7 +136,7 @@ public class MatchingControllerTest {
         Matching savedMatching = new Matching("Niq", 2L, "side", true);
 
         when(activityPublisher.check(any(Matching.class))).thenReturn(true);
-        when(matchingServiceImpl.findMatchingWithPendingTrue(anyString(), anyLong())).thenReturn(Optional.empty());
+        when(matchingServiceImpl.findMatchingWithPendingFalse(anyString(), anyLong())).thenReturn(Optional.empty());
         lenient().when(matchingServiceImpl.save(any(Matching.class))).thenReturn(savedMatching);
         when(activityPublisher.getOwnerId(anyLong())).thenReturn("dummyString");
         doNothing().when(notificationPublisher).notifyUser(anyString(), anyString(), anyLong(), anyString(), anyString());
@@ -186,7 +186,7 @@ public class MatchingControllerTest {
     @Test
     public void unenrollTest() throws Exception {
         Pair<String, Long> expected = new Pair<String, Long>(userId, activityId);
-        when(matchingServiceImpl.findMatchingWithPendingTrue(userId, activityId))
+        when(matchingServiceImpl.findMatchingWithPendingFalse(userId, activityId))
                 .thenReturn(Optional.of(matching));
 
         MvcResult mvcResult = mockMvc

@@ -75,7 +75,7 @@ public class MatchingController {
     @PostMapping("/chooseActivity")
     public ResponseEntity<Matching> chooseActivity(@RequestBody Matching matching) {
         if (!activityPublisher.check(matching)
-                || matchingServiceImpl.findMatchingWithPendingTrue(matching.getUserId(), matching.getActivityId())
+                || matchingServiceImpl.findMatchingWithPendingFalse(matching.getUserId(), matching.getActivityId())
                 .isPresent()) {
             return ResponseEntity.badRequest().build();
         }
@@ -155,7 +155,7 @@ public class MatchingController {
     public ResponseEntity<Pair<String, Long>> unenroll(@RequestBody Pair<String, Long> userIdActivityIdPair) {
         String userId = userIdActivityIdPair.getFirst();
         Long activityId = userIdActivityIdPair.getSecond();
-        Optional<Matching> matching = matchingServiceImpl.findMatchingWithPendingTrue(userId, activityId);
+        Optional<Matching> matching = matchingServiceImpl.findMatchingWithPendingFalse(userId, activityId);
         if (matching.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
