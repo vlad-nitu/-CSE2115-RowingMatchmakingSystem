@@ -33,4 +33,11 @@ public class NotificationPublisherTest {
         notificationPublisher.notifyUser("tataVlad", "Nicu", 1L, "iron", "notifyOwner");
         verify(matchingUtils, times(1)).postRequest("/notifyUser", notification);
     }
+
+    @Test
+    public void notifyUserInvalid() throws Exception {
+        BaseNotification notification = new BaseNotification("tataVlad", "Nicu", 1L, "iron", "notifyOwner");
+        when(matchingUtils.postRequest("/notifyUser", notification)).thenThrow(new Exception("lol"));
+        notificationPublisher.notifyUser("tataVlad", "Nicu", 1L, "iron", "notifyOwner");
+    }
 }

@@ -36,4 +36,12 @@ public class UserPublisherTest {
         userPublisher.sendAvailableActivities(possibleMatchings);
         verify(matchingUtils, times(1)).postRequest("/getAvailableActivities", possibleMatchings);
     }
+
+    @Test
+    public void sendAvailableActivitiesInvalid() throws Exception {
+        List<Pair<Long, String>> possibleMatchings = new ArrayList<>();
+        possibleMatchings.add(new Pair<Long, String>(1L, "iron"));
+        when(matchingUtils.postRequest("/getAvailableActivities", possibleMatchings)).thenThrow(new Exception("lol"));
+        userPublisher.sendAvailableActivities(possibleMatchings);
+    }
 }

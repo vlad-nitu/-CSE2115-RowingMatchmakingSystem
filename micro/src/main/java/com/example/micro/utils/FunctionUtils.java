@@ -3,7 +3,9 @@ package com.example.micro.utils;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 public class FunctionUtils {
     /**
      * Eliminates the time slots that overlap with already existing ones.

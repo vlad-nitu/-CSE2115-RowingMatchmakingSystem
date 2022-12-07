@@ -94,6 +94,29 @@ public class ActivityPublisherTest {
     }
 
     @Test
+    public void unenrollInvalid() throws Exception {
+        Pair<Long, String> posTaken = new Pair<Long, String>(1L, "cox");
+        when(matchingUtils.postRequest("/unenrollPosition", posTaken)).thenThrow(new Exception("lol"));
+        activityPublisher.unenroll(1L, "cox");
+    }
+
+    @Test
+    public void takeAvailableSpotValid() throws Exception {
+        Response res = Response.ok().build();
+        Pair<Long, String> posTaken = new Pair<Long, String>(1L, "cox");
+        when(matchingUtils.postRequest("/takeAvailableSpot", posTaken)).thenReturn(res);
+        activityPublisher.takeAvailableSpot(1L, "cox");
+        verify(matchingUtils, times(1)).postRequest("/takeAvailableSpot", posTaken);
+    }
+
+    @Test
+    public void takeAvailableSpotInvalid() throws Exception {
+        Pair<Long, String> posTaken = new Pair<Long, String>(1L, "cox");
+        when(matchingUtils.postRequest("/takeAvailableSpot", posTaken)).thenThrow(new Exception("lol"));
+        activityPublisher.takeAvailableSpot(1L, "cox");
+    }
+
+    @Test
     public void checkValid() throws Exception {
         Matching a = new Matching("tataVlad", 1L, "maestru", null);
         Response res = Response.ok(true).build();
