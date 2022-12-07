@@ -122,7 +122,7 @@ public class MatchingController {
     @PostMapping("/decideMatchDecline/{senderId}")
     public ResponseEntity<Matching> chooseMatchDecline(@RequestBody Matching matching, @PathVariable String senderId) {
         String ownerId = activityPublisher.getOwnerId(matching.getActivityId());
-        if (! ownerId.equals(senderId)
+        if (ownerId.equals(senderId)
                 || !matchingServiceImpl.checkId(matching.getUserId(), matching.getActivityId(), matching.getPosition())) {
             return ResponseEntity.badRequest().build();
         }

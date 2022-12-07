@@ -154,7 +154,7 @@ public class MatchingControllerTest {
     }
 
     @Test
-    public void  getUserActivitiesTest() throws Exception {
+    public void getUserActivitiesTest() throws Exception {
 
         when(matchingServiceImpl.findActivitiesByUserId("Vlad")).thenReturn(List.of(1L));
 
@@ -198,13 +198,13 @@ public class MatchingControllerTest {
     }
 
     @Test
-    public void findAllTest() throws Exception  {
+    public void findAllTest() throws Exception {
         List<Matching> expected = List.of(matching);
         when(matchingServiceImpl.findAll()).thenReturn(expected);
         MvcResult mvcResult = mockMvc
                 .perform(get("/findAll")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(expected))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(expected))
                 )
                 .andExpect(status().isOk())
                 .andReturn();
@@ -245,6 +245,55 @@ public class MatchingControllerTest {
                 .when(activityPublisher.getOwnerId(matching.getActivityId())).thenReturn(ownerId);
 
         MvcResult mvcResult = mockMvc
+                .perform(post("/decideMatchAccept/Vlad"))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).isEqualTo(""); // no response
+
+        verify(matchingServiceImpl, never()).deleteById(anyString(), anyLong(), anyString());
+    }
+
+    @Test
+    public void decideMatchAcceptPasses() throws Exception {
+        String ownerId = "Radu";
+        lenient()
+                .when(activityPublisher.getOwnerId(matching.getActivityId())).thenReturn(ownerId);
+        lenient()
+                .when(matchingServiceImpl.checkId(anyString(), anyLong(), anyString())).thenReturn(true);
+
+        when(matchingServiceImpl.save(matching)).thenReturn(matching);
+
+        doNothing().when(matchingServiceImpl).deleteById(anyString(), anyLong(), anyString());
+        doNothing().when(activityPublisher).takeAvailableSpot(anyLong(), anyString());
+        doNothing().when(notificationPublisher).notifyUser(anyString(), anyString(), anyLong(), anyString(), anyString());
+
+
+        MvcResult mvcResult = mockMvc
+                .perform(post("/decideMatchAccept/Vlad")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(matching)))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        Matching obtained = objectMapper.readValue(contentAsString, Matching.class);
+        assertThat(obtained).isEqualTo(matching);
+    }
+
+
+    @Test
+    public void decideMatchDeclineFails1() throws Exception {
+        String ownerId = "Radu";
+        lenient()
+                .when(activityPublisher.getOwnerId(matching.getActivityId())).thenReturn(ownerId);
+
+        lenient()
+                .when(matchingServiceImpl.checkId(anyString(), anyLong(), anyString())).thenReturn(true);
+
+        MvcResult mvcResult = mockMvc
                 .perform(post("/decideMatchDecline/Vlad"))
                 .andExpect(status().isBadRequest())
                 .andReturn();
@@ -254,4 +303,33 @@ public class MatchingControllerTest {
 
         verify(matchingServiceImpl, never()).deleteById(anyString(), anyLong(), anyString());
     }
+
+    @Test
+    public void decideMatchDeclinePass() throws Exception {
+
+        String ownerId = "Radu";
+        lenient()
+                .when(activityPublisher.getOwnerId(matching.getActivityId())).thenReturn(ownerId);
+        lenient()
+                .when(matchingServiceImpl.checkId(anyString(), anyLong(), anyString())).thenReturn(true);
+
+        doNothing().when(matchingServiceImpl).deleteById(anyString(), anyLong(), anyString());
+
+
+        MvcResult mvcResult = mockMvc
+                .perform(post("/decideMatchDecline/Vlad")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(matching)))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+        matching.setPending(true);
+
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        Matching obtained = objectMapper.readValue(contentAsString, Matching.class);
+        assertThat(obtained).isEqualTo(matching);
+
+    }
+
 }

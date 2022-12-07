@@ -50,7 +50,8 @@ public class MatchingServiceImpl {
     }
 
     public Boolean checkId(String userId, long activityId, String position) {
-        return matchingRepository.findById(new CompositeKey(userId, activityId, position)).isPresent();
+        Optional<Matching> matching = matchingRepository.findById(new CompositeKey(userId, activityId, position));
+        return matching.isPresent() && matching.get().isPending();
     }
 
     /**
