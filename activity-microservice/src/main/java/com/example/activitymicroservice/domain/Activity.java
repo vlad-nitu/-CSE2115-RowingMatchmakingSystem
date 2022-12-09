@@ -2,10 +2,7 @@ package com.example.activitymicroservice.domain;
 
 import com.example.activitymicroservice.utils.TimeSlot;
 import java.util.List;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,6 +19,7 @@ import lombok.ToString;
 @ToString
 public abstract class Activity {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long activityId;
     private String ownerId;
     @Transient

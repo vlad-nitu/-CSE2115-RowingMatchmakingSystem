@@ -345,4 +345,15 @@
     </module>
 </module>
 
+<dependencyManagement>
+<dependencies>
+    <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-bom</artifactId>
+        <version>3.0.2.Final</version>
+        <type>pom</type>
+        <scope>import</scope>
+    </dependency>
+</dependencies>
+</dependencyManagement>
 
