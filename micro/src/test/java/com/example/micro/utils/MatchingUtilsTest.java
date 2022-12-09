@@ -6,16 +6,25 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -25,7 +34,10 @@ public class MatchingUtilsTest {
 
     public String server;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
+    @Mock
+    private Authentication auth;
+
+    @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
     public ResteasyClient client;
 
     /**
@@ -58,8 +70,9 @@ public class MatchingUtilsTest {
         given(client.target(anyString())
                 .path(anyString())
                 .request(anyString())
+                .header(anyString(), anyString())
                 .accept(anyString())
-                .get(Response.class))
+                .get())
                 .willAnswer(invocation -> Exception.class);
 
         assertThatThrownBy(() ->
@@ -70,16 +83,20 @@ public class MatchingUtilsTest {
 
     @Test
     public void getRequestTest() throws Exception {
+        when(auth.getCredentials()).thenReturn("mockedPassword");
+        SecurityContextHolder.getContext().setAuthentication(auth);
         Response expected = Response.ok().build();
-
         when(client.target(anyString())
                 .path(anyString())
                 .request(anyString())
+                .header(anyString(), anyString())
                 .accept(anyString())
                 .get(Response.class))
                 .thenReturn(Response.ok().build());
 
         Response obtained = matchingUtils.getRequest(server);
+
+        SecurityContextHolder.clearContext();
         assertThat(expected.getStatus())
                 .isEqualTo(obtained.getStatus());
     }
@@ -104,16 +121,16 @@ public class MatchingUtilsTest {
     @Test
     public void postRequestTest() throws Exception {
         String data = "dummyData";
-
         Response expected = Response.ok().build();
-
         when(client.target(anyString())
                 .path(anyString())
                 .request(anyString())
+                .header(anyString(), anyString())
                 .accept(anyString())
                 .post(Entity.entity(data, APPLICATION_JSON), Response.class))
                 .thenReturn(Response.ok().build());
-
+        when(auth.getCredentials()).thenReturn("mockedPassword");
+        SecurityContextHolder.getContext().setAuthentication(auth);
         Response obtained = matchingUtils.postRequest(server, data);
         assertThat(expected.getStatus())
                 .isEqualTo(obtained.getStatus());
