@@ -134,7 +134,7 @@ public class MatchingUtilsTest {
         Response obtained = matchingUtils.postRequest(server, data);
         assertThat(expected.getStatus())
                 .isEqualTo(obtained.getStatus());
-
+        SecurityContextHolder.clearContext();
 
     }
 
