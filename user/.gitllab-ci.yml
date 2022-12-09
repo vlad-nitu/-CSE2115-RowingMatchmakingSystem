@@ -1,0 +1,35 @@
+image: gradle:latest
+
+stages:
+  - build
+  - staticAnalysis
+  - test
+
+variables:
+  # Disable the Gradle daemon to ensure isolated runs of the CI pipeline.
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+build-user:
+  stage: build
+  script:
+    gradle user:assemble user:testClasses
+
+checkStyle-user:
+  stage: staticAnalysis
+  script:
+    gradle user:checkstyleMain user:checkStyleTest
+  allow_failure: true
+
+
+PMD-user:
+  stage: staticAnalysis
+  script:
+    gradle user:pmdMain
+  allow_failure: true
+
+test-user:
+  stage: test
+  script:
+    - gradle user:test user:jacocoTestReport
+    - cat user/build/reports/jacoco/test/html/index.html | grep -Po "Total.*?([0-9]{1,3})%"
+  coverage: /([0-9]{1,3})%/
