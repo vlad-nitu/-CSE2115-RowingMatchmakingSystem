@@ -3,13 +3,11 @@ package com.example.micro.controllers;
 import com.example.micro.domain.Matching;
 import com.example.micro.publishers.ActivityPublisher;
 import com.example.micro.publishers.NotificationPublisher;
-import com.example.micro.publishers.UserPublisher;
 import com.example.micro.services.MatchingServiceImpl;
 import com.example.micro.utils.FunctionUtils;
 import com.example.micro.utils.Pair;
 import com.example.micro.utils.TimeSlot;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +22,6 @@ public class MatchingController {
 
     private final transient MatchingServiceImpl matchingServiceImpl;
     private final transient ActivityPublisher activityPublisher;
-    private final transient UserPublisher userPublisher;
     private final transient NotificationPublisher notificationPublisher;
 
     /**
@@ -32,16 +29,13 @@ public class MatchingController {
      *
      * @param matchingServiceImpl - matching service implementation
      * @param activityPublisher - for communication with Activity microservice through API Endpoints
-     * @param userPublisher - for communication with User microservice through API Endpoints
      * @param notificationPublisher - for communication with Notification microservice through API Endpoints
      */
     public MatchingController(MatchingServiceImpl matchingServiceImpl,
                               ActivityPublisher activityPublisher,
-                              UserPublisher userPublisher,
                               NotificationPublisher notificationPublisher) {
         this.matchingServiceImpl = matchingServiceImpl;
         this.activityPublisher = activityPublisher;
-        this.userPublisher = userPublisher;
         this.notificationPublisher = notificationPublisher;
     }
 
@@ -60,7 +54,6 @@ public class MatchingController {
         List<TimeSlot> occTimeSlots = activityPublisher.getTimeSlots(selectedActivities);
         List<TimeSlot> newTimeSlots = FunctionUtils.filterTimeSlots(timeSlots, occTimeSlots);
         List<Pair<Long, String>> possibleActivities = activityPublisher.getAvailableActivities(userId, newTimeSlots);
-        userPublisher.sendAvailableActivities(possibleActivities);
         return ResponseEntity.ok(possibleActivities);
     }
 

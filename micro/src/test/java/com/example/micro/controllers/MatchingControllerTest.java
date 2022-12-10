@@ -18,23 +18,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.example.micro.domain.Matching;
 import com.example.micro.publishers.ActivityPublisher;
 import com.example.micro.publishers.NotificationPublisher;
-import com.example.micro.publishers.UserPublisher;
 import com.example.micro.services.MatchingServiceImpl;
-import com.example.micro.utils.FunctionUtils;
 import com.example.micro.utils.Pair;
 import com.example.micro.utils.TimeSlot;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.checkerframework.checker.nullness.Opt;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -49,8 +44,6 @@ public class MatchingControllerTest {
     private MatchingServiceImpl matchingServiceImpl;
     @Mock
     private ActivityPublisher activityPublisher;
-    @Mock
-    private UserPublisher userPublisher;
     @Mock
     private NotificationPublisher notificationPublisher;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -74,7 +67,6 @@ public class MatchingControllerTest {
         matching = new Matching("Vlad", 1L, "rower", false);
         this.matchingController = new MatchingController(matchingServiceImpl,
                 activityPublisher,
-                userPublisher,
                 notificationPublisher);
         mockMvc = MockMvcBuilders
                 .standaloneSetup(matchingController)
@@ -87,7 +79,6 @@ public class MatchingControllerTest {
         when(activityPublisher.getTimeSlots(List.of())).thenReturn(List.of());
         // when(FunctionUtils.filterTimeSlots(List.of(), List.of())).thenReturn(List.of());
         when(activityPublisher.getAvailableActivities(userId, List.of())).thenReturn(List.of());
-        doNothing().when(userPublisher).sendAvailableActivities(List.of()); // mock void method
 
         MvcResult result = mockMvc
                 .perform(post("/getAvailableActivities/Vlad")

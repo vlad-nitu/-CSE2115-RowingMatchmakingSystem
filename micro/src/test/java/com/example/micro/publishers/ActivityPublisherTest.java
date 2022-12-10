@@ -120,14 +120,14 @@ public class ActivityPublisherTest {
     public void checkValid() throws Exception {
         Matching a = new Matching("tataVlad", 1L, "maestru", null);
         Response res = Response.ok(true).build();
-        when(matchingUtils.getRequest("/check/tataVlad/1")).thenReturn(res);
+        when(matchingUtils.getRequest("/check/tataVlad/1/maestru")).thenReturn(res);
         assertThat(activityPublisher.check(a)).isEqualTo(true);
     }
 
     @Test
     public void checkInvalid() throws Exception {
         Matching a = new Matching("tataVlad", 1L, "maestru", null);
-        when(matchingUtils.getRequest("/check/tataVlad/1")).thenThrow(new Exception("lol"));
+        when(matchingUtils.getRequest("/check/tataVlad/1/maestru")).thenThrow(new Exception("lol"));
         assertThat(activityPublisher.check(a)).isEqualTo(false);
     }
 }

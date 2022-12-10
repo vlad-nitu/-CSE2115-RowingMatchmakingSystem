@@ -124,7 +124,10 @@ public class ActivityPublisher {
     public Boolean check(Matching matching) {
         try {
             @Cleanup
-            Response res = matchingUtils.getRequest("/check/" + matching.getUserId() + "/" + matching.getActivityId());
+            Response res = matchingUtils.getRequest("/check/"
+                    + matching.getUserId() + "/"
+                    + matching.getActivityId() + "/"
+                    + matching.getPosition());
             Boolean check = res.readEntity(new GenericType<>() {});
             return check;
 
