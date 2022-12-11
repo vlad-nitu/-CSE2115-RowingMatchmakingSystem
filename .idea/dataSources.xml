@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+<<<<<<< HEAD
     <data-source source="LOCAL" name="@ActivityDatabase" uuid="3b2a3acd-7337-488a-bad6-9258e8807a8b">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
       <jdbc-url>jdbc:mysql://projects-db.ewi.tudelft.nl:3306/projects_Activty-microservice</jdbc-url>
+=======
+    <data-source source="LOCAL" name="projects_MatchingMicroservice@projects-db.ewi.tudelft.nl" uuid="f3c1d784-cd25-4077-9e6b-12cd0a63e516">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://projects-db.ewi.tudelft.nl:3306/projects_MatchingMicroservice</jdbc-url>
+>>>>>>> main
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

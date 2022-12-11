@@ -1,6 +1,9 @@
 package nl.tudelft.sem.template.authentication.domain.user;
 
 import java.util.Objects;
+import javax.annotation.processing.Generated;
+import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -8,7 +11,10 @@ import javax.persistence.Id;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Table;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import lombok.NoArgsConstructor;
+import net.bytebuddy.dynamic.loading.InjectionClassLoader;
 import nl.tudelft.sem.template.authentication.domain.HasEvents;
 
 /**
@@ -22,8 +28,8 @@ public class AppUser extends HasEvents {
      * Identifier for the application user.
      */
     @Id
-    @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", nullable = false)
     private int id;
 
     @Column(name = "net_id", nullable = false, unique = true)
