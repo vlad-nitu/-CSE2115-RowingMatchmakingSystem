@@ -2,3 +2,4 @@ include:
   - authentication-microservice/.gitlab-ci.yml
   - example-microservice/.gitlab-ci.yml
   - micro/.gitlab-ci.yml
+  - notification-microservice/.gitlab-ci.yml
