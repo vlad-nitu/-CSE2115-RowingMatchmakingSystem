@@ -1,20 +1,21 @@
 package com.example.activitymicroservice.services;
 
 import com.example.activitymicroservice.domain.Activity;
-import com.example.activitymicroservice.repositories.activityRepo;
+import com.example.activitymicroservice.repositories.ActivityRepository;
 import com.example.activitymicroservice.utils.TimeSlot;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
-public class activityService {
+public class ActivityService {
 
-    private final transient activityRepo activityRepository;
+    private final transient ActivityRepository activityRepository;
 
-    public List<Activity> findAll(){
+    public List<Activity> findAll() {
         return activityRepository.findAll();
     }
 
@@ -22,7 +23,7 @@ public class activityService {
         return activityRepository.save(matching);
     }
 
-    public List<TimeSlot> findTimeslotsByActivityID(){
-        return (List<TimeSlot>) activityRepository.findAll().stream().map(x -> x.getTimeSlot());
+    public List<TimeSlot> findTimeslotsByActivityId() {
+        return activityRepository.findAll().stream().map(Activity::getTimeSlot).collect(Collectors.toList());
     }
 }

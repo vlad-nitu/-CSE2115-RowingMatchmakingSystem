@@ -11,17 +11,17 @@ import java.util.SplittableRandom;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
-public class activityUtil {
+public class ActivityUtils {
 
     private final transient String server;
     private final transient ResteasyClient client;
 
-    public activityUtil(String server) {
+    public ActivityUtils(String server) {
         this.server = server;
         this.client = new ResteasyClientBuilder().build();
     }
 
-    public activityUtil() {
+    public ActivityUtils() {
         this.server = "";
         this.client = new ResteasyClientBuilder().build();
     }
