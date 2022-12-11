@@ -11,5 +11,5 @@ class NotificationMicroserviceApplicationTests {
     void contextLoads() {
     }
     */
-    
+
 }

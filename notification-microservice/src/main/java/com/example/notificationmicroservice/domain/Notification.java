@@ -72,4 +72,9 @@ public class Notification {
                 && getActivityId().equals(that.getActivityId()) && getType().equals(that.getType())
                 && Objects.equals(getPosition(), that.getPosition());
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getUserId(), getTargetId(), getActivityId(), getType(), getPosition());
+    }
 }
