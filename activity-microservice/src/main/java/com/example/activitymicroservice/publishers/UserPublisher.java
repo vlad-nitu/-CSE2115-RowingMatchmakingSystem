@@ -5,6 +5,7 @@ import lombok.Cleanup;
 
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
+import java.util.Collections;
 import java.util.Set;
 
 public class UserPublisher {
@@ -105,7 +106,8 @@ public class UserPublisher {
             return  positions;
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return null;
+            Set<String> emptySet = Collections.<String>emptySet();
+            return emptySet;
         }
     }
 }
