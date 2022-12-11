@@ -24,6 +24,6 @@ public class ActivityService {
     }
 
     public List<TimeSlot> findTimeslotsByActivityId() {
-        return activityRepository.findAll().stream().map(Activity::getTimeSlot).collect(Collectors.toList());
+        return activityRepository.findAll().stream().map(x -> x.getTimeSlot()).collect(Collectors.toList());
     }
 }
