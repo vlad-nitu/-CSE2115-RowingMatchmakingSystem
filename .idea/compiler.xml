@@ -2,15 +2,32 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.24/13a394eed5c4f9efb2a6d956e2086f1d81e857d9/lombok-1.18.24.jar" />
         </processorPath>
-        <module name="nl.tudelft.cse.sem.template.template.authentication-microservice.main" />
-        <module name="nl.tudelft.cse.sem.template.template.example-microservice.main" />
+        <module name="template.authentication-microservice.main" />
+        <module name="SEM.SEM33a.micro.template.micro.main" />
+        <module name="template.example-microservice.main" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="11" />
+    <bytecodeTargetLevel target="11">
+      <module name="commons" target="17" />
+      <module name="commons.main" target="17" />
+      <module name="commons.test" target="17" />
+      <module name="databaseTest.main" target="17" />
+      <module name="databaseTest.test" target="17" />
+      <module name="demo" target="17" />
+      <module name="demo.main" target="17" />
+      <module name="demo.test" target="17" />
+      <module name="demo1" target="17" />
+      <module name="demo1.main" target="17" />
+      <module name="demo1.test" target="17" />
+      <module name="micro" target="17" />
+      <module name="micro.main" target="17" />
+      <module name="micro.test" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>
