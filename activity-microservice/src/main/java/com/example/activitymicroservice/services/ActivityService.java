@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -14,7 +15,7 @@ public class ActivityService {
 
     private final transient ActivityRepository activityRepository;
 
-    public List<Activity> findAll(){
+    public List<Activity> findAll() {
         return activityRepository.findAll();
     }
 
@@ -22,7 +23,7 @@ public class ActivityService {
         return activityRepository.save(matching);
     }
 
-    public List<TimeSlot> findTimeslotsByActivityID(){
-        return (List<TimeSlot>) activityRepository.findAll().stream().map(x -> x.getTimeSlot());
+    public List<TimeSlot> findTimeslotsByActivityId() {
+        return activityRepository.findAll().stream().map(x -> x.getTimeSlot()).collect(Collectors.toList());
     }
 }
