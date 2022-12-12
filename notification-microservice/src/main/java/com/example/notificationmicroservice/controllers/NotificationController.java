@@ -1,5 +1,6 @@
 package com.example.notificationmicroservice.controllers;
 
+import com.example.notificationmicroservice.authentication.AuthManager;
 import com.example.notificationmicroservice.domain.Notification;
 import com.example.notificationmicroservice.services.NotificationDatabaseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +24,12 @@ import java.util.Map;
 public class NotificationController {
 
     private final transient NotificationDatabaseService notificationDatabaseService;
-    //private final transient AuthService
+    private final transient AuthManager authManager;
 
     @Autowired
-    public NotificationController(NotificationDatabaseService notificationDatabaseService) {
+    public NotificationController(NotificationDatabaseService notificationDatabaseService, AuthManager authManager) {
         this.notificationDatabaseService = notificationDatabaseService;
+        this.authManager = authManager;
     }
 
     @GetMapping("/hello")
@@ -43,7 +45,9 @@ public class NotificationController {
      */
 
     @GetMapping("/getNotifications/{targetId}")
-    public ResponseEntity<List<Notification>> getNotificationsByTarget(@PathVariable String targetId) {
+    public ResponseEntity getNotificationsByTarget(@PathVariable String targetId) {
+        if(!authManager.getNetId().equals(targetId))
+            return ResponseEntity.badRequest().body("Only the recipient can ask for their notifications");
         List<Notification> notifications = notificationDatabaseService.findNotificationsByTargetId(targetId);
         notificationDatabaseService.removeNotificationsByTargetId(targetId);
         return ResponseEntity.ok(notifications);
