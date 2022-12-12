@@ -46,17 +46,20 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-//    runtimeOnly 'com.mysql:mysql-connector-j'
-//
-    //Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-//    {
-//
-//        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-//    }
-//    testImplementation('org.junit.jupiter:junit-jupiter:5.8.2')
-//    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.12.4'
-//    testImplementation('org.assertj:assertj-core:3.23.1')
+    implementation 'mysql:mysql-connector-java:8.0.31'
+
+    // Local test database (in-memory)
+    implementation 'com.h2database:h2'
+    developmentOnly 'org.hibernate:hibernate-entitymanager'
+
+    //Testing
+    testImplementation('org.springframework.boot:spring-boot-starter-test'){
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation('org.junit.jupiter:junit-jupiter:5.8.2')
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.12.4'
+    testImplementation('org.assertj:assertj-core:3.23.1')
 }
 
 tasks.named('test') {
