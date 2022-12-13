@@ -90,4 +90,23 @@ class NotificationControllerTest {
         String contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).isEqualTo(expected);
     }
+
+    @Test
+    void validationTest() throws Exception {
+        Notification notification = new Notification("", "", null, "", "cox");
+        String expected = "{\"activityId\":\"activityId is mandatory and cannot be null\",\"" +
+                "targetId\":\"targetId is mandatory and cannot be blank\",\"" +
+                "type\":\"type is mandatory and cannot be blank\",\"userId\":\"" +
+                "userId is mandatory and cannot be blank\"}";
+        MvcResult mvcResult = mockMvc
+                .perform(post("/notifyUser")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(notification))
+                )
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).isEqualTo(expected);
+    }
 }

@@ -11,6 +11,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @NoArgsConstructor
 @EqualsAndHashCode
@@ -26,15 +28,19 @@ public class Notification {
     private Long id;
 
     @Column(name = "userId", nullable = false)
+    @NotBlank(message = "userId is mandatory and cannot be blank")
     private String userId;
 
     @Column(name = "targetId", nullable = false)
+    @NotBlank(message = "targetId is mandatory and cannot be blank")
     private String targetId;
 
     @Column(name = "activityId", nullable = false)
+    @NotNull(message = "activityId is mandatory and cannot be null")
     private Long activityId;
 
     @Column(name = "type", nullable = false)
+    @NotBlank(message = "type is mandatory and cannot be blank")
     private String type;
 
     @Column(name = "position")

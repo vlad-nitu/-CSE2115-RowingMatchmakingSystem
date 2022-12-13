@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,15 +47,16 @@ public class NotificationController {
 
     @GetMapping("/getNotifications/{targetId}")
     public ResponseEntity getNotificationsByTarget(@PathVariable String targetId) {
-        if(!authManager.getNetId().equals(targetId))
+        if (!authManager.getNetId().equals(targetId)) {
             return ResponseEntity.badRequest().body("Only the recipient can ask for their notifications");
+        }
         List<Notification> notifications = notificationDatabaseService.findNotificationsByTargetId(targetId);
         notificationDatabaseService.removeNotificationsByTargetId(targetId);
         return ResponseEntity.ok(notifications);
     }
 
     @PostMapping("/notifyUser")
-    public ResponseEntity<Notification> saveNotification(@RequestBody Notification notification) {
+    public ResponseEntity<Notification> saveNotification(@RequestBody @Valid Notification notification) {
         return ResponseEntity.ok(notificationDatabaseService.save(notification));
     }
 
