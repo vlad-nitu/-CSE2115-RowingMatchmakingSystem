@@ -12,7 +12,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import nl.tudelft.cse.sem.template.user.domain.User;
 import nl.tudelft.cse.sem.template.user.utils.TimeSlot;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
