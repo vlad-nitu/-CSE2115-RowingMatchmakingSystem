@@ -2,6 +2,7 @@ package nl.tudelft.cse.sem.template.user.controllers;
 
 import nl.tudelft.cse.sem.template.user.utils.InputValidation;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +13,9 @@ import nl.tudelft.cse.sem.template.user.domain.User;
 import nl.tudelft.cse.sem.template.user.services.UserService;
 
 import java.util.Optional;
+import javax.ws.rs.Path;
+
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -101,5 +105,15 @@ public class UserController {
     @GetMapping("/sendPositions/{userId}")
     public ResponseEntity<Set<String>> sendPositions(@PathVariable String userId) {
         return ResponseEntity.ok(userService.findPositionsById(userId));
+    }
+
+    /**
+     * Find all users.
+     *
+     * @return - Response of a list of users
+     */
+    @GetMapping(value = "/findAll", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<User>> findAllUsers() {
+        return ResponseEntity.ok(userService.findAll());
     }
 }
