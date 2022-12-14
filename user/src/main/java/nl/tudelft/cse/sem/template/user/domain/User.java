@@ -35,5 +35,5 @@ public class User {
             name = "Availability",
             joinColumns = @JoinColumn(name = "userid")
     )
-    private Set<TimeSlot> timeSlotList;
+    private Set<TimeSlot> timeSlots;
 }
