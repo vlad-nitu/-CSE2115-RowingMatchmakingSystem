@@ -1,4 +1,5 @@
 package nl.tudelft.cse.sem.template.user.utils;
+
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import javax.ws.rs.client.Entity;
