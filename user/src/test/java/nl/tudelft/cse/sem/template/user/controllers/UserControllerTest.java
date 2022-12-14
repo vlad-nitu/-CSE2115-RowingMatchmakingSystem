@@ -66,26 +66,27 @@ public class UserControllerTest {
                 .build();
     }
 
-//    @Test
-//    public void createUserTest() throws Exception{
-//        User savedUser = new User("David", false, 'M',
-//                "Proteus", "none", Set.of("cox"), timeSlots);
-//        when(userService.save(user))
-//                .thenReturn(savedUser);
-//
-//        MvcResult mvcResult = mockMvc
-//                .perform(post("/createUser")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectMapper.writeValueAsString(user))
-//                    )
-//                .andDo(MockMvcResultHandlers.print())
-//                .andExpect(status().isOk())
-//                .andReturn();
-//
-//        String contentAsString = mvcResult.getResponse().getContentAsString();
-//        User obtained = objectMapper.readValue(contentAsString, User.class);
-//        assertThat(obtained).isEqualTo(user);
-//  }
+    //    @Test
+    //    public void createUserTest() throws Exception{
+    //        User savedUser = new User("David", false, 'M',
+    //                "Proteus", "none", Set.of("cox"), timeSlots);
+    //        when(userService.save(user))
+    //                .thenReturn(savedUser);
+    //
+    //        MvcResult mvcResult = mockMvc
+    //                .perform(post("/createUser")
+    //                        .contentType(MediaType.APPLICATION_JSON)
+    //                        .content(objectMapper.writeValueAsString(user))
+    //                    )
+    //                .andDo(MockMvcResultHandlers.print())
+    //                .andExpect(status().isOk())
+    //                .andReturn();
+    //
+    //        String contentAsString = mvcResult.getResponse().getContentAsString();
+    //        User obtained = objectMapper.readValue(contentAsString, User.class);
+    //        assertThat(obtained).isEqualTo(user);
+    //  }
+
     @Test
     public void findAllTest() throws Exception {
         List<User> expected = List.of(user);
