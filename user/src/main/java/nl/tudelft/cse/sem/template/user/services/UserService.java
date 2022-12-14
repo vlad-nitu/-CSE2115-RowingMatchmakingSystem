@@ -17,16 +17,18 @@ public class UserService {
     private final transient UserRepository userRepository;
 
     /**
-     * Finds all the users stored in the database
-     * @return List<User> containing all the users persisted in the repository
+     * Finds all the users stored in the database.
+     *
+     * @return List {@literal <}User{@literal >} containing all the users persisted in the repository
      */
     public List<User> findAll() {
         return userRepository.findAll();
     }
 
     /**
-     * Saves a new user in the database
-     * @param user
+     * Saves a new user in the database.
+     *
+     * @param user - the User object to be persisted in the repository
      * @return User object containing the saved user
      */
     public User save(User user) {
@@ -34,54 +36,59 @@ public class UserService {
     }
 
     /**
-     * Finds competitiveness corresponding to the given userId
+     * Finds competitiveness corresponding to the given userId.
+     *
      * @param userId - the ID of the user
      * @return boolean defining whether the user is competetive
      */
-    public boolean findCompetitivenessByUserId(String userId){
+    public boolean findCompetitivenessByUserId(String userId) {
         Optional<User> user = userRepository.findById(userId);
         return user.get().isCompetitive();
     }
 
     /**
-     * Finds the gender corresponding to the given userId
+     * Finds the gender corresponding to the given userId.
+     *
      * @param userId - the ID of the user
      * @return character defining the user's gender
      */
-    public Character findGenderById(String userId){
+    public Character findGenderById(String userId) {
         Optional<User> user = userRepository.findById(userId);
         return user.get().getGender();
     }
 
 
     /**
-     * Finds the certificate possessed by the user with the given ID
+     * Finds the certificate possessed by the user with the given ID.
+     *
      * @param userId - the ID of the user
      * @return String containing the user's certificate
      */
-    public String findCertificateById(String userId){
+    public String findCertificateById(String userId) {
         Optional<User> user = userRepository.findById(userId);
         return user.get().getCertificate();
     }
 
 
     /**
-     * Finds the organisation corresponding to the given userId
+     * Finds the organisation corresponding to the given userId.
+     *
      * @param userId - the ID of the user
      * @return String containing the organisation the user is a part of
      */
-    public String findOrganisationById(String userId){
+    public String findOrganisationById(String userId) {
         Optional<User> user = userRepository.findById(userId);
         return user.get().getOrganisation();
     }
 
 
     /**
-     * Finds the positions the user with the given userId is capable of filling
+     * Finds the positions the user with the given userId is capable of filling.
+     *
      * @param userId - the ID of the user
-     * @return Set<String> containing the positions the user is able to fulfill
+     * @return Set {@literal <}String{@literal >} containing the positions the user is able to fulfill
      */
-    public Set<String> findPositionsById(String userId){
+    public Set<String> findPositionsById(String userId) {
         Optional<User> user = userRepository.findById(userId);
         return user.get().getPositions();
     }
