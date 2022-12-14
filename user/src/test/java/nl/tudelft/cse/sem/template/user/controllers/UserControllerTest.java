@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import nl.tudelft.cse.sem.template.user.domain.User;
 import nl.tudelft.cse.sem.template.user.utils.TimeSlot;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ import java.util.Set;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -66,14 +68,17 @@ public class UserControllerTest {
 
 //    @Test
 //    public void createUserTest() throws Exception{
+//        User savedUser = new User("David", false, 'M',
+//                "Proteus", "none", Set.of("cox"), timeSlots);
 //        when(userService.save(user))
-//                .thenReturn(user);
+//                .thenReturn(savedUser);
 //
 //        MvcResult mvcResult = mockMvc
 //                .perform(post("/createUser")
 //                        .contentType(MediaType.APPLICATION_JSON)
 //                        .content(objectMapper.writeValueAsString(user))
 //                    )
+//                .andDo(MockMvcResultHandlers.print())
 //                .andExpect(status().isOk())
 //                .andReturn();
 //
