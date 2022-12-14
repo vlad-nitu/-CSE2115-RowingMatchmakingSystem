@@ -76,7 +76,10 @@ public class UserService {
      */
     public String findCertificateById(String userId) {
         Optional<User> user = userRepository.findById(userId);
-        return user.get().getCertificate();
+        if (user.isPresent()) {
+            return user.get().getCertificate();
+        }
+        return null;
     }
 
 
@@ -86,7 +89,7 @@ public class UserService {
      * @param userId - the ID of the user
      * @return String containing the organisation the user is a part of
      */
-    public String findOrganizationById(String userId) {
+    public String findOrganisationById(String userId) {
         Optional<User> user = userRepository.findById(userId);
         return user.get().getOrganisation();
     }
@@ -102,7 +105,4 @@ public class UserService {
         Optional<User> user = userRepository.findById(userId);
         return user.get().getPositions();
     }
-
-
-
 }

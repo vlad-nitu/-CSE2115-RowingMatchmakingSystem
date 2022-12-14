@@ -90,7 +90,7 @@ public class UserController {
      */
     @GetMapping("/sendOrganization/{userId}")
     public ResponseEntity<String> sendOrganization(@PathVariable String userId) {
-        return ResponseEntity.ok(userService.findOrganizationById(userId));
+        return ResponseEntity.ok(userService.findOrganisationById(userId));
     }
 
     /**

@@ -148,7 +148,7 @@ public class UserControllerTest {
     @Test
     public void sendOrganizationTest() throws Exception {
         String expected = "Laga";
-        when(userService.findOrganizationById(userId)).thenReturn(expected);
+        when(userService.findOrganisationById(userId)).thenReturn(expected);
         MvcResult mvcResult = mockMvc
                 .perform(get("/sendOrganization/LotteKremer"))
                 .andExpect(status().isOk())
@@ -172,4 +172,5 @@ public class UserControllerTest {
         assertThat(contentAsString).contains("Cox");
         assertThat(contentAsString).contains("Coach");
     }
+
 }
