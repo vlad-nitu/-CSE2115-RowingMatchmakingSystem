@@ -74,23 +74,23 @@ public class UserControllerTest {
                 .standaloneSetup(userController)
                 .build();
     }
-    @Test
-    public void createUserTest() throws Exception{
-        when(userService.save(user))
-                .thenReturn(user);
-
-        MvcResult mvcResult = mockMvc
-                .perform(post("/createUser")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(user))
-                    )
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String contentAsString = mvcResult.getResponse().getContentAsString();
-        User obtained = objectMapper.readValue(contentAsString, User.class);
-        assertThat(obtained).isEqualTo(user);
-    }
+//    @Test
+//    public void createUserTest() throws Exception{
+//        when(userService.save(user))
+//                .thenReturn(user);
+//
+//        MvcResult mvcResult = mockMvc
+//                .perform(post("/createUser")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsString(user))
+//                    )
+//                .andExpect(status().isOk())
+//                .andReturn();
+//
+//        String contentAsString = mvcResult.getResponse().getContentAsString();
+//        User obtained = objectMapper.readValue(contentAsString, User.class);
+//        assertThat(obtained).isEqualTo(user);
+//    }
     @Test
     public void findAllTest() throws Exception {
         List<User> expected = List.of(user);
