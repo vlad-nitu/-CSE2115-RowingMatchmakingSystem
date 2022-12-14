@@ -26,6 +26,16 @@ public class UserService {
     }
 
     /**
+     * Find the user with the given ID.
+     *
+     * @param userId - the ID of the user
+     * @return User object if a match is found, null otherwise
+     */
+    public Optional<User> findUserById(String userId) {
+        return userRepository.findById(userId);
+    }
+
+    /**
      * Saves a new user in the database.
      *
      * @param user - the User object to be persisted in the repository
