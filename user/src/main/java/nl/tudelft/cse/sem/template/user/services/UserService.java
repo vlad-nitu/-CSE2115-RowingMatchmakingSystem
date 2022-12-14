@@ -76,7 +76,7 @@ public class UserService {
      * @param userId - the ID of the user
      * @return String containing the organisation the user is a part of
      */
-    public String findOrganisationById(String userId) {
+    public String findOrganizationById(String userId) {
         Optional<User> user = userRepository.findById(userId);
         return user.get().getOrganisation();
     }
