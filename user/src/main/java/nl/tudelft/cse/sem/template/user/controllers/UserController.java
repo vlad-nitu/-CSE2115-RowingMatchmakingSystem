@@ -1,5 +1,7 @@
 package nl.tudelft.cse.sem.template.user.controllers;
 
+import nl.tudelft.cse.sem.template.user.utils.InputValidation;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -8,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import nl.tudelft.cse.sem.template.user.domain.User;
 import nl.tudelft.cse.sem.template.user.services.UserService;
+
+import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -31,7 +35,14 @@ public class UserController {
      * @return ResponseEntity object with a message composed of the User that was added
      */
     @PostMapping("/createUser")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    public ResponseEntity createUser(@RequestBody User user) {
+        if (!InputValidation.userIdValidation(user.getUserId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("The provided ID is invalid!");
+        }
+        Optional<User> foundUser = userService.findUserById(user.getUserId());
+        if (foundUser.isPresent()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User with the given ID already exists!");
+        }
         return ResponseEntity.ok(userService.save(user));
     }
 
