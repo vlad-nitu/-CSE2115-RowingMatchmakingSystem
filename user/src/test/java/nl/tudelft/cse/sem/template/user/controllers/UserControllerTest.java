@@ -80,7 +80,7 @@ public class UserControllerTest {
 //        String contentAsString = mvcResult.getResponse().getContentAsString();
 //        User obtained = objectMapper.readValue(contentAsString, User.class);
 //        assertThat(obtained).isEqualTo(user);
-//    }
+//  }
     @Test
     public void findAllTest() throws Exception {
         List<User> expected = List.of(user);
