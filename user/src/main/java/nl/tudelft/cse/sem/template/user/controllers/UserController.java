@@ -13,8 +13,6 @@ import nl.tudelft.cse.sem.template.user.domain.User;
 import nl.tudelft.cse.sem.template.user.services.UserService;
 
 import java.util.Optional;
-import javax.ws.rs.Path;
-
 import java.util.List;
 import java.util.Set;
 

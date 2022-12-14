@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import nl.tudelft.cse.sem.template.user.domain.User;
 import nl.tudelft.cse.sem.template.user.utils.TimeSlot;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
@@ -73,7 +74,23 @@ public class UserControllerTest {
                 .standaloneSetup(userController)
                 .build();
     }
+    @Test
+    public void createUserTest() throws Exception{
+        when(userService.save(user))
+                .thenReturn(user);
 
+        MvcResult mvcResult = mockMvc
+                .perform(post("/createUser")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(user))
+                    )
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        User obtained = objectMapper.readValue(contentAsString, User.class);
+        assertThat(obtained).isEqualTo(user);
+    }
     @Test
     public void findAllTest() throws Exception {
         List<User> expected = List.of(user);
@@ -159,7 +176,4 @@ public class UserControllerTest {
         assertThat(contentAsString).contains("Cox");
         assertThat(contentAsString).contains("Coach");
     }
-
-    @Test
-    public void
 }
