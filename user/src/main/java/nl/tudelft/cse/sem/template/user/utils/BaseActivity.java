@@ -2,8 +2,8 @@ package nl.tudelft.cse.sem.template.user.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-
 import java.util.List;
+
 @AllArgsConstructor
 @EqualsAndHashCode
 public class BaseActivity {

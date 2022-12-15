@@ -1,7 +1,11 @@
 package nl.tudelft.cse.sem.template.user.publishers;
 
+import lombok.Cleanup;
+import nl.tudelft.cse.sem.template.user.utils.BaseActivity;
 import nl.tudelft.cse.sem.template.user.utils.UserUtils;
 import org.springframework.stereotype.Service;
+
+import javax.ws.rs.core.Response;
 
 @Service
 public class ActivityPublisher {
@@ -14,4 +18,16 @@ public class ActivityPublisher {
     public ActivityPublisher() {
         this.userUtils = new UserUtils("http://localhost:8084/");
     }
+
+    // We still need to find a way here to make a distinction between a competition and a training
+    // I would maybe suggest to send all the information necessary for a competition together with the type
+    // and then to make the logic division between this (with casting?)
+    public void createActivity(BaseActivity activity) throws Exception {
+        try {
+            Response res = userUtils.postRequest("/createActivity", activity);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
 }
