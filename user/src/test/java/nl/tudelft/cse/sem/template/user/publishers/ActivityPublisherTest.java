@@ -28,10 +28,10 @@ public class ActivityPublisherTest {
     //private List<TimeSlot> timeSlots;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         activityPublisher = new ActivityPublisher(userUtils);
         TimeSlot timeSlot = new TimeSlot(LocalDateTime.of(2022, 12, 15, 16, 15),
-        LocalDateTime.of(2022, 12, 15, 17, 45));
+                LocalDateTime.of(2022, 12, 15, 17, 45));
         activity = new BaseActivity(1L, "LotteKremer", timeSlot, List.of("cox"), "C4");
     }
 

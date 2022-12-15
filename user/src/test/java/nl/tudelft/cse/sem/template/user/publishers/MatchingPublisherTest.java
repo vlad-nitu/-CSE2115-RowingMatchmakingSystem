@@ -48,31 +48,64 @@ public class MatchingPublisherTest {
     @Test
     public void getAvailableActivitiesTestInvalid() throws Exception {
         when(userUtils.postRequest("/getAvailableActivities/LotteKremer", timeSlots)).thenThrow(new Exception());
-        assertThat(matchingPublisher.getAvailableActivities("LotteKremer", timeSlots)).
-                isEqualTo(new ArrayList<Pair<Long, String>>());
+        assertThat(matchingPublisher.getAvailableActivities("LotteKremer", timeSlots))
+                .isEqualTo(new ArrayList<Pair<Long, String>>());
     }
 
     @Test
-    public void getUserActivitiesValid() {}
+    public void getUserActivitiesValid() throws Exception {
+        List<Long> activityIds = List.of(1L, 2L, 3L);
+        Response res = Response.ok(activityIds).build();
+        when(userUtils.getRequest("/getUserActivities/LotteKremer")).thenReturn(res);
+        assertThat(matchingPublisher.getUserActivities("LotteKremer")).isEqualTo(activityIds);
+    }
 
     @Test
-    public void getUserActivitiesTestInvalid() {}
+    public void getUserActivitiesTestInvalid() throws Exception {
+        when(userUtils.getRequest("/getUserActivities/LotteKremer")).thenThrow(new Exception());
+        assertThat(matchingPublisher.getUserActivities("LotteKremer")).isEqualTo(new ArrayList<Long>());
+    }
 
     @Test
-    public void decideMatchTestValid() {}
+    public void decideMatchTestValid() throws Exception {
+        Response res = Response.ok(matching).build();
+        when(userUtils.postRequest("/decideMatch/LotteKremer/accept", matching)).thenReturn(res);
+        assertThat(matchingPublisher.decideMatch("LotteKremer", "accept", matching)).isEqualTo(matching);
+    }
 
     @Test
-    public void decideMatchTestInvalid() {}
+    public void decideMatchTestInvalid() throws Exception {
+        when(userUtils.postRequest("/decideMatch/LotteKremer/accept", matching))
+                .thenThrow(new Exception());
+        assertThat(matchingPublisher.decideMatch("LotteKremer", "accept", matching))
+                .isEqualTo(new BaseMatching());
+    }
 
     @Test
-    public void chooseActivityTestValid() {}
+    public void chooseActivityTestInvalid() throws Exception {
+        when(userUtils.postRequest("/chooseActivity", matching)).thenThrow(new Exception());
+        assertThat(matchingPublisher.chooseActivity(matching)).isEqualTo(new BaseMatching());
+    }
 
     @Test
-    public void chooseActivityTestInvalid() {}
+    public void chooseActivityTestValid() throws Exception {
+        Response res = Response.ok(matching).build();
+        when(userUtils.postRequest("/chooseActivity", matching)).thenReturn(res);
+        assertThat(matchingPublisher.chooseActivity(matching)).isEqualTo(matching);
+    }
 
     @Test
-    public void unenrollTestValid() {}
+    public void unenrollTestValid() throws Exception {
+        Pair<String, Long>  userActivityPair = new Pair<String, Long>("LotteKremer", 1L);
+        Response res = Response.ok(userActivityPair).build();
+        when(userUtils.postRequest("/unenroll", userActivityPair)).thenReturn(res);
+        assertThat(matchingPublisher.unenroll(userActivityPair)).isEqualTo(userActivityPair);
+    }
 
     @Test
-    public void unenrollTestInvalid() {}
+    public void unenrollTestInvalid() throws Exception {
+        Pair<String, Long>  userActivityPair = new Pair<String, Long>("LotteKremer", 1L);
+        when(userUtils.postRequest("/unenroll", userActivityPair)).thenThrow(new Exception());
+        assertThat(matchingPublisher.unenroll(userActivityPair)).isEqualTo(new Pair<String, Long>());
+    }
 }
