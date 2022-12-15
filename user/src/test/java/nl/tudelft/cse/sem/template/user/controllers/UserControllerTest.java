@@ -71,7 +71,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void createUserTest() throws Exception{
+    public void createUserTest() throws Exception {
         when(userService.save(user))
                 .thenReturn(user);
 
@@ -87,7 +87,7 @@ public class UserControllerTest {
         String contentAsString = mvcResult.getResponse().getContentAsString();
         User obtained = objectMapper.readValue(contentAsString, User.class);
         assertThat(obtained).isEqualTo(user);
-  }
+    }
 
     @Test
     public void findAllTest() throws Exception {
