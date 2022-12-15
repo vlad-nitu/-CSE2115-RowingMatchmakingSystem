@@ -1,6 +1,7 @@
 package nl.tudelft.cse.sem.template.user.publishers;
 
 import lombok.Cleanup;
+import lombok.Generated;
 import nl.tudelft.cse.sem.template.user.utils.BaseNotification;
 import nl.tudelft.cse.sem.template.user.utils.UserUtils;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
 @Service
+@Generated
 public class NotificationPublisher {
 
     private final transient UserUtils userUtils;
