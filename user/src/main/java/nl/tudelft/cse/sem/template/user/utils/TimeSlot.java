@@ -3,15 +3,16 @@ package nl.tudelft.cse.sem.template.user.utils;
 import java.time.LocalDateTime;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
 import javax.persistence.*;
 
 @Embeddable
 @NoArgsConstructor
 @EqualsAndHashCode
 public class TimeSlot {
+
     @Column(name = "starttime")
     private LocalDateTime start;
+
     @Column(name = "endtime")
     private LocalDateTime end;
 

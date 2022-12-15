@@ -1,6 +1,8 @@
 package nl.tudelft.cse.sem.template.user.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import nl.tudelft.cse.sem.template.user.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import nl.tudelft.cse.sem.template.user.domain.User;
 import nl.tudelft.cse.sem.template.user.utils.TimeSlot;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
@@ -45,6 +48,8 @@ public class UserControllerTest {
 
     @BeforeEach
     void setUp() {
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         userId = "LotteKremer";
         certificate = "C4";
         organization = "Laga";
@@ -65,26 +70,24 @@ public class UserControllerTest {
                 .build();
     }
 
-    //    @Test
-    //    public void createUserTest() throws Exception{
-    //        User savedUser = new User("David", false, 'M',
-    //                "Proteus", "none", Set.of("cox"), timeSlots);
-    //        when(userService.save(user))
-    //                .thenReturn(savedUser);
-    //
-    //        MvcResult mvcResult = mockMvc
-    //                .perform(post("/createUser")
-    //                        .contentType(MediaType.APPLICATION_JSON)
-    //                        .content(objectMapper.writeValueAsString(user))
-    //                    )
-    //                .andDo(MockMvcResultHandlers.print())
-    //                .andExpect(status().isOk())
-    //                .andReturn();
-    //
-    //        String contentAsString = mvcResult.getResponse().getContentAsString();
-    //        User obtained = objectMapper.readValue(contentAsString, User.class);
-    //        assertThat(obtained).isEqualTo(user);
-    //  }
+    @Test
+    public void createUserTest() throws Exception{
+        when(userService.save(user))
+                .thenReturn(user);
+
+        MvcResult mvcResult = mockMvc
+                .perform(post("/createUser")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(user))
+                    )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        User obtained = objectMapper.readValue(contentAsString, User.class);
+        assertThat(obtained).isEqualTo(user);
+  }
 
     @Test
     public void findAllTest() throws Exception {

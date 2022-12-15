@@ -37,14 +37,14 @@ public class UserController {
      * @return ResponseEntity object with a message composed of the User that was added
      */
     @PostMapping("/createUser")
-    public ResponseEntity createUser(@RequestBody User user) {
-        if (!InputValidation.userIdValidation(user.getUserId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("The provided ID is invalid!");
-        }
-        Optional<User> foundUser = userService.findUserById(user.getUserId());
-        if (foundUser.isPresent()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User with the given ID already exists!");
-        }
+    public ResponseEntity<User> createUser(@RequestBody User user) {
+//        if (!InputValidation.userIdValidation(user.getUserId())) {
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("The provided ID is invalid!");
+//        }
+//        Optional<User> foundUser = userService.findUserById(user.getUserId());
+//        if (foundUser.isPresent()) {
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User with the given ID already exists!");
+//        }
         return ResponseEntity.ok(userService.save(user));
     }
 
