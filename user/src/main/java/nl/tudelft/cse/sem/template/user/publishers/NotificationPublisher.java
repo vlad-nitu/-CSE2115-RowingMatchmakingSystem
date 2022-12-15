@@ -21,6 +21,13 @@ public class NotificationPublisher {
         this.userUtils = new UserUtils("http://localhost:8086/");
     }
 
+    // do we need a list of notifications here?
+    /**
+     * Requests all the notifications that are collected for the user and have not been seen yet.
+     *
+     * @param userId the id of the user requesting the notifications
+     * @return the received notification, if any are present
+     */
     public BaseNotification getNotifications(String userId) {
         try {
             @Cleanup
