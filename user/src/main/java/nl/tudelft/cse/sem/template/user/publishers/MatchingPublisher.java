@@ -35,6 +35,7 @@ public class MatchingPublisher {
      */
     public List<Pair<Long, String>> getAvailableActivities(String userId, List<TimeSlot> timeSlots) {
         try {
+            @Cleanup
             Response res = userUtils.postRequest("/getAvailableActivities/" + userId, timeSlots);
             List<Pair<Long, String>> availableActivities = res.readEntity(new GenericType<>() {});
             return availableActivities;
@@ -72,6 +73,7 @@ public class MatchingPublisher {
      */
     public BaseMatching decideMatch(String userId, String type, BaseMatching matching) {
         try {
+            @Cleanup
             Response res = userUtils.postRequest("/decideMatch/" + userId + "/" + type, matching);
             BaseMatching matchResult = res.readEntity(new GenericType<>() {});
             return matchResult;
@@ -90,6 +92,7 @@ public class MatchingPublisher {
      */
     public BaseMatching chooseActivity(BaseMatching matching) {
         try {
+            @Cleanup
             Response res = userUtils.postRequest("/chooseActivity", matching);
             BaseMatching matchResult = res.readEntity(new GenericType<>() {});
             return matchResult;
@@ -102,12 +105,13 @@ public class MatchingPublisher {
     /**
      * Sends a request to unenroll from an activity the user was participating in.
      *
-     *  @param userIdActivityIdPair A pair which is the combination of the activity id from the activity
+     * @param userIdActivityIdPair A pair which is the combination of the activity id from the activity
      *                             where the user wants to unenroll from and the user id itself
      * @return a copy of the pair when unenrollment was succesful
      */
     public Pair<String, Long> unenroll(Pair<String, Long> userIdActivityIdPair) {
         try {
+            @Cleanup
             Response res = userUtils.postRequest("/unenroll", userIdActivityIdPair);
             Pair<String, Long> receivedPair = res.readEntity(new GenericType<>() {});
             return receivedPair;

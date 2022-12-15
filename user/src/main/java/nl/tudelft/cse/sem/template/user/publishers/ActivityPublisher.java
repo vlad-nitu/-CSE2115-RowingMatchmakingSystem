@@ -30,7 +30,7 @@ public class ActivityPublisher {
      */
     public void createActivity(BaseActivity activity) throws Exception {
         try {
-            Response res = userUtils.postRequest("/createActivity", activity);
+            userUtils.postRequest("/createActivity", activity);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
