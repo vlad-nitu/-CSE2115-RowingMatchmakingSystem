@@ -38,13 +38,15 @@ public class UserController {
      */
     @PostMapping("/createUser")
     public ResponseEntity<User> createUser(@RequestBody User user) {
-//        if (!InputValidation.userIdValidation(user.getUserId())) {
+        if (!InputValidation.userIdValidation(user.getUserId())) {
 //            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("The provided ID is invalid!");
-//        }
-//        Optional<User> foundUser = userService.findUserById(user.getUserId());
-//        if (foundUser.isPresent()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        Optional<User> foundUser = userService.findUserById(user.getUserId());
+        if (foundUser.isPresent()) {
 //            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User with the given ID already exists!");
-//        }
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         return ResponseEntity.ok(userService.save(user));
     }
 
