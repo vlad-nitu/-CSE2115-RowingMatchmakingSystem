@@ -44,6 +44,7 @@ public class Notification {
     private String type;
 
     @Column(name = "position")
+    @NotBlank(message = "position is mandatory and cannot be blank")
     private String position;
 
     /** This Notification constructor is needed because I can't use.
@@ -61,5 +62,19 @@ public class Notification {
         this.activityId = activityId;
         this.type = type;
         this.position = position;
+    }
+
+    /** The message that is to be sent to the user based on notification type and position.
+     *
+     * @return the built message
+     */
+    public String buildMessage() {
+        if (type.equals("notifyUser")) {
+            return "Congratulations, you have been accepted as a " + position
+                    + " for activity with Id: " + activityId;
+        } else  {
+            return "A new user has applied as a " + position
+                    + " for activity with Id: " + activityId;
+        }
     }
 }

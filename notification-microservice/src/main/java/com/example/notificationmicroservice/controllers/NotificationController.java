@@ -3,6 +3,7 @@ package com.example.notificationmicroservice.controllers;
 import com.example.notificationmicroservice.authentication.AuthManager;
 import com.example.notificationmicroservice.domain.Notification;
 import com.example.notificationmicroservice.services.NotificationDatabaseService;
+import com.example.notificationmicroservice.utils.NotificationStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,11 +28,19 @@ public class NotificationController {
 
     private final transient NotificationDatabaseService notificationDatabaseService;
     private final transient AuthManager authManager;
+    private transient NotificationStrategy strategy;
 
+    /** Notification controller for injection.
+     *
+     * @param notificationDatabaseService service that communicates with the notification database
+     * @param authManager authentication manager
+     */
     @Autowired
-    public NotificationController(NotificationDatabaseService notificationDatabaseService, AuthManager authManager) {
+    public NotificationController(NotificationDatabaseService notificationDatabaseService,
+                                  AuthManager authManager, NotificationStrategy strategy) {
         this.notificationDatabaseService = notificationDatabaseService;
         this.authManager = authManager;
+        this.strategy = strategy;
     }
 
     @GetMapping("/hello")
@@ -44,20 +54,32 @@ public class NotificationController {
      * @param targetId the requesting user that wants to get notifications
      * @return notifications addressed to the user
      */
-
     @GetMapping("/getNotifications/{targetId}")
-    public ResponseEntity getNotificationsByTarget(@PathVariable String targetId) {
+    public ResponseEntity<List<String>> getNotificationsByTarget(@PathVariable String targetId) {
         if (!authManager.getNetId().equals(targetId)) {
-            return ResponseEntity.badRequest().body("Only the recipient can ask for their notifications");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         List<Notification> notifications = notificationDatabaseService.findNotificationsByTargetId(targetId);
+        List<String> notificationMessages = new ArrayList<>();
+        for (Notification notification : notifications) {
+            notificationMessages.add(notification.buildMessage());
+        }
         notificationDatabaseService.removeNotificationsByTargetId(targetId);
-        return ResponseEntity.ok(notifications);
+        return ResponseEntity.ok(notificationMessages);
     }
 
+    /** Handles the incoming request to notify user with current selected strategy.
+     *
+     * @param notification notification that is to be handled by notification strategy
+     * @return if it succeeded to be handled by notification strategy
+     */
     @PostMapping("/notifyUser")
-    public ResponseEntity<Notification> saveNotification(@RequestBody @Valid Notification notification) {
-        return ResponseEntity.ok(notificationDatabaseService.save(notification));
+    public ResponseEntity<String> notifyUser(@RequestBody @Valid Notification notification) {
+        if (!strategy.handleNotification(notification)) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(strategy.getFailureMessage());
+        }
+
+        return ResponseEntity.ok("Successfully notified");
     }
 
     /**
@@ -79,4 +101,7 @@ public class NotificationController {
         return errors;
     }
 
+    public void setNotificationStrategy(NotificationStrategy notificationStrategy) {
+        this.strategy = notificationStrategy;
+    }
 }
