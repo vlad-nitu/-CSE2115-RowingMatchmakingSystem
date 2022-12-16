@@ -108,6 +108,17 @@ public class UserController {
     }
 
     /**
+     * API Endpoint that performs a GET request in order to obtain and send the email of the User.
+     *
+     * @param userId - String object representing the unique identifier of a User
+     * @return String object representing the email of the User
+     */
+    @GetMapping("/sendEmail/{userId}")
+    public ResponseEntity<String> sendEmail(@PathVariable String userId) {
+        return ResponseEntity.ok(userService.findEmailById(userId));
+    }
+
+    /**
      * Find all users.
      *
      * @return - Response of a list of users

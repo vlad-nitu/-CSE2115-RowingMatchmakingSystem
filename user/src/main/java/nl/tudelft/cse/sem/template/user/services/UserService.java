@@ -105,4 +105,15 @@ public class UserService {
         Optional<User> user = userRepository.findById(userId);
         return user.get().getPositions();
     }
+
+    /**
+     * Finds the email of the user with the given userId.
+     *
+     * @param userId - the ID of the user
+     * @return the email of the user in String format
+     */
+    public String findEmailById(String userId) {
+        Optional<User> user = userRepository.findById(userId);
+        return user.get().getEmail();
+    }
 }

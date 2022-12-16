@@ -36,4 +36,7 @@ public class User {
             joinColumns = @JoinColumn(name = "userid")
     )
     private Set<TimeSlot> timeSlots;
+
+    @Column(name = "email")
+    private String email;
 }
