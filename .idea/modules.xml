@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/authentication-microservice/nl.tudelft.cse.sem.template.template.authentication-microservice.main.iml" filepath="$PROJECT_DIR$/.idea/modules/authentication-microservice/nl.tudelft.cse.sem.template.template.authentication-microservice.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/example-microservice/nl.tudelft.cse.sem.template.template.example-microservice.main.iml" filepath="$PROJECT_DIR$/.idea/modules/example-microservice/nl.tudelft.cse.sem.template.template.example-microservice.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/activity-microservice/template.activity-microservice.main.iml" filepath="$PROJECT_DIR$/.idea/modules/activity-microservice/template.activity-microservice.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/authentication-microservice/template.authentication-microservice.main.iml" filepath="$PROJECT_DIR$/.idea/modules/authentication-microservice/template.authentication-microservice.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/example-microservice/template.example-microservice.main.iml" filepath="$PROJECT_DIR$/.idea/modules/example-microservice/template.example-microservice.main.iml" />
