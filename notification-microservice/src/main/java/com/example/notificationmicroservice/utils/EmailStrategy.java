@@ -37,7 +37,7 @@ public class EmailStrategy implements NotificationStrategy {
             subject = "Accepted for activity";
         }
 
-        String toEmail = "laimonas.cao@gmail.com";
+        String toEmail = userPublisher.getEmail(notification.getTargetId());
         String body = notification.buildMessage();
 
         SimpleMailMessage message = new SimpleMailMessage();
