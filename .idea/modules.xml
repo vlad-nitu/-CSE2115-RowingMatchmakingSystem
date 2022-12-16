@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/authentication-microservice/nl.tudelft.cse.sem.template.template.authentication-microservice.main.iml" filepath="$PROJECT_DIR$/.idea/modules/authentication-microservice/nl.tudelft.cse.sem.template.template.authentication-microservice.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/example-microservice/nl.tudelft.cse.sem.template.template.example-microservice.main.iml" filepath="$PROJECT_DIR$/.idea/modules/example-microservice/nl.tudelft.cse.sem.template.template.example-microservice.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/template.iml" filepath="$PROJECT_DIR$/.idea/modules/template.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/activity-microservice/template.activity-microservice.iml" filepath="$PROJECT_DIR$/.idea/modules/activity-microservice/template.activity-microservice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/activity-microservice/template.activity-microservice.main.iml" filepath="$PROJECT_DIR$/.idea/modules/activity-microservice/template.activity-microservice.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/activity-microservice/template.activity-microservice.test.iml" filepath="$PROJECT_DIR$/.idea/modules/activity-microservice/template.activity-microservice.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/authentication-microservice/template.authentication-microservice.iml" filepath="$PROJECT_DIR$/.idea/modules/authentication-microservice/template.authentication-microservice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/authentication-microservice/template.authentication-microservice.test.iml" filepath="$PROJECT_DIR$/.idea/modules/authentication-microservice/template.authentication-microservice.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/example-microservice/template.example-microservice.iml" filepath="$PROJECT_DIR$/.idea/modules/example-microservice/template.example-microservice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/example-microservice/template.example-microservice.test.iml" filepath="$PROJECT_DIR$/.idea/modules/example-microservice/template.example-microservice.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/micro/template.micro.iml" filepath="$PROJECT_DIR$/.idea/modules/micro/template.micro.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/micro/template.micro.main.iml" filepath="$PROJECT_DIR$/.idea/modules/micro/template.micro.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/micro/template.micro.test.iml" filepath="$PROJECT_DIR$/.idea/modules/micro/template.micro.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/notification-microservice/template.notification-microservice.iml" filepath="$PROJECT_DIR$/.idea/modules/notification-microservice/template.notification-microservice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/notification-microservice/template.notification-microservice.main.iml" filepath="$PROJECT_DIR$/.idea/modules/notification-microservice/template.notification-microservice.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/notification-microservice/template.notification-microservice.test.iml" filepath="$PROJECT_DIR$/.idea/modules/notification-microservice/template.notification-microservice.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/user/template.user.iml" filepath="$PROJECT_DIR$/.idea/modules/user/template.user.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/user/template.user.main.iml" filepath="$PROJECT_DIR$/.idea/modules/user/template.user.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/user/template.user.test.iml" filepath="$PROJECT_DIR$/.idea/modules/user/template.user.test.iml" />
+    </modules>
+  </component>
+</project>
