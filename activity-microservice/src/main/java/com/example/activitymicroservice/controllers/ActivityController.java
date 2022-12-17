@@ -100,7 +100,8 @@ public class ActivityController {
      */
     @PostMapping("/sendAvailableActivities/{userId}")
     public ResponseEntity<List<Pair<Long, String>>> sendAvailableActivities(@RequestBody List<TimeSlot> timeSlots,
-                                                                            @PathVariable String userId) {
+                                                                            @PathVariable String userId)
+            throws InvalidObjectException {
         List<Pair<Long, String>> list = new ArrayList<>();
         Validator positionValidator = new PositionValidator();
 
@@ -119,12 +120,10 @@ public class ActivityController {
         List<Activity> activityList = activityService.getActivitiesByTimeSlot(timeSlots);
         for (Activity activity : activityList) {
             for (String position : activity.getAvailablePositions()) {
-                try {
-                    boolean isValid = competitivenessValidator.handle(activity, userPublisher, position, userId);
-                    if (isValid) {
-                        list.add(new Pair<>(activity.getActivityId(), position));
-                    }
-                } catch (InvalidObjectException ignored) {}
+                boolean isValid = competitivenessValidator.handle(activity, userPublisher, position, userId);
+                if (isValid) {
+                    list.add(new Pair<>(activity.getActivityId(), position));
+                }
             }
         }
         return ResponseEntity.ok(list);
