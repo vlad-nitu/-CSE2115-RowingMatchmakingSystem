@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
-@Valid
 @RestController
 public class MatchingController {
 
@@ -69,7 +68,7 @@ public class MatchingController {
      * @return - ResponseEntity object with a message composed of the saved matching.
      */
     @PostMapping("/chooseActivity")
-    public ResponseEntity<Matching> chooseActivity(@RequestBody Matching matching) {
+    public ResponseEntity<Matching> chooseActivity(@Valid @RequestBody Matching matching) {
         if (!activityPublisher.check(matching)
                 || matchingServiceImpl.findMatchingWithPendingFalse(matching.getUserId(), matching.getActivityId())
                 .isPresent()) {
@@ -92,7 +91,7 @@ public class MatchingController {
      * @return - ResponseEntity object with a message composed of the matching that was accepted or declined
      */
     @PostMapping("/decideMatchAccept/{senderId}")
-    public ResponseEntity<Matching> chooseMatchAccept(@RequestBody Matching matching, @PathVariable String senderId) {
+    public ResponseEntity<Matching> chooseMatchAccept(@Valid @RequestBody Matching matching, @PathVariable String senderId) {
         String ownerId = activityPublisher.getOwnerId(matching.getActivityId());
         if (ownerId.equals(senderId)
                 || !matchingServiceImpl.checkId(matching.getUserId(), matching.getActivityId(), matching.getPosition())) {
@@ -116,7 +115,7 @@ public class MatchingController {
      * @return - ResponseEntity object with a message composed of the matching that was accepted or declined
      */
     @PostMapping("/decideMatchDecline/{senderId}")
-    public ResponseEntity<Matching> chooseMatchDecline(@RequestBody Matching matching, @PathVariable String senderId) {
+    public ResponseEntity<Matching> chooseMatchDecline(@Valid @RequestBody Matching matching, @PathVariable String senderId) {
         String ownerId = activityPublisher.getOwnerId(matching.getActivityId());
         if (ownerId.equals(senderId)
                 || !matchingServiceImpl.checkId(matching.getUserId(), matching.getActivityId(), matching.getPosition())) {
@@ -180,7 +179,7 @@ public class MatchingController {
      */
     @PostMapping("/save")
     public ResponseEntity<Matching> saveMatching(
-            @RequestBody Matching matching
+            @Valid @RequestBody Matching matching
     ) {
         return ResponseEntity.ok(
                 matchingServiceImpl.save(matching)
