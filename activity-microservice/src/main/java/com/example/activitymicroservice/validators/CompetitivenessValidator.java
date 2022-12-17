@@ -1,7 +1,7 @@
 package com.example.activitymicroservice.validators;
 
 import com.example.activitymicroservice.domain.Activity;
-import com.example.activitymicroservice.domain.Cometiton;
+import com.example.activitymicroservice.domain.Competition;
 import com.example.activitymicroservice.publishers.UserPublisher;
 
 import java.io.InvalidObjectException;
@@ -20,8 +20,8 @@ public class CompetitivenessValidator extends BaseValidator {
      */
     public boolean handle(Activity activity, UserPublisher userPublisher,
                           String position, String userId) throws InvalidObjectException {
-        if (activity instanceof Cometiton) {
-            if (((Cometiton) activity).isCompetitive() != userPublisher.getCompetitiveness(userId)) {
+        if (activity instanceof Competition) {
+            if (((Competition) activity).isCompetitive() != userPublisher.getCompetitiveness(userId)) {
                 throw new InvalidObjectException("Competitiveness does not match");
             }
         }

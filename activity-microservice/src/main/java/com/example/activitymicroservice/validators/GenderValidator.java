@@ -1,7 +1,7 @@
 package com.example.activitymicroservice.validators;
 
 import com.example.activitymicroservice.domain.Activity;
-import com.example.activitymicroservice.domain.Cometiton;
+import com.example.activitymicroservice.domain.Competition;
 import com.example.activitymicroservice.publishers.UserPublisher;
 
 import java.io.InvalidObjectException;
@@ -20,8 +20,8 @@ public class GenderValidator extends BaseValidator {
      */
     public boolean handle(Activity activity, UserPublisher userPublisher,
                           String position, String userId) throws InvalidObjectException {
-        if (activity instanceof Cometiton
-                && ((Cometiton) activity).getGender() != userPublisher.getGender(userId)) {
+        if (activity instanceof Competition
+                && ((Competition) activity).getGender() != userPublisher.getGender(userId)) {
             throw new InvalidObjectException("The gender is not suitable");
         }
         return super.checkNext(activity, userPublisher, position, userId);

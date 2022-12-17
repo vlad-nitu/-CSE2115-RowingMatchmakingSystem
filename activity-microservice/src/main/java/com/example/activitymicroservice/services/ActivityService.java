@@ -1,7 +1,7 @@
 package com.example.activitymicroservice.services;
 
 import com.example.activitymicroservice.domain.Activity;
-import com.example.activitymicroservice.domain.Cometiton;
+import com.example.activitymicroservice.domain.Competition;
 import com.example.activitymicroservice.repositories.ActivityRepository;
 import com.example.activitymicroservice.utils.Pair;
 import com.example.activitymicroservice.utils.TimeSlot;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -98,14 +97,14 @@ public class ActivityService {
     public boolean checkUser(Activity activity, Character gender,
                              String certificate, String organisation,
                              boolean competitiveness, List<String> listPositions, String position) {
-        if (activity instanceof Cometiton) {
-            if (((Cometiton) activity).isCompetitive() != competitiveness) {
+        if (activity instanceof Competition) {
+            if (((Competition) activity).isCompetitive() != competitiveness) {
                 return false;
             }
-            if (((Cometiton) activity).getGender() != gender) {
+            if (((Competition) activity).getGender() != gender) {
                 return false;
             }
-            if (!Objects.equals(((Cometiton) activity).getOrganisation(), organisation)) {
+            if (!Objects.equals(((Competition) activity).getOrganisation(), organisation)) {
                 return false;
             }
         }
