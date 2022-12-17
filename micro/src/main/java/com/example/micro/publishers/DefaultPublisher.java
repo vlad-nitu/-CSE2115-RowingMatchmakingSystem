@@ -2,12 +2,14 @@ package com.example.micro.publishers;
 
 import com.example.micro.utils.MatchingUtils;
 import lombok.Cleanup;
+import lombok.Generated;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
 @Service
+@Generated
 public class DefaultPublisher {
     private final transient MatchingUtils matchingUtils;
 
