@@ -17,7 +17,7 @@ public class UserPublisher {
     }
 
     UserPublisher() {
-        this.notificationUtils = new NotificationUtils("http://localhost:8083/");
+        this.notificationUtils = new NotificationUtils("http://localhost:8085/");
     }
 
     /**
@@ -32,7 +32,7 @@ public class UserPublisher {
             Response res = notificationUtils.getRequest("/getEmail/" + userId);
             return res.readEntity(new GenericType<>() {});
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("Bad request");
             return null;
         }
     }

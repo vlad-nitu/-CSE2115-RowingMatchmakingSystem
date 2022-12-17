@@ -1,4 +1,4 @@
-package com.example.notificationmicroservice.utils;
+package com.example.notificationmicroservice.strategy;
 
 import com.example.notificationmicroservice.domain.Notification;
 import com.example.notificationmicroservice.publishers.UserPublisher;

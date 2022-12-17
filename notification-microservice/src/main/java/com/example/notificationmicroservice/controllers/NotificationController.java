@@ -3,7 +3,7 @@ package com.example.notificationmicroservice.controllers;
 import com.example.notificationmicroservice.authentication.AuthManager;
 import com.example.notificationmicroservice.domain.Notification;
 import com.example.notificationmicroservice.services.NotificationDatabaseService;
-import com.example.notificationmicroservice.utils.NotificationStrategy;
+import com.example.notificationmicroservice.strategy.NotificationStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
