@@ -23,12 +23,27 @@ public class ActivityService {
         return activityRepository.findAll();
     }
 
-    public Activity save(Activity matching) {
-        return activityRepository.save(matching);
+    public Activity save(Activity activity) {
+        return activityRepository.save(activity);
     }
 
-    public List<TimeSlot> findTimeslotsByActivityId() {
-        return activityRepository.findAll().stream().map(x -> x.getTimeSlot()).collect(Collectors.toList());
+    /**
+     * Gets a list of TimeSlots and returns all the Activities that are included in those timeslots.
+     *
+     * @param timeSlots List of TimeSlots
+     * @return List of Activities
+     */
+    public List<Activity> getActivitiesByTimeSlot(List<TimeSlot> timeSlots) {
+        List<Activity> activityList = new ArrayList<>();
+        for (Activity activity : activityRepository.findAll()) {
+            for (TimeSlot timeSlot : timeSlots) {
+                if (activity.getTimeSlot().isIncluded(timeSlot)) {
+                    activityList.add(activity);
+                    break;
+                }
+            }
+        }
+        return activityList;
     }
 
     public Activity findActivity(Long activityId) {
@@ -83,8 +98,8 @@ public class ActivityService {
     public boolean checkUser(Activity activity, Character gender,
                              String certificate, String organisation,
                              boolean competitiveness, List<String> listPositions, String position) {
-        if (competitiveness) {
-            if (activity.getClass() !=  Cometiton.class) {
+        if (activity instanceof Cometiton) {
+            if (((Cometiton) activity).isCompetitive() != competitiveness) {
                 return false;
             }
             if (((Cometiton) activity).getGender() != gender) {
