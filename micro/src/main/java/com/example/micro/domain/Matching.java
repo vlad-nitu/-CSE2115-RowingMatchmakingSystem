@@ -28,6 +28,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 public class Matching {
     @Id
+    @NotNull(message = "userId is mandatory, thus it cannot be null.")
     @NotBlank(message = "userId is mandatory, thus it cannot be blank.")
     @Column(name = "userid", nullable = false)
     private String userId;
@@ -36,6 +37,7 @@ public class Matching {
     @Column(name = "activityid", nullable = false)
     private Long activityId;
     @Id
+    @NotNull(message = "position is mandatory, thus it cannot be null.")
     @NotBlank(message = "position is mandatory, thus it cannot be blank.")
     @Column(name = "position", nullable = false)
     private String position;

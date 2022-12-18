@@ -285,7 +285,7 @@ public class MatchingControllerTest {
     }
 
     @Test
-    public void decideMatchAccpeptFailsOwnerEqualsSender() throws Exception {
+    public void decideMatchAcceptFailsOwnerEqualsSender() throws Exception {
         String ownerId = "Radu";
         lenient()
                 .when(activityPublisher.getOwnerId(matching.getActivityId())).thenReturn(ownerId);
@@ -374,7 +374,7 @@ public class MatchingControllerTest {
     }
 
     @Test
-    public void decideMatchDeclinFailsCheckIdFalse() throws Exception {
+    public void decideMatchDeclineFailsCheckIdFalse() throws Exception {
         String ownerId = "Radu";
         lenient()
                 .when(activityPublisher.getOwnerId(matching.getActivityId())).thenReturn(ownerId);
