@@ -2,13 +2,13 @@ package com.example.activitymicroservice.domain;
 
 import com.example.activitymicroservice.utils.TimeSlot;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import lombok.*;
+
 
 
 @Entity
@@ -18,6 +18,12 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Training.class, name = "training"),
+        @JsonSubTypes.Type(value = Competition.class, name = "competition")
+})
 public abstract class Activity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -26,21 +32,7 @@ public abstract class Activity {
     @Transient
     private TimeSlot timeSlot;
     @ElementCollection
-    private List<String> availablePositions;
+    private Set<String> availablePositions;
     private String certificate;
-
-    /**
-     * Default constructor.
-     *
-     * @param ownerId the ID of the owner
-     * @param timeSlot the timeSlot of the activity
-     * @param availablePositions the available positions in the activity
-     * @param certificate the certificate needed for the activity
-     */
-    public Activity(String ownerId, TimeSlot timeSlot, List<String> availablePositions, String certificate) {
-        this.ownerId = ownerId;
-        this.timeSlot = timeSlot;
-        this.availablePositions = availablePositions;
-        this.certificate = certificate;
-    }
+    private String type; // used for deserialization of abstract class instance
 }
