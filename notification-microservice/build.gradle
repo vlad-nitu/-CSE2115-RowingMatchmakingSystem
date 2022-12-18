@@ -83,6 +83,8 @@ dependencies {
     implementation 'org.jboss.resteasy:resteasy-multipart-provider:3.15.0.Final'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
+    implementation 'org.springframework.boot:spring-boot-starter-mail:2.3.5.RELEASE'
+    implementation 'javax.mail:javax.mail-api:1.6.2'
 }
 
 test {

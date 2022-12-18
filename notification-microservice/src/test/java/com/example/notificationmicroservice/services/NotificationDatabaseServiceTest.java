@@ -2,9 +2,13 @@ package com.example.notificationmicroservice.services;
 
 import com.example.notificationmicroservice.domain.Notification;
 import com.example.notificationmicroservice.repositories.NotificationRepository;
+import org.aspectj.weaver.ast.Not;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
@@ -14,14 +18,15 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class NotificationDatabaseServiceTest {
 
+    @Mock
     NotificationRepository notificationRepository;
     NotificationDatabaseService notificationDatabaseService;
 
     @BeforeEach
     void setUp() {
-        notificationRepository = Mockito.mock(NotificationRepository.class);
         notificationDatabaseService = new NotificationDatabaseService(notificationRepository);
     }
 

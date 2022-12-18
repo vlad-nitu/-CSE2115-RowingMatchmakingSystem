@@ -1,6 +1,6 @@
 package com.example.notificationmicroservice.domain;
 
-import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,11 +11,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.Objects;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
-
-@AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 @Getter
 @Setter
 @Entity
@@ -28,21 +28,27 @@ public class Notification {
     private Long id;
 
     @Column(name = "userId", nullable = false)
+    @NotBlank(message = "userId is mandatory and cannot be blank")
     private String userId;
 
     @Column(name = "targetId", nullable = false)
+    @NotBlank(message = "targetId is mandatory and cannot be blank")
     private String targetId;
 
     @Column(name = "activityId", nullable = false)
+    @NotNull(message = "activityId is mandatory and cannot be null")
     private Long activityId;
 
     @Column(name = "type", nullable = false)
+    @NotBlank(message = "type is mandatory and cannot be blank")
     private String type;
 
     @Column(name = "position")
+    @NotBlank(message = "position is mandatory and cannot be blank")
     private String position;
 
-    /** Notification constructor.
+    /** This Notification constructor is needed because I can't use.
+     * All args constructor since id is assigned by the db.
      *
      * @param userId from user
      * @param targetId to user
@@ -58,23 +64,17 @@ public class Notification {
         this.position = position;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
+    /** The message that is to be sent to the user based on notification type and position.
+     *
+     * @return the built message
+     */
+    public String buildMessage() {
+        if (type.equals("notifyUser")) {
+            return "Congratulations, you have been accepted as a " + position
+                    + " for activity with Id: " + activityId;
+        } else  {
+            return "A new user has applied as a " + position
+                    + " for activity with Id: " + activityId;
         }
-        if (!(o instanceof Notification)) {
-            return false;
-        }
-        Notification that = (Notification) o;
-        return Objects.equals(getId(), that.getId()) && getUserId().equals(that.getUserId())
-                && getTargetId().equals(that.getTargetId())
-                && getActivityId().equals(that.getActivityId()) && getType().equals(that.getType())
-                && Objects.equals(getPosition(), that.getPosition());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getUserId(), getTargetId(), getActivityId(), getType(), getPosition());
     }
 }
