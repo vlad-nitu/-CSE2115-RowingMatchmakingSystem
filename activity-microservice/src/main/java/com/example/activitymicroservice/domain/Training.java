@@ -1,10 +1,8 @@
 package com.example.activitymicroservice.domain;
 
 import javax.persistence.Entity;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+
+import lombok.*;
 
 @Entity
 @Getter
