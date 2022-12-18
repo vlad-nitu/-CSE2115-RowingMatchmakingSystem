@@ -117,7 +117,7 @@ public class ActivityController {
 
         List<Activity> activityList = activityService.getActivitiesByTimeSlot(timeSlots);
         for (Activity activity : activityList) {
-            for (String position : activity.getAvailablePositions()) {
+            for (String position : activity.getPositions()) {
                 boolean isValid = competitivenessValidator.handle(activity, userPublisher, position, userId);
                 if (isValid) {
                     list.add(new Pair<>(activity.getActivityId(), position));

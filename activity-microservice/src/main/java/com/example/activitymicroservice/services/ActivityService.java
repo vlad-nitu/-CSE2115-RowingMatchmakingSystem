@@ -76,7 +76,7 @@ public class ActivityService {
      */
     public void takeSpot(Pair<Long, String> posTaken) throws Exception {
         Activity activity = this.findActivity(posTaken.getFirst());
-        boolean isPosition = activity.getAvailablePositions().remove(posTaken.getSecond());
+        boolean isPosition = activity.getPositions().remove(posTaken.getSecond());
         if (!isPosition) {
             throw new Exception("The wished position was not found");
         }
