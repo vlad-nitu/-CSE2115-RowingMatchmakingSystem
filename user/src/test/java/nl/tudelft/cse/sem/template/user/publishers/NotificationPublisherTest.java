@@ -13,6 +13,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @ExtendWith(MockitoExtension.class)
 public class NotificationPublisherTest {
     @Mock
@@ -20,25 +23,28 @@ public class NotificationPublisherTest {
 
     private NotificationPublisher notificationPublisher;
     private BaseNotification notification;
+    private List<BaseNotification> notifications;
 
     @BeforeEach
     void setUp() {
         notificationPublisher = new NotificationPublisher(userUtils);
         notification = new BaseNotification("LotteKremer", "LotteKremer",
                 1L, "Cox", "type1");
+        notifications = new ArrayList<>();
+        notifications.add(notification);
     }
 
     @Test
-    public void getNotificationTestValid() throws Exception {
-        Response res = Response.ok(notification).build();
+    public void getNotificationsTestValid() throws Exception {
+        Response res = Response.ok(notifications).build();
         when(userUtils.getRequest("/getNotifications/LotteKremer")).thenReturn(res);
-        assertThat(notificationPublisher.getNotifications("LotteKremer")).isEqualTo(notification);
+        assertThat(notificationPublisher.getNotifications("LotteKremer")).isEqualTo(notifications);
     }
 
     @Test
-    public void getNotificationTestInvalid() throws Exception {
+    public void getNotificationsTestInvalid() throws Exception {
         when(userUtils.getRequest("/getNotifications/LotteKremer")).thenThrow(new Exception("Invalid"));
-        assertThat(notificationPublisher.getNotifications("LotteKremer")).isEqualTo(new BaseNotification());
+        assertThat(notificationPublisher.getNotifications("LotteKremer")).isEqualTo(new ArrayList<>());
     }
 
 }
