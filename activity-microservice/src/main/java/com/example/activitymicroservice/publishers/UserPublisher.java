@@ -2,12 +2,14 @@ package com.example.activitymicroservice.publishers;
 
 import com.example.activitymicroservice.utils.ActivityUtils;
 import lombok.Cleanup;
+import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
-import java.util.Collections;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
+@Service
 public class UserPublisher {
 
     private final transient ActivityUtils activityUtils;
@@ -17,14 +19,14 @@ public class UserPublisher {
     }
 
     UserPublisher() {
-        this.activityUtils = new ActivityUtils("http://localhost:8083/");
+        this.activityUtils = new ActivityUtils("http://localhost:8085/");
     }
 
     /**
-     * Request the competitiveness of the activity.
+     * Request the competitiveness of the user.
      *
      * @param userId the id of the user
-     * @return the competitiveness of the activity
+     * @return the competitiveness of the user
      */
     public boolean getCompetitiveness(String userId) {
         try {
@@ -39,10 +41,10 @@ public class UserPublisher {
     }
 
     /**
-     * Request the gender required for the activity.
+     * Request the gender of the user.
      *
      * @param userId the id of the user
-     * @return the gender required for the activity
+     * @return the gender of the user
      */
     public  Character getGender(String userId) {
         try {
@@ -57,10 +59,10 @@ public class UserPublisher {
     }
 
     /**
-     * Request the organisation required for the activity.
+     * Request the organisation of the user.
      *
      * @param userId the id of the user
-     * @return the organisation required for the activity
+     * @return the organisation of the user
      */
     public String getOrganisation(String userId) {
         try {
@@ -75,10 +77,10 @@ public class UserPublisher {
     }
 
     /**
-     * Request the certificate required for the activity.
+     * Request the certificate of the user.
      *
      * @param userId the id of the user
-     * @return the certificate required for the activity
+     * @return the certificate of the user
      */
     public String getCertificate(String userId) {
         try {
@@ -93,21 +95,21 @@ public class UserPublisher {
     }
 
     /**
-     * Request the positions available at the activity.
+     * Request the positions the user can fill in.
      *
      * @param userId the id of the user
-     * @return a set with the available positions
+     * @return a set with the positions the user can fill in
      */
-    public Set<String> getPositions(String userId) {
+    public List<String> getPositions(String userId) {
         try {
             @Cleanup
             Response res = activityUtils.getRequest("/sendPositions/" + userId);
-            Set<String> positions = res.readEntity(new GenericType<>() {});
+            List<String> positions = res.readEntity(new GenericType<>() {});
             return  positions;
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            Set<String> emptySet = Collections.<String>emptySet();
-            return emptySet;
+            List<String> emptyList = new ArrayList<>();
+            return emptyList;
         }
     }
 }

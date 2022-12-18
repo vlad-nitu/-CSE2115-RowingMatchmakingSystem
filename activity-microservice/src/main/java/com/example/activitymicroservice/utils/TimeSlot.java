@@ -29,6 +29,24 @@ public class TimeSlot {
         this.end = end;
     }
 
+    /**
+     * Checks if the current TimeSlot is included in another TimeSlot.
+     *
+     * @param t1 a TimeSLot object that we check if the current one is included
+     * @return a boolean
+     */
+    public boolean isIncluded(TimeSlot t1) {
+        if (t1 == null) {
+            return false;
+        }
+        if (this.getStart().isAfter(t1.getStart()) || this.getStart().isEqual(t1.getStart())) {
+            if (this.getEnd().isBefore(t1.getEnd()) || this.getEnd().isEqual(t1.getEnd())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
