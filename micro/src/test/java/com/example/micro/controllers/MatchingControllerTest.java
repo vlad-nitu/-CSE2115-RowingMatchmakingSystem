@@ -324,7 +324,23 @@ public class MatchingControllerTest {
         String contentAsString = mvcResult.getResponse().getContentAsString();
         Matching obtained = objectMapper.readValue(contentAsString, Matching.class);
         assertThat(obtained).isEqualTo(matching);
+    }
 
+    @Test
+    void validationTest() throws Exception {
+        Matching matchingInvalid = new Matching("", null, "", false);
+        MvcResult mvcResult = mockMvc
+                .perform(post("/save")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(matchingInvalid))
+                )
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("userId is mandatory, thus it cannot be blank.");
+        assertThat(contentAsString).contains("activityId is mandatory, thus it cannot be null.");
+        assertThat(contentAsString).contains("position is mandatory, thus it cannot be blank.");
     }
 
 }
