@@ -31,8 +31,8 @@ public class User {
     private boolean isCompetitive;
 
     @NotBlank(message = "Gender is mandatory and cannot be blank")
-    @NotNull(message = "Gender is mandatory and cannot be null")
-    @Pattern(regexp = "\\b[MF]{1}\\b", message = "Gender must be specified by M or F")
+    //@NotNull(message = "Gender is mandatory and cannot be null")
+    //@Pattern(regexp = "\\b[MF]{1}\\b", message = "Gender must be specified by M or F")
     @Column(name = "gender")
     private char gender;
 
