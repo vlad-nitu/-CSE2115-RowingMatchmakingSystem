@@ -34,6 +34,14 @@ public abstract class Activity {
     private List<String> availablePositions;
     private String certificate;
 
+    /**
+     * Default constructor.
+     *
+     * @param ownerId the ID of the owner
+     * @param timeSlot the timeSlot of the activity
+     * @param availablePositions the available positions in the activity
+     * @param certificate the certificate needed for the activity
+     */
     public Activity(String ownerId, TimeSlot timeSlot, List<String> availablePositions, String certificate) {
         this.ownerId = ownerId;
         this.timeSlot = timeSlot;
