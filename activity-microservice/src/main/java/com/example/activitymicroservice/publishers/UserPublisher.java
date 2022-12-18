@@ -18,7 +18,7 @@ public class UserPublisher {
     }
 
     UserPublisher() {
-        this.activityUtils = new ActivityUtils("http://localhost:8083/");
+        this.activityUtils = new ActivityUtils("http://localhost:8085/");
     }
 
     /**

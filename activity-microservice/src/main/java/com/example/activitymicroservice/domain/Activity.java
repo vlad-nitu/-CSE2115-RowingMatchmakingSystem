@@ -34,4 +34,10 @@ public abstract class Activity {
     private List<String> availablePositions;
     private String certificate;
 
+    public Activity(String ownerId, TimeSlot timeSlot, List<String> availablePositions, String certificate) {
+        this.ownerId = ownerId;
+        this.timeSlot = timeSlot;
+        this.availablePositions = availablePositions;
+        this.certificate = certificate;
+    }
 }
