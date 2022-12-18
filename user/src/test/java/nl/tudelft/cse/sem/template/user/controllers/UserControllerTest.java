@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.Mockito.lenient;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -72,7 +73,20 @@ public class UserControllerTest {
 
     @Test
     public void createUserTest() throws Exception {
-        when(userService.save(user))
+
+        TimeSlot t1 = new TimeSlot(LocalDateTime.of(2003, 12, 1, 23, 15),
+                LocalDateTime.of(2003, 10, 5, 23, 15));
+
+        TimeSlot t2 = new TimeSlot(LocalDateTime.of(2004, 12, 1, 23, 15),
+                LocalDateTime.of(2003, 10, 5, 23, 15));
+
+        TimeSlot t3 = new TimeSlot(LocalDateTime.of(2005, 12, 1, 23, 15),
+                LocalDateTime.of(2003, 10, 5, 23, 15));
+
+        user.setTimeSlots(Set.of(t1, t2, t3));
+        user.setOrganisation("Laga5");
+
+        lenient().when(userService.save(user))
                 .thenReturn(user);
 
         MvcResult mvcResult = mockMvc

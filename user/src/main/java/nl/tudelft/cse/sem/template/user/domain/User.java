@@ -30,7 +30,6 @@ public class User {
     @Column(name = "iscompetitive")
     private boolean isCompetitive;
 
-    @NotBlank(message = "Gender is mandatory and cannot be blank")
     //TODO change to String or validate with use of InputValidation.java
     //@NotNull(message = "Gender is mandatory and cannot be null")
     //@Pattern(regexp = "\\b[MF]{1}\\b", message = "Gender must be specified by M or F")
@@ -62,6 +61,5 @@ public class User {
             name = "Availability",
             joinColumns = @JoinColumn(name = "userid")
     )
-    private Set<@NotBlank(message = "Time slot cannot be blank")
-        @NotNull(message = "Time slot cannot be null") TimeSlot> timeSlots;
+    private Set<@NotNull(message = "Time slot cannot be null") TimeSlot> timeSlots;
 }
