@@ -50,6 +50,7 @@ public class User {
     private String certificate;
 
     @ElementCollection
+    @NotNull(message = "Positions list cannot be null")
     @Column(name = "positions")
     private Set<@NotBlank(message = "Position cannot be blank")
         @NotNull(message = "Position cannot be null")

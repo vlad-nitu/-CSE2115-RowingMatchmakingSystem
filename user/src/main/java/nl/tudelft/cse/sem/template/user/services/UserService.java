@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+//TODO handle the case of Optional not being present
 @AllArgsConstructor
 @Service
 public class UserService {
