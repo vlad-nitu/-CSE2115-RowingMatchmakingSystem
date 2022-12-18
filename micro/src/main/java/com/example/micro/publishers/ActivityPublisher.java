@@ -9,12 +9,14 @@ import java.util.List;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 import lombok.Cleanup;
+import lombok.Generated;
 import org.springframework.stereotype.Service;
 
 
 
 
 @Service
+@Generated
 public class ActivityPublisher {
 
     private final transient MatchingUtils matchingUtils;

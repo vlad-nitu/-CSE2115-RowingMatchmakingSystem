@@ -7,15 +7,20 @@ import com.example.micro.services.MatchingServiceImpl;
 import com.example.micro.utils.FunctionUtils;
 import com.example.micro.utils.Pair;
 import com.example.micro.utils.TimeSlot;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 public class MatchingController {
@@ -66,7 +71,7 @@ public class MatchingController {
      * @return - ResponseEntity object with a message composed of the saved matching.
      */
     @PostMapping("/chooseActivity")
-    public ResponseEntity<Matching> chooseActivity(@RequestBody Matching matching) {
+    public ResponseEntity<Matching> chooseActivity(@Valid @RequestBody Matching matching) {
         if (!activityPublisher.check(matching)
                 || matchingServiceImpl.findMatchingWithPendingFalse(matching.getUserId(), matching.getActivityId())
                 .isPresent()) {
@@ -89,7 +94,7 @@ public class MatchingController {
      * @return - ResponseEntity object with a message composed of the matching that was accepted or declined
      */
     @PostMapping("/decideMatchAccept/{senderId}")
-    public ResponseEntity<Matching> chooseMatchAccept(@RequestBody Matching matching, @PathVariable String senderId) {
+    public ResponseEntity<Matching> chooseMatchAccept(@Valid @RequestBody Matching matching, @PathVariable String senderId) {
         String ownerId = activityPublisher.getOwnerId(matching.getActivityId());
         if (ownerId.equals(senderId)
                 || !matchingServiceImpl.checkId(matching.getUserId(), matching.getActivityId(), matching.getPosition())) {
@@ -113,7 +118,8 @@ public class MatchingController {
      * @return - ResponseEntity object with a message composed of the matching that was accepted or declined
      */
     @PostMapping("/decideMatchDecline/{senderId}")
-    public ResponseEntity<Matching> chooseMatchDecline(@RequestBody Matching matching, @PathVariable String senderId) {
+    public ResponseEntity<Matching> chooseMatchDecline(@Valid @RequestBody Matching matching,
+                                                       @PathVariable String senderId) {
         String ownerId = activityPublisher.getOwnerId(matching.getActivityId());
         if (ownerId.equals(senderId)
                 || !matchingServiceImpl.checkId(matching.getUserId(), matching.getActivityId(), matching.getPosition())) {
@@ -177,13 +183,33 @@ public class MatchingController {
      */
     @PostMapping("/save")
     public ResponseEntity<Matching> saveMatching(
-            @RequestBody Matching matching
+            @Valid @RequestBody Matching matching
     ) {
         return ResponseEntity.ok(
                 matchingServiceImpl.save(matching)
         );
     }
 
+    /**
+     * Handles BAD_REQUEST exceptions thrown by the Validator of Matching entities
+     * Acts as a parser of the BAD_REQUEST exception messageb bodies.
+     * Triggered for all Matching entities that do not respect the @Valid annotation
+     *
+     * @param ex exception
+     * @return a Mapping fieldName -> errorMessage
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
+    }
 
 
 }
