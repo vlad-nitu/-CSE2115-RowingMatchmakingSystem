@@ -32,8 +32,8 @@ public class MatchingController {
     /**
      * All arguments constructor, injects the main service component and all 3 publishers into controller.
      *
-     * @param matchingServiceImpl - matching service implementation
-     * @param activityPublisher - for communication with Activity microservice through API Endpoints
+     * @param matchingServiceImpl   - matching service implementation
+     * @param activityPublisher     - for communication with Activity microservice through API Endpoints
      * @param notificationPublisher - for communication with Notification microservice through API Endpoints
      */
     public MatchingController(MatchingServiceImpl matchingServiceImpl,
@@ -48,7 +48,7 @@ public class MatchingController {
      * API Endpoint that performs a GET request in order to obtain all the available activities a user can be matched to,
      * based on his/her specified timeslot.
      *
-     * @param userId - String object representing the User's ID
+     * @param userId    - String object representing the User's ID
      * @param timeSlots - Timeslot object representing the start time and end time a user is available between
      * @return - ResponseEntity object with a message composed of all the possible activities a user can be matched to.
      */
@@ -146,8 +146,7 @@ public class MatchingController {
      * was previously assigned to.
      *
      * @param userIdActivityIdPair - Pair object of (userId, activityId) that represents that: the user with 'id' "userID"
-     *      wants to unenroll from activity with 'id' "activityId".
-     *
+     *                             wants to unenroll from activity with 'id' "activityId".
      * @return - ResponseEntity object with a message composed of the previously described Pair object
      */
     @PostMapping("/unenroll")
@@ -189,6 +188,21 @@ public class MatchingController {
                 matchingServiceImpl.save(matching)
         );
     }
+
+    /**
+     * Returns all the timeSlots a user has added in the request body.
+     * Mainly for testing purposes of the serializer & deserializer of TimeSlot object
+     *
+     * @param userId    ID of an User
+     * @param timeSlots TimeSlots object
+     * @return ResponseEntity with status 200_OK and the List of TimeSlot objects as body
+     */
+    @PostMapping("/addTimeSlots/{userId}")
+    public ResponseEntity<List<TimeSlot>> addTimeSlots(@PathVariable String userId,
+                                                       @RequestBody List<TimeSlot> timeSlots) {
+        return ResponseEntity.ok(timeSlots);
+    }
+
 
     /**
      * Handles BAD_REQUEST exceptions thrown by the Validator of Matching entities
