@@ -462,4 +462,28 @@ public class MatchingControllerTest {
         assertThat(contentAsString).contains("position is mandatory, thus it cannot be blank.");
     }
 
+    @Test
+    void addTimeSlotsTest() throws Exception {
+
+        MvcResult result = mockMvc
+                .perform(post("/addTimeSlots/Vlad")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(List.of(
+                                new TimeSlot(LocalDateTime.of(2003, 12, 22, 12, 12),
+                                        LocalDateTime.of(2003, 12, 22, 14, 12)),
+                                new TimeSlot(LocalDateTime.of(2004, 12, 22, 12, 12),
+                                        LocalDateTime.of(2005, 12, 22, 14, 12))
+                        )))
+                )
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String content = result.getResponse().getContentAsString();
+        assertThat(content).contains(
+                "start", "end",
+                "2003-12-22 12:12", "2003-12-22 14:12",
+                "2004-12-22 12:12", "2005-12-22 14:12"
+        ); // List of deserialized LocalDateTimes as Strings
+    }
+
 }
