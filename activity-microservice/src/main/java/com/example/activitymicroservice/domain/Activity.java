@@ -1,7 +1,7 @@
 package com.example.activitymicroservice.domain;
 
 import com.example.activitymicroservice.utils.TimeSlot;
-import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -55,4 +55,29 @@ public class Activity {
 
     private String certificate;
     private String type; // used for deserialization of abstract class instance
+
+    //Added this because we need an equals method for testing and the Lombok
+    //Equals and hashcode was throwing a scary warning regarding JPA entities
+    //Not working well with it
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Activity)) {
+            return false;
+        }
+        Activity activity = (Activity) o;
+        return Objects.equals(getActivityId(), activity.getActivityId())
+                && Objects.equals(getOwnerId(), activity.getOwnerId())
+                && Objects.equals(getTimeSlot(), activity.getTimeSlot())
+                && Objects.equals(getPositions(), activity.getPositions())
+                && Objects.equals(getCertificate(), activity.getCertificate())
+                && Objects.equals(getType(), activity.getType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getActivityId(), getOwnerId(), getTimeSlot(), getPositions(), getCertificate(), getType());
+    }
 }

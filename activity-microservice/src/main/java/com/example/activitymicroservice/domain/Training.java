@@ -1,17 +1,12 @@
 package com.example.activitymicroservice.domain;
 
-import javax.persistence.Entity;
+import lombok.*;
 
-import lombok.Setter;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
+import javax.persistence.Entity;
 
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
 @ToString
 public class Training extends Activity {
 }

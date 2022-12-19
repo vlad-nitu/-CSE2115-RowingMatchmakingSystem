@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Service
@@ -47,6 +48,10 @@ public class ActivityService {
 
     public Activity findActivity(Long activityId) {
         return activityRepository.findById(activityId).get();
+    }
+
+    public Optional<Activity> findActivityOptional(Long activityId) {
+        return activityRepository.findById(activityId);
     }
 
     public void deleteById(Long activityId) {
