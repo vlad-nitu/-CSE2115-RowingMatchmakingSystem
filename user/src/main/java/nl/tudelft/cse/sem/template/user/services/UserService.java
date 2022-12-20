@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-//TODO handle the case of Optional not being present
 @AllArgsConstructor
 @Service
 public class UserService {
@@ -33,7 +32,11 @@ public class UserService {
      * @return User object if a match is found, null otherwise
      */
     public Optional<User> findUserById(String userId) {
-        return userRepository.findById(userId);
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isPresent()) {
+            return user;
+        }
+        return null;
     }
 
     /**
@@ -54,7 +57,10 @@ public class UserService {
      */
     public boolean findCompetitivenessByUserId(String userId) {
         Optional<User> user = userRepository.findById(userId);
-        return user.get().isCompetitive();
+        if (user.isPresent()) {
+            return user.get().isCompetitive();
+        }
+        return false;
     }
 
     /**
@@ -65,7 +71,10 @@ public class UserService {
      */
     public Character findGenderById(String userId) {
         Optional<User> user = userRepository.findById(userId);
-        return user.get().getGender();
+        if (user.isPresent()) {
+            return user.get().getGender();
+        }
+        return ' ';
     }
 
 
@@ -92,7 +101,10 @@ public class UserService {
      */
     public String findOrganisationById(String userId) {
         Optional<User> user = userRepository.findById(userId);
-        return user.get().getOrganisation();
+        if (user.isPresent()) {
+            return user.get().getOrganisation();
+        }
+        return null;
     }
 
 
@@ -104,6 +116,9 @@ public class UserService {
      */
     public Set<String> findPositionsById(String userId) {
         Optional<User> user = userRepository.findById(userId);
-        return user.get().getPositions();
+        if (user.isPresent()) {
+            return user.get().getPositions();
+        }
+        return null;
     }
 }
