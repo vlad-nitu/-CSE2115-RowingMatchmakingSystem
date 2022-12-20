@@ -1,5 +1,6 @@
 package com.example.micro.controllers;
 
+import com.example.micro.authentication.AuthManager;
 import com.example.micro.domain.Matching;
 import com.example.micro.publishers.ActivityPublisher;
 import com.example.micro.publishers.NotificationPublisher;
@@ -28,6 +29,7 @@ public class MatchingController {
     private final transient MatchingServiceImpl matchingServiceImpl;
     private final transient ActivityPublisher activityPublisher;
     private final transient NotificationPublisher notificationPublisher;
+    private final transient AuthManager authManger;
 
     /**
      * All arguments constructor, injects the main service component and all 3 publishers into controller.
@@ -38,10 +40,12 @@ public class MatchingController {
      */
     public MatchingController(MatchingServiceImpl matchingServiceImpl,
                               ActivityPublisher activityPublisher,
-                              NotificationPublisher notificationPublisher) {
+                              NotificationPublisher notificationPublisher,
+                              AuthManager authManager) {
         this.matchingServiceImpl = matchingServiceImpl;
         this.activityPublisher = activityPublisher;
         this.notificationPublisher = notificationPublisher;
+        this.authManger=authManager;
     }
 
     /**

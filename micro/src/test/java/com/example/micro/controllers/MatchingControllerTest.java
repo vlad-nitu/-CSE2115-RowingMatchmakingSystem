@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.micro.authentication.AuthManager;
 import com.example.micro.domain.Matching;
 import com.example.micro.publishers.ActivityPublisher;
 import com.example.micro.publishers.NotificationPublisher;
@@ -47,6 +48,8 @@ public class MatchingControllerTest {
     private ActivityPublisher activityPublisher;
     @Mock
     private NotificationPublisher notificationPublisher;
+    @Mock
+    private AuthManager authManager;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
 
@@ -68,7 +71,8 @@ public class MatchingControllerTest {
         matching = new Matching("Vlad", 1L, "rower", false);
         this.matchingController = new MatchingController(matchingServiceImpl,
                 activityPublisher,
-                notificationPublisher);
+                notificationPublisher,
+                authManager);
         mockMvc = MockMvcBuilders
                 .standaloneSetup(matchingController)
                 .build();
