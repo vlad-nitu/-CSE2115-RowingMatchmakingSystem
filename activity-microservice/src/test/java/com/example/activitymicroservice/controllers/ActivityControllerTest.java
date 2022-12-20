@@ -20,7 +20,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,7 +51,7 @@ class ActivityControllerTest {
     void emptyOptional() throws Exception {
         when(activityService.findActivityOptional(1L)).thenReturn(Optional.empty());
         MvcResult res = mockMvc
-                .perform(delete("/cancelActivity/1")
+                .perform(post("/cancelActivity/1")
                 )
                 .andExpect(status().isNotFound())
                 .andReturn();
@@ -66,7 +66,7 @@ class ActivityControllerTest {
         when(activityService.findActivityOptional(1L)).thenReturn(Optional.of(act));
         when(authManager.getNetId()).thenReturn("User");
         MvcResult res = mockMvc
-                .perform(delete("/cancelActivity/1"))
+                .perform(post("/cancelActivity/1"))
                 .andExpect(status().isForbidden())
                 .andReturn();
 
@@ -81,7 +81,7 @@ class ActivityControllerTest {
         when(authManager.getNetId()).thenReturn("Owner");
         when(matchingPublisher.deleteMatchingByActivityId(1L)).thenReturn(false);
         MvcResult res = mockMvc
-                .perform(delete("/cancelActivity/1"))
+                .perform(post("/cancelActivity/1"))
                 .andExpect(status().isInternalServerError())
                 .andReturn();
 
@@ -96,7 +96,7 @@ class ActivityControllerTest {
         when(authManager.getNetId()).thenReturn("Owner");
         when(matchingPublisher.deleteMatchingByActivityId(1L)).thenReturn(true);
         MvcResult res = mockMvc
-                .perform(delete("/cancelActivity/1"))
+                .perform(post("/cancelActivity/1"))
                 .andExpect(status().isNoContent())
                 .andReturn();
 
