@@ -24,5 +24,16 @@ public class InputValidation {
 
     }
 
+    /**
+     * Validates the user's gender by checking if it follows the required format.
+     * @param gender - the character defining the user's indicated gender
+     * @return boolean defining whether the input passed the validation
+     */
+    public static boolean userGenderValidation(Character gender) {
+
+        return gender == 'M' || gender == 'F' || gender == 'f' || gender == 'm';
+
+    }
+
 
 }

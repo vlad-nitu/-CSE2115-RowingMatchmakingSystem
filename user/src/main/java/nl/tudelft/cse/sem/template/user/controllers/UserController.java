@@ -52,12 +52,13 @@ public class UserController {
     public ResponseEntity createUser(@Valid @RequestBody User user) {
         if (!InputValidation.userIdValidation(user.getUserId())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided ID is invalid!");
-            // return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        if (!InputValidation.userGenderValidation(user.getGender())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided gender is invalid!");
         }
         Optional<User> foundUser = userService.findUserById(user.getUserId());
         if (foundUser.isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with the given ID already exists!");
-            // return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         return ResponseEntity.ok(userService.save(user));
     }
