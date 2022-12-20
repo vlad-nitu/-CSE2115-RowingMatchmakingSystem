@@ -105,6 +105,20 @@ public class UserService {
         return null;
     }
 
+    /**
+     * Finds the e-mail address corresponding to the given userId.
+     *
+     * @param userId - the ID of the user
+     * @return String containing the user's e-mail address
+     */
+    public String findEmailById(String userId) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isPresent()) {
+            return user.get().getEmail();
+        }
+        return null;
+    }
+
 
     /**
      * Finds the positions the user with the given userId is capable of filling.

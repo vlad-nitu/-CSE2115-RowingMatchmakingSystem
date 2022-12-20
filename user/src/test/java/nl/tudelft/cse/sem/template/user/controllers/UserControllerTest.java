@@ -52,6 +52,7 @@ public class UserControllerTest {
     private Boolean competitive;
     private Character gender;
     private String certificate;
+    private  String email;
     private String organization;
     private Set<String> positions;
     private Set<TimeSlot> timeSlots;
@@ -65,13 +66,14 @@ public class UserControllerTest {
         organization = "Laga";
         competitive = true;
         gender = 'F';
+        email = "test@domain.com";
         positions = new HashSet<>();
         positions.add("cox");
         positions.add("coach");
         timeSlots = new HashSet<>();
         timeSlots.add(new TimeSlot(LocalDateTime.of(2022, 12, 14, 7, 00),
                 LocalDateTime.of(2022, 12, 14, 19, 15)));
-        user = new User(userId, competitive, gender, organization, certificate, positions, timeSlots);
+        user = new User(userId, competitive, gender, organization, certificate, email, positions, timeSlots);
 
         this.userController = new UserController(userService, activityPublisher, matchingPublisher, notificationPublisher);
 
@@ -241,4 +243,16 @@ public class UserControllerTest {
         assertThat(contentAsString).contains("Coach");
     }
 
+    @Test
+    void sendEmail() throws Exception {
+        String expected = "test@domain.com";
+        when(userService.findEmailById(userId)).thenReturn(expected);
+        MvcResult mvcResult = mockMvc
+                .perform(get("/sendEmail/LotteKremer"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("test@domain.com");
+    }
 }
