@@ -111,7 +111,7 @@ public class MatchingController {
      * @return ResponseEntity object with a message composed of the matching that was accepted or declined
      */
     @PostMapping("/decideMatch/{senderId}/{type}")
-    public ResponseEntity<Matching> chooseMatch(@Valid @RequestBody Matching matching, @PathVariable String senderId, @PathVariable String type) {
+    public ResponseEntity<Matching> chooseMatch(@Valid @RequestBody Matching matching, @PathVariable String senderId, @PathVariable String type){
         String ownerId = activityPublisher.getOwnerId(matching.getActivityId());
         if (!authManger.getNetId().equals(senderId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
