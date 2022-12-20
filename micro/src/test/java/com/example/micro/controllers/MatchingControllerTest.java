@@ -249,6 +249,22 @@ public class MatchingControllerTest {
     }
 
     @Test
+    public void unenrollUnauthorizedTest() throws Exception {
+        Pair<String, Long> expected = new Pair<String, Long>(userId, activityId);
+        lenient().when(authManager.getNetId()).thenReturn("Niq");
+        lenient().when(matchingServiceImpl.findMatchingWithPendingFalse(userId, activityId))
+                .thenReturn(Optional.empty());
+        MvcResult mvcResult = mockMvc
+                .perform(post("/unenroll")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(expected)))
+                .andExpect(status().isUnauthorized())
+                .andReturn();
+
+        assertThat(mvcResult.getResponse().getContentAsString()).isEmpty();
+    }
+
+    @Test
     public void unenrollTest() throws Exception {
         Pair<String, Long> expected = new Pair<String, Long>(userId, activityId);
         lenient().when(authManager.getNetId()).thenReturn(userId);
