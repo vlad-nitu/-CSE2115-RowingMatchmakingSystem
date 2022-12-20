@@ -54,6 +54,8 @@ class UserServiceTest {
                 "certificate", new HashSet<>(), new HashSet<>()));
         when(userRepository.findById("id")).thenReturn(expected);
         assertThat(userService.findCompetitivenessByUserId("id")).isEqualTo(expected.get().isCompetitive());
+        when(userRepository.findById("")).thenReturn(Optional.empty());
+        assertThat(userService.findCompetitivenessByUserId("")).isEqualTo(false);
     }
 
     @Test
@@ -62,6 +64,8 @@ class UserServiceTest {
                 "certificate", new HashSet<>(), new HashSet<>()));
         when(userRepository.findById("id")).thenReturn(expected);
         assertThat(userService.findGenderById("id")).isEqualTo(expected.get().getGender());
+        when(userRepository.findById("")).thenReturn(Optional.empty());
+        assertThat(userService.findGenderById("")).isEqualTo(' ');
     }
 
     @Test
@@ -70,6 +74,8 @@ class UserServiceTest {
                 "certificate", new HashSet<>(), new HashSet<>()));
         when(userRepository.findById("id")).thenReturn(expected);
         assertThat(userService.findCertificateById("id")).isEqualTo(expected.get().getCertificate());
+        when(userRepository.findById("")).thenReturn(Optional.empty());
+        assertThat(userService.findCertificateById("")).isEqualTo(null);
     }
 
     @Test
@@ -78,6 +84,8 @@ class UserServiceTest {
                 "certificate", new HashSet<>(), new HashSet<>()));
         when(userRepository.findById("id")).thenReturn(expected);
         assertThat(userService.findOrganisationById("id")).isEqualTo(expected.get().getOrganisation());
+        when(userRepository.findById("")).thenReturn(Optional.empty());
+        assertThat(userService.findOrganisationById("")).isEqualTo(null);
     }
 
     @Test
@@ -86,5 +94,7 @@ class UserServiceTest {
                 "certificate", new HashSet<>(), new HashSet<>()));
         when(userRepository.findById("id")).thenReturn(expected);
         assertThat(userService.findPositionsById("id")).isEqualTo(expected.get().getPositions());
+        when(userRepository.findById("")).thenReturn(Optional.empty());
+        assertThat(userService.findPositionsById("")).isEqualTo(new HashSet<>());
     }
 }

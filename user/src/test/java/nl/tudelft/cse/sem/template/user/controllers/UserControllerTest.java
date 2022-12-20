@@ -138,6 +138,7 @@ public class UserControllerTest {
         expected = contentAsString.contains("The provided gender is invalid!");
         assertThat(expected);
 
+        user.setGender('M');
         lenient().when(userService.findUserById(anyString()))
                 .thenReturn(Optional.of(new User()));
         mvcResult = mockMvc

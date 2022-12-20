@@ -8,10 +8,10 @@ import java.util.regex.Matcher;
 public class InputValidation {
 
     private static final Pattern patternNoSpecialCharacters = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
-
+    private static final Pattern patternMF = Pattern.compile("[^mf]", Pattern.CASE_INSENSITIVE);
 
     /**
-     * Validates the userId by checking if it contains special characters.
+     * Validates the userId by checking if it follows the required format.
      *
      * @param userId - the ID of the user to be validated
      * @return boolean defining whether the input passed the validation
@@ -32,7 +32,9 @@ public class InputValidation {
      */
     public static boolean userGenderValidation(Character gender) {
 
-        return gender == 'M' || gender == 'F' || gender == 'f' || gender == 'm';
+        Matcher matcher = patternMF.matcher(gender.toString());
+
+        return !matcher.find();
 
     }
 

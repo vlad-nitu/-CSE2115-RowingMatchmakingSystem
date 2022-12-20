@@ -16,8 +16,10 @@ class InputValidationTest {
 
     @Test
     void userGenderValidation() {
-        char genderValid = 'M';
-        assertTrue(InputValidation.userGenderValidation(genderValid));
+        char genderValidM = 'M';
+        assertTrue(InputValidation.userGenderValidation(genderValidM));
+        char genderValidf = 'f';
+        assertTrue(InputValidation.userGenderValidation(genderValidf));
         char genderInvalid = 'N';
         assertFalse(InputValidation.userGenderValidation(genderInvalid));
     }
