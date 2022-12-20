@@ -377,7 +377,9 @@ public class MatchingControllerTest {
         String ownerId = "Vlad";
         lenient().when(activityPublisher.getOwnerId(matching.getActivityId())).thenReturn(ownerId);
         lenient().when(authManager.getNetId()).thenReturn(ownerId);
-        lenient().when(matchingServiceImpl.checkId(matching.getUserId(), matching.getActivityId(), matching.getPosition())).thenReturn(false);
+        lenient().when(matchingServiceImpl.checkId(matching.getUserId(),
+                matching.getActivityId(),
+                matching.getPosition())).thenReturn(false);
         MvcResult mvcResult = mockMvc
                 .perform(post("/decideMatch/Vlad/accept")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -396,7 +398,9 @@ public class MatchingControllerTest {
         String ownerId = "Vlad";
         lenient().when(activityPublisher.getOwnerId(matching.getActivityId())).thenReturn(ownerId);
         lenient().when(authManager.getNetId()).thenReturn(ownerId);
-        lenient().when(matchingServiceImpl.checkId(matching.getUserId(), matching.getActivityId(), matching.getPosition())).thenReturn(true);
+        lenient().when(matchingServiceImpl.checkId(matching.getUserId(),
+                matching.getActivityId(),
+                matching.getPosition())).thenReturn(true);
         MvcResult mvcResult = mockMvc
                 .perform(post("/decideMatch/Vlad/lol")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -56,7 +56,8 @@ public class MatchingController {
      * @return - ResponseEntity object with a message composed of all the possible activities a user can be matched to.
      */
     @PostMapping("/getAvailableActivities/{userId}")
-    public ResponseEntity<List<Pair<Long, String>>> getAvailableActivities(@PathVariable String userId, @RequestBody List<TimeSlot> timeSlots) {
+    public ResponseEntity<List<Pair<Long, String>>> getAvailableActivities(@PathVariable String userId,
+                                                                           @RequestBody List<TimeSlot> timeSlots) {
 
         if (!authManger.getNetId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -97,7 +98,10 @@ public class MatchingController {
         matching.setPending(true);
         Matching savedMatching = matchingServiceImpl.save(matching);
         String targetId = activityPublisher.getOwnerId(matching.getActivityId());
-        notificationPublisher.notifyUser(matching.getUserId(), targetId, matching.getActivityId(), matching.getPosition(), "notifyOwner");
+        notificationPublisher.notifyUser(matching.getUserId(),
+                        targetId, matching.getActivityId(),
+                        matching.getPosition(),
+                        "notifyOwner");
         return ResponseEntity.ok(savedMatching);
     }
 
@@ -111,12 +115,14 @@ public class MatchingController {
      * @return ResponseEntity object with a message composed of the matching that was accepted or declined
      */
     @PostMapping("/decideMatch/{senderId}/{type}")
-    public ResponseEntity<Matching> chooseMatch(@Valid @RequestBody Matching matching, @PathVariable String senderId, @PathVariable String type){
-        String ownerId = activityPublisher.getOwnerId(matching.getActivityId());
+    public ResponseEntity<Matching> chooseMatch(@Valid @RequestBody Matching matching,
+                                                @PathVariable String senderId,
+                                                @PathVariable String type) {
+
         if (!authManger.getNetId().equals(senderId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        if (!ownerId.equals(senderId)) {
+        if (!senderId.equals(activityPublisher.getOwnerId(matching.getActivityId()))) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         if (!matchingServiceImpl.checkId(matching.getUserId(), matching.getActivityId(), matching.getPosition())) {
