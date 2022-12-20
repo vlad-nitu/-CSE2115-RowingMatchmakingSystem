@@ -220,8 +220,6 @@ public class MatchingControllerTest {
 
     @Test
     public void getUserActivitiesTestFails() throws Exception {
-
-        when(matchingServiceImpl.findActivitiesByUserId("Vlad")).thenReturn(List.of(1L));
         lenient().when(authManager.getNetId()).thenReturn("Niq");
         MvcResult mvcResult = mockMvc
                 .perform(get("/getUserActivities/Vlad"))
@@ -230,7 +228,7 @@ public class MatchingControllerTest {
 
         //JSON String representation of List<Long> object.
         String contentAsString = mvcResult.getResponse().getContentAsString();
-        assertThat(contentAsString).contains("1");
+        assertThat(contentAsString).contains("");
     }
 
     @Test
