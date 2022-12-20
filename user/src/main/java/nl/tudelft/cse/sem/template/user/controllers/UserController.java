@@ -7,18 +7,14 @@ import nl.tudelft.cse.sem.template.user.utils.InputValidation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
 import nl.tudelft.cse.sem.template.user.domain.User;
 import nl.tudelft.cse.sem.template.user.services.UserService;
 
 import javax.validation.Valid;
-import java.util.Optional;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 //TODO parse or personalise error messages
 @RestController
@@ -129,4 +125,26 @@ public class UserController {
     public ResponseEntity<List<User>> findAllUsers() {
         return ResponseEntity.ok(userService.findAll());
     }
+
+    /**
+     * Handles BAD_REQUEST exceptions thrown by the Validator of Matching entities
+     * Acts as a parser of the BAD_REQUEST exception messageb bodies.
+     * Triggered for all Matching entities that do not respect the @Valid annotation
+     *
+     * @param ex exception
+     * @return a Mapping fieldName -> errorMessage
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
+    }
 }
+
