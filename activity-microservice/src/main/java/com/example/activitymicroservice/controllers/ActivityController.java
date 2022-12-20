@@ -147,7 +147,7 @@ public class ActivityController {
      * @param activityId the id of the activity to be deleted
      * @return the deleted activity
      */
-    @DeleteMapping("/cancelActivity/{activityId}")
+    @PostMapping("/cancelActivity/{activityId}")
     public ResponseEntity<Activity> cancelActivity(@PathVariable Long activityId) {
         Optional<Activity> activity = activityService.findActivityOptional(activityId);
         if (activity.isEmpty()) {
@@ -159,16 +159,6 @@ public class ActivityController {
         if (!matchingPublisher.deleteMatchingByActivityId(activityId)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-
-        /* For easy creation for testing
-        Activity training = new Training();
-        training.setOwnerId("5559375");
-        training.setCertificate("B4");
-        training.setType("training");
-        training.setPositions(Set.of("cox", "coach", "guard"));
-        training.setTimeSlot(null);
-        Activity act = activityService.save(training);
-        */
         activityService.deleteById(activityId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(activity.get());
     }
