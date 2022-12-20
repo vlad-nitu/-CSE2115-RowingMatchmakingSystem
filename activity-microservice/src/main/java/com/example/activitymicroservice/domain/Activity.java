@@ -36,10 +36,7 @@ public abstract class Activity {
     private Long activityId;
     private String ownerId;
 
-    @CollectionTable(
-            name = "TimeSlots",
-            joinColumns = @JoinColumn(name = "activity_id")
-    )
+    @Embedded
     private TimeSlot timeSlot;
 
     @ElementCollection
