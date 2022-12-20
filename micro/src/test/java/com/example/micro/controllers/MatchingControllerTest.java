@@ -99,6 +99,28 @@ public class MatchingControllerTest {
     }
 
     @Test
+    void getAvailableActivitiesUnauthorizedTest() throws Exception {
+
+        lenient().when(authManager.getNetId()).thenReturn("Niq");
+        lenient().when(matchingServiceImpl.findActivitiesByUserId(userId)).thenReturn(List.of());
+        lenient().when(activityPublisher.getTimeSlots(List.of())).thenReturn(List.of());
+        // when(FunctionUtils.filterTimeSlots(List.of(), List.of())).thenReturn(List.of());
+        lenient().when(activityPublisher.getAvailableActivities(userId, List.of())).thenReturn(List.of());
+
+        MvcResult result = mockMvc
+                .perform(post("/getAvailableActivities/Vlad")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(List.of()))
+                )
+                .andExpect(status().isUnauthorized())
+                .andReturn();
+
+        String content = result.getResponse().getContentAsString();
+        assertThat(content).isEqualTo(""); // Blank
+
+    }
+
+    @Test
     public void chooseActivityFail1() throws Exception {
         when(authManager.getNetId()).thenReturn(userId);
         when(activityPublisher.check(any(Matching.class))).thenReturn(false);
@@ -128,6 +150,30 @@ public class MatchingControllerTest {
                 .andReturn();
 
         assertThat(mvcResult.getResponse().getContentAsString()).isEmpty(); // no response received
+    }
+
+    @Test
+    public void chooseActivityUnauthorizedTest() throws Exception {
+
+        lenient()
+                .when(authManager.getNetId()).thenReturn("Niq");
+        lenient()
+                .when(activityPublisher.check(any(Matching.class))).thenReturn(true);
+        lenient()
+                .when(matchingServiceImpl
+                        .findMatchingWithPendingFalse(anyString(), anyLong()))
+                .thenReturn(Optional.of(matching));
+
+        MvcResult mvcResult = mockMvc
+                .perform(post("/chooseActivity")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(matching))
+                )
+                .andExpect(status().isUnauthorized())
+                .andReturn();
+
+        assertThat(mvcResult.getResponse().getContentAsString()).isEmpty(); // no response received
+
     }
 
     @Test
