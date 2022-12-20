@@ -22,11 +22,14 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.mockito.Mockito.when;
@@ -107,6 +110,47 @@ public class UserControllerTest {
         String contentAsString = mvcResult.getResponse().getContentAsString();
         User obtained = objectMapper.readValue(contentAsString, User.class);
         assertThat(obtained).isEqualTo(user);
+
+        user.setUserId("Invalid!");
+        mvcResult = mockMvc
+                .perform(post("/createUser")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(user))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        boolean expected = contentAsString.contains("The provided ID is invalid!");
+        assertThat(expected);
+
+        user.setUserId("Valid");
+        user.setGender('N');
+        mvcResult = mockMvc
+                .perform(post("/createUser")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(user))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        expected = contentAsString.contains("The provided gender is invalid!");
+        assertThat(expected);
+
+        lenient().when(userService.findUserById(anyString()))
+                .thenReturn(Optional.of(new User()));
+        mvcResult = mockMvc
+                .perform(post("/createUser")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(user))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        expected = contentAsString.contains("User with the given ID already exists!");
+        assertThat(expected);
     }
 
     @Test
