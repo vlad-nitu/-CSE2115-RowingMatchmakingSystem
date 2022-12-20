@@ -1,6 +1,5 @@
 package com.example.activitymicroservice.utils;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -10,15 +9,15 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.*;
 
-import javax.persistence.Entity;
+import javax.persistence.Embeddable;
 
+@Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
 @Getter
 @Setter
-public class TimeSlot implements Serializable {
-    static final long serialVersionUID = -3387516993124229948L;
+public class TimeSlot {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     @JsonSerialize(using = LocalDateTimeSerializer.class)

@@ -3,14 +3,7 @@ package com.example.activitymicroservice.domain;
 import com.example.activitymicroservice.utils.TimeSlot;
 import java.util.Objects;
 import java.util.Set;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Transient;
-import javax.persistence.ElementCollection;
-import javax.persistence.Column;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -42,6 +35,11 @@ public abstract class Activity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long activityId;
     private String ownerId;
+
+    @CollectionTable(
+            name = "TimeSlots",
+            joinColumns = @JoinColumn(name = "activity_id")
+    )
     private TimeSlot timeSlot;
 
     @ElementCollection
