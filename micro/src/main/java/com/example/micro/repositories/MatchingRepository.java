@@ -7,11 +7,14 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
+
 @Repository
 public interface MatchingRepository extends JpaRepository<Matching, CompositeKey> {
     Optional<List<Matching>> findMatchingsByUserId(String userId);
 
     Optional<Matching> findMatchingByUserIdAndActivityIdAndPending(String userId, Long activityId, Boolean pending);
 
+    @Transactional
     void deleteByActivityId(Long activityId);
 }
