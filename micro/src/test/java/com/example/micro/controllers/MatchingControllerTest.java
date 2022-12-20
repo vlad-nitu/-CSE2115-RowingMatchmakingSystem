@@ -273,7 +273,7 @@ public class MatchingControllerTest {
         lenient().when(activityPublisher.getOwnerId(1L)).thenReturn("Vlad");
 
         MvcResult mvcResult = mockMvc
-                .perform(get("/deleteMatchingByActivityId/1"))
+                .perform(post("/deleteMatchingByActivityId/1"))
                 .andExpect(status().isUnauthorized())
                 .andReturn();
 
@@ -287,7 +287,7 @@ public class MatchingControllerTest {
         lenient().when(activityPublisher.getOwnerId(1L)).thenReturn("Vlad");
 
         MvcResult mvcResult = mockMvc
-                .perform(get("/deleteMatchingByActivityId/1"))
+                .perform(post("/deleteMatchingByActivityId/1"))
                 .andExpect(status().isNoContent())
                 .andReturn();
 

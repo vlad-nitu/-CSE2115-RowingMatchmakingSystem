@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import javax.ws.rs.core.Response;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -28,20 +29,20 @@ class MatchingPublisherTest {
     @Test
     void not204Response() throws Exception {
         Response res = Response.status(500).build();
-        when(activityUtils.getRequest(anyString())).thenReturn(res);
+        when(activityUtils.postRequest(anyString(), any())).thenReturn(res);
         assertFalse(matchingPublisher.deleteMatchingByActivityId(1L));
     }
 
     @Test
     void successfulDeletionResponse() throws Exception {
         Response res = Response.status(204).build();
-        when(activityUtils.getRequest(anyString())).thenReturn(res);
+        when(activityUtils.postRequest(anyString(), any())).thenReturn(res);
         assertTrue(matchingPublisher.deleteMatchingByActivityId(1L));
     }
 
     @Test
     void errorRequest() throws Exception {
-        when(activityUtils.getRequest(anyString())).thenThrow(new Exception());
+        when(activityUtils.postRequest(anyString(), any())).thenThrow(new Exception());
         assertFalse(matchingPublisher.deleteMatchingByActivityId(1L));
     }
 }

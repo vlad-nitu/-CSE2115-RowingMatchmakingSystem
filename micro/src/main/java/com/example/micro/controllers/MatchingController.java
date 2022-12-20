@@ -208,7 +208,7 @@ public class MatchingController {
      * @param activityId Long object
      * @return - Response Entity of type 204_NO_CONTENT as the Matching was deleted with empty body
      */
-    @GetMapping("/deleteMatchingByActivityId/{activityId}")
+    @PostMapping("/deleteMatchingByActivityId/{activityId}")
     public ResponseEntity<Matching> deleteMatchingByActivityId(@PathVariable Long activityId) {
         String ownerId = activityPublisher.getOwnerId(activityId);
         if (!authManger.getNetId().equals(ownerId)) {

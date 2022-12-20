@@ -32,7 +32,7 @@ public class MatchingPublisher {
     public boolean deleteMatchingByActivityId(Long activityId) {
         try {
             @Cleanup
-            Response res = activityUtils.getRequest("/deleteMatchingByActivityId/" + activityId);
+            Response res = activityUtils.postRequest("/deleteMatchingByActivityId/" + activityId, null);
             return res.getStatus() == 204;
         } catch (Exception e) {
             System.out.println(e.getMessage());
