@@ -37,13 +37,11 @@ import lombok.ToString;
         @JsonSubTypes.Type(value = Training.class, name = "training"),
         @JsonSubTypes.Type(value = Competition.class, name = "competition")
 })
-public class Activity {
+public abstract class Activity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long activityId;
     private String ownerId;
-    @Transient
-
     private TimeSlot timeSlot;
 
     @ElementCollection
@@ -54,7 +52,6 @@ public class Activity {
                 @Size(min = 3, max = 20, message = "Position name must be between 3 and 20 characters") String> positions;
 
     private String certificate;
-    private String type; // used for deserialization of abstract class instance
 
     //Added this because we need an equals method for testing and the Lombok
     //Equals and hashcode was throwing a scary warning regarding JPA entities
@@ -72,12 +69,11 @@ public class Activity {
                 && Objects.equals(getOwnerId(), activity.getOwnerId())
                 && Objects.equals(getTimeSlot(), activity.getTimeSlot())
                 && Objects.equals(getPositions(), activity.getPositions())
-                && Objects.equals(getCertificate(), activity.getCertificate())
-                && Objects.equals(getType(), activity.getType());
+                && Objects.equals(getCertificate(), activity.getCertificate());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getActivityId(), getOwnerId(), getTimeSlot(), getPositions(), getCertificate(), getType());
+        return Objects.hash(getActivityId(), getOwnerId(), getTimeSlot(), getPositions(), getCertificate());
     }
 }

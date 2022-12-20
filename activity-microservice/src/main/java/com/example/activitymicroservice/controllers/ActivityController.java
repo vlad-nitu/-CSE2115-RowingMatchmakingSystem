@@ -17,12 +17,13 @@ import com.example.activitymicroservice.validators.CertificateValidator;
 import com.example.activitymicroservice.validators.CompetitivenessValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.InvalidObjectException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 public class ActivityController {
@@ -162,6 +163,26 @@ public class ActivityController {
         activityService.deleteById(activityId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(activity.get());
     }
+
+    /**
+     * Handles BAD_REQUEST exceptions thrown by the Validator of Activity entities
+     * Acts as a parser of the BAD_REQUEST exception messageb bodies.
+     *
+     * @param ex exception
+     * @return a Mapping fieldName -> errorMessage
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
+    }
+
 
 }
 

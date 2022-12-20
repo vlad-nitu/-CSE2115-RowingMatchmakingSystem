@@ -1,33 +1,33 @@
 package com.example.activitymicroservice.utils;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.Objects;
 
-public class TimeSlot {
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import lombok.*;
+
+import javax.persistence.Entity;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@Getter
+@Setter
+public class TimeSlot implements Serializable {
+    static final long serialVersionUID = -3387516993124229948L;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime start;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime end;
-
-    public TimeSlot(LocalDateTime start, LocalDateTime end) {
-        this.start = start;
-        this.end = end;
-    }
-
-    public LocalDateTime getStart() {
-        return start;
-    }
-
-    public void setStart(LocalDateTime start) {
-        this.start = start;
-    }
-
-    public LocalDateTime getEnd() {
-        return end;
-    }
-
-    public void setEnd(LocalDateTime end) {
-        this.end = end;
-    }
 
     /**
      * Checks if the current TimeSlot is included in another TimeSlot.
@@ -47,26 +47,8 @@ public class TimeSlot {
         return false;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        TimeSlot timeSlot = (TimeSlot) o;
-        return start.equals(timeSlot.start) && end.equals(timeSlot.end);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(start, end);
-    }
-
     public boolean overlaps(TimeSlot o) {
-        return (this.end.isAfter(o.getStart()) && this.end.isBefore(o.getEnd()))
-                || (this.start.isAfter(o.getStart()) && this.start.isBefore(o.getEnd()));
+        return (this.end.isAfter(o.getStart()) && this.end.isBefore(o.getEnd())
+                || (this.start.isAfter(o.getStart()) && this.start.isBefore(o.getEnd())));
     }
 }
