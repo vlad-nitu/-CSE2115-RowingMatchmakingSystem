@@ -127,9 +127,9 @@ public class UserController {
     }
 
     /**
-     * Handles BAD_REQUEST exceptions thrown by the Validator of Matching entities
-     * Acts as a parser of the BAD_REQUEST exception messageb bodies.
-     * Triggered for all Matching entities that do not respect the @Valid annotation
+     * Handles BAD_REQUEST exceptions thrown by the Validator of User entities
+     * Acts as a parser of the BAD_REQUEST exception messages bodies.
+     * Triggered for all User entities that do not respect the @Valid annotation
      *
      * @param ex exception
      * @return a Mapping fieldName -> errorMessage
