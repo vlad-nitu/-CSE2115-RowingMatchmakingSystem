@@ -50,9 +50,10 @@ public class UserController {
             // return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        if (!InputValidation.validatePositions(user.getPositions()))
+        if (!InputValidation.validatePositions(user.getPositions())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("One of the positions that you provided is not valid!");
+        }
 
         return ResponseEntity.ok(userService.save(user));
     }

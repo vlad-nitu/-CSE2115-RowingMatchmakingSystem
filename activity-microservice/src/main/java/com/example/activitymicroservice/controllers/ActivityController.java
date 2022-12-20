@@ -33,12 +33,13 @@ public class ActivityController {
     private final transient MatchingPublisher matchingPublisher;
     private final transient AuthManager authManager;
 
-    /** Constructor for injection.
+    /**
+     * Constructor for injection.
      *
-     * @param activityService activity service
-     * @param userPublisher user publisher
+     * @param activityService   activity service
+     * @param userPublisher     user publisher
      * @param matchingPublisher matching publisher
-     * @param authManager authentication manager
+     * @param authManager       authentication manager
      */
     public ActivityController(ActivityService activityService,
                               UserPublisher userPublisher, MatchingPublisher matchingPublisher, AuthManager authManager) {
@@ -73,7 +74,7 @@ public class ActivityController {
             return ResponseEntity.ok();
         } catch (Exception e) {
             e.printStackTrace();
-            return  ResponseEntity.badRequest();
+            return ResponseEntity.badRequest();
         }
     }
 
@@ -81,10 +82,10 @@ public class ActivityController {
      * API Endpoint that performs a GET request in order to
      * check if a User is eligible for a certain Activity.
      *
-     * @param userId String object representing the User's ID
+     * @param userId     String object representing the User's ID
      * @param activityId Long object representing the Activity's ID
-     * @param position String object representing the position the User is applying to
-     * @return  ResponseEntity object with a boolean to certify if the User is eligible for that Activity or not
+     * @param position   String object representing the position the User is applying to
+     * @return ResponseEntity object with a boolean to certify if the User is eligible for that Activity or not
      */
     @GetMapping("/check/{userId}/{activityId}/{position}")
     public ResponseEntity<Boolean> check(@PathVariable String userId,
@@ -99,12 +100,18 @@ public class ActivityController {
                 certificate, organisation, competitiveness, listPositions, position));
     }
 
+    /**
+     * API enpoint that allows for creating an Activity object and persisting it to the DB.
+     *
+     * @param activity - Activity object that you will create
+     * @return - 200_OK, if activity was created, or 400_BAD_REQUEST if the Activity object failed input validation stage
+     */
     @PostMapping("/createActivity")
     public ResponseEntity<Activity> createActivity(@RequestBody Activity activity) {
 
-        if (InputValidation.validatePositions(activity.getPositions()))
+        if (InputValidation.validatePositions(activity.getPositions())) {
             return ResponseEntity.ok(this.activityService.save(activity));
-        else {
+        } else {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -114,7 +121,7 @@ public class ActivityController {
      * Pair(Activity.ID, Position) that a certain User can enrol to.
      *
      * @param timeSlots the List of TimeSlots of a User
-     * @param userId the ID of the User
+     * @param userId    the ID of the User
      * @return a List of Pair(Activity.ID, Position)
      */
     @PostMapping("/sendAvailableActivities/{userId}")
@@ -149,7 +156,8 @@ public class ActivityController {
     }
 
 
-    /** API endpoint that performs a DELETE request for the given activityId.
+    /**
+     * API endpoint that performs a DELETE request for the given activityId.
      *
      * @param activityId the id of the activity to be deleted
      * @return the deleted activity
