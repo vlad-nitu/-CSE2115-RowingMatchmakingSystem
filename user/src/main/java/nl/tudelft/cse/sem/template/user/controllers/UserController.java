@@ -1,5 +1,8 @@
 package nl.tudelft.cse.sem.template.user.controllers;
 
+import nl.tudelft.cse.sem.template.user.publishers.ActivityPublisher;
+import nl.tudelft.cse.sem.template.user.publishers.MatchingPublisher;
+import nl.tudelft.cse.sem.template.user.publishers.NotificationPublisher;
 import nl.tudelft.cse.sem.template.user.utils.InputValidation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,14 +25,21 @@ import java.util.Set;
 public class UserController {
 
     private final transient UserService userService;
+    private final transient ActivityPublisher activityPublisher;
+    private final transient MatchingPublisher matchingPublisher;
+    private final transient NotificationPublisher notificationPublisher;
 
     /**
      * All argument constructor, injects the main service component and all (4 now 0) publishers into the controller.
      *
      * @param userService - user service implementation
      */
-    public UserController(UserService userService) {
+    public UserController(UserService userService, ActivityPublisher activityPublisher,
+                          MatchingPublisher matchingPublisher, NotificationPublisher notificationPublisher) {
         this.userService = userService;
+        this.activityPublisher = activityPublisher;
+        this.matchingPublisher = matchingPublisher;
+        this.notificationPublisher = notificationPublisher;
     }
 
     /**

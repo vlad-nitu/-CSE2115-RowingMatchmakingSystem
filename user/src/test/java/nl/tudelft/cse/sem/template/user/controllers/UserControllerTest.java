@@ -3,6 +3,9 @@ package nl.tudelft.cse.sem.template.user.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import nl.tudelft.cse.sem.template.user.publishers.ActivityPublisher;
+import nl.tudelft.cse.sem.template.user.publishers.MatchingPublisher;
+import nl.tudelft.cse.sem.template.user.publishers.NotificationPublisher;
 import nl.tudelft.cse.sem.template.user.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +38,9 @@ public class UserControllerTest {
     MockMvc mockMvc;
     @Mock
     private UserService userService;
+    private ActivityPublisher activityPublisher;
+    private MatchingPublisher matchingPublisher;
+    private NotificationPublisher notificationPublisher;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private UserController userController;
@@ -64,7 +70,7 @@ public class UserControllerTest {
                 LocalDateTime.of(2022, 12, 14, 19, 15)));
         user = new User(userId, competitive, gender, organization, certificate, positions, timeSlots);
 
-        this.userController = new UserController(userService);
+        this.userController = new UserController(userService, activityPublisher, matchingPublisher, notificationPublisher);
 
         mockMvc = MockMvcBuilders
                 .standaloneSetup(userController)
