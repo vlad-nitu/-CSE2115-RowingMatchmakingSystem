@@ -2,42 +2,52 @@
 
 package com.example.activitymicroservice.controllers;
 
+import com.example.activitymicroservice.authentication.AuthManager;
 import com.example.activitymicroservice.domain.Activity;
+import com.example.activitymicroservice.publishers.MatchingPublisher;
 import com.example.activitymicroservice.publishers.UserPublisher;
 import com.example.activitymicroservice.services.ActivityService;
 import com.example.activitymicroservice.utils.Pair;
 import com.example.activitymicroservice.utils.TimeSlot;
-import com.example.activitymicroservice.validators.BaseValidator;
 import com.example.activitymicroservice.validators.Validator;
 import com.example.activitymicroservice.validators.GenderValidator;
 import com.example.activitymicroservice.validators.PositionValidator;
 import com.example.activitymicroservice.validators.OrganisationValidator;
 import com.example.activitymicroservice.validators.CertificateValidator;
 import com.example.activitymicroservice.validators.CompetitivenessValidator;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.InvalidObjectException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class ActivityController {
     private final transient ActivityService activityService;
     private final transient UserPublisher userPublisher;
+    private final transient MatchingPublisher matchingPublisher;
+    private final transient AuthManager authManager;
 
+    /** Constructor for injection.
+     *
+     * @param activityService activity service
+     * @param userPublisher user publisher
+     * @param matchingPublisher matching publisher
+     * @param authManager authentication manager
+     */
     public ActivityController(ActivityService activityService,
-                              UserPublisher userPublisher) {
+                              UserPublisher userPublisher, MatchingPublisher matchingPublisher, AuthManager authManager) {
         this.activityService = activityService;
         this.userPublisher = userPublisher;
+        this.matchingPublisher = matchingPublisher;
+        this.authManager = authManager;
     }
 
     @GetMapping("/sendOwnerId/{activityId}")
-    public ResponseEntity<String> sentOwnerId(@PathVariable Long activityId) {
+    public ResponseEntity<String> sendOwnerId(@PathVariable Long activityId) {
         return ResponseEntity.ok(this.activityService.findActivity(activityId).getOwnerId());
     }
 
@@ -130,6 +140,29 @@ public class ActivityController {
         }
         return ResponseEntity.ok(list);
     }
+
+
+    /** API endpoint that performs a DELETE request for the given activityId.
+     *
+     * @param activityId the id of the activity to be deleted
+     * @return the deleted activity
+     */
+    @PostMapping("/cancelActivity/{activityId}")
+    public ResponseEntity<Activity> cancelActivity(@PathVariable Long activityId) {
+        Optional<Activity> activity = activityService.findActivityOptional(activityId);
+        if (activity.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        if (!authManager.getNetId().equals(activity.get().getOwnerId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        if (!matchingPublisher.deleteMatchingByActivityId(activityId)) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+        activityService.deleteById(activityId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(activity.get());
+    }
+
 }
 
 

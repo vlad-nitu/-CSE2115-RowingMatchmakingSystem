@@ -8,9 +8,11 @@ import com.example.activitymicroservice.utils.TimeSlot;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Service
@@ -49,6 +51,11 @@ public class ActivityService {
         return activityRepository.findById(activityId).get();
     }
 
+    public Optional<Activity> findActivityOptional(Long activityId) {
+        return activityRepository.findById(activityId);
+    }
+
+    @Transactional
     public void deleteById(Long activityId) {
         activityRepository.deleteById(activityId);
     }
