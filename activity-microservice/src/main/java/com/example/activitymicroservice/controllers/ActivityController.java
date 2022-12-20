@@ -7,6 +7,7 @@ import com.example.activitymicroservice.domain.Activity;
 import com.example.activitymicroservice.publishers.MatchingPublisher;
 import com.example.activitymicroservice.publishers.UserPublisher;
 import com.example.activitymicroservice.services.ActivityService;
+import com.example.activitymicroservice.utils.InputValidation;
 import com.example.activitymicroservice.utils.Pair;
 import com.example.activitymicroservice.utils.TimeSlot;
 import com.example.activitymicroservice.validators.Validator;
@@ -100,7 +101,12 @@ public class ActivityController {
 
     @PostMapping("/createActivity")
     public ResponseEntity<Activity> createActivity(@RequestBody Activity activity) {
-        return ResponseEntity.ok(this.activityService.save(activity));
+
+        if (InputValidation.validatePositions(activity.getPositions()))
+            return ResponseEntity.ok(this.activityService.save(activity));
+        else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     /**
