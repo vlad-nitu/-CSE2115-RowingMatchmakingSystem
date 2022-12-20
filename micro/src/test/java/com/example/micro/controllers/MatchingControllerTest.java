@@ -253,6 +253,33 @@ public class MatchingControllerTest {
     }
 
     @Test
+    void deleteMatchingByActivityIdUnauthorizedTest() throws Exception {
+        lenient().when(authManager.getNetId()).thenReturn("Niq");
+        lenient().when(activityPublisher.getOwnerId(1L)).thenReturn("Vlad");
+
+        MvcResult mvcResult = mockMvc
+                .perform(get("/deleteMatchingByActivityId/1"))
+                .andExpect(status().isUnauthorized())
+                .andReturn();
+
+        verify(matchingServiceImpl, never()).deleteByActivityId(activityId);
+    }
+
+    @Test
+    void deleteMatchingByActivityIdTest() throws Exception {
+        Long activityId = 1L;
+        lenient().when(authManager.getNetId()).thenReturn("Vlad");
+        lenient().when(activityPublisher.getOwnerId(1L)).thenReturn("Vlad");
+
+        MvcResult mvcResult = mockMvc
+                .perform(get("/deleteMatchingByActivityId/1"))
+                .andExpect(status().isNoContent())
+                .andReturn();
+
+        lenient().doNothing().when(matchingServiceImpl).deleteByActivityId(activityId);
+    }
+
+    @Test
     public void findAllTest() throws Exception {
         List<Matching> expected = List.of(matching);
         when(matchingServiceImpl.findAll()).thenReturn(expected);

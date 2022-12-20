@@ -52,7 +52,7 @@ public class MatchingServiceImpl {
         return matching.isPresent() && matching.get().getPending();
     }
 
-    public void deleteByActivityId(Long activityId){
+    public void deleteByActivityId(Long activityId) {
         matchingRepository.deleteByActivityId(activityId);
     }
     /*
