@@ -30,9 +30,6 @@ public class User {
     @Column(name = "iscompetitive")
     private boolean isCompetitive;
 
-    //TODO change to String or validate with use of InputValidation.java
-    //@NotNull(message = "Gender is mandatory and cannot be null")
-    //@Pattern(regexp = "\\b[MF]{1}\\b", message = "Gender must be specified by M or F")
     @Column(name = "gender")
     private char gender;
 
