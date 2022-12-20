@@ -51,6 +51,10 @@ public class MatchingServiceImpl {
         Optional<Matching> matching = matchingRepository.findById(new CompositeKey(userId, activityId, position));
         return matching.isPresent() && matching.get().getPending();
     }
+
+    public void deleteByActivityId(Long activityId){
+        matchingRepository.deleteByActivityId(activityId);
+    }
     /*
     /**
      * Returns the pending status of a matching.

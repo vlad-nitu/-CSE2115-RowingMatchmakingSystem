@@ -12,4 +12,6 @@ public interface MatchingRepository extends JpaRepository<Matching, CompositeKey
     Optional<List<Matching>> findMatchingsByUserId(String userId);
 
     Optional<Matching> findMatchingByUserIdAndActivityIdAndPending(String userId, Long activityId, Boolean pending);
+
+    void deleteByActivityId(Long activityId);
 }

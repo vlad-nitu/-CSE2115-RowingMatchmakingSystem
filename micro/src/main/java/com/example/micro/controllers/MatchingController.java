@@ -120,7 +120,7 @@ public class MatchingController {
         if(!authManger.getNetId().equals(senderId)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        if (ownerId.equals(senderId) ){
+        if (!ownerId.equals(senderId) ){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         if (!matchingServiceImpl.checkId(matching.getUserId(), matching.getActivityId(), matching.getPosition())){
@@ -206,6 +206,16 @@ public class MatchingController {
         return ResponseEntity.ok(userIdActivityIdPair);
     }
 
+    @GetMapping("/deleteMatchingByActivityId/{activityId}")
+    public ResponseEntity<Matching> deleteMatchingByActivityId(@PathVariable Long activityId){
+        String ownerId = activityPublisher.getOwnerId(activityId);
+        if(!authManger.getNetId().equals(ownerId)){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        matchingServiceImpl.deleteByActivityId(activityId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
 
     /**
      * Find all matchings.
@@ -236,7 +246,7 @@ public class MatchingController {
      * Returns all the timeSlots a user has added in the request body.
      * Mainly for testing purposes of the serializer & deserializer of TimeSlot object
      *
-     * @param userId    ID of an User
+     * @param userId    ID of a User
      * @param timeSlots TimeSlots object
      * @return ResponseEntity with status 200_OK and the List of TimeSlot objects as body
      */
@@ -245,6 +255,7 @@ public class MatchingController {
                                                        @RequestBody List<TimeSlot> timeSlots) {
         return ResponseEntity.ok(timeSlots);
     }
+
 
 
     /**
