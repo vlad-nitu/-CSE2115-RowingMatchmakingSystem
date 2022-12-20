@@ -110,7 +110,7 @@ public class MatchingController {
      * @param type     The type of the request
      * @return ResponseEntity object with a message composed of the matching that was accepted or declined
      */
-    @PostMapping("/decideMatchAccept/{senderId}/{type}")
+    @PostMapping("/decideMatch/{senderId}/{type}")
     public ResponseEntity<Matching> chooseMatch(@Valid @RequestBody Matching matching, @PathVariable String senderId, @PathVariable String type) {
         String ownerId = activityPublisher.getOwnerId(matching.getActivityId());
         if (!authManger.getNetId().equals(senderId)) {
