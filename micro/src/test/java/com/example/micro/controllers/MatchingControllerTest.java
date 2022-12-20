@@ -80,6 +80,7 @@ public class MatchingControllerTest {
 
     @Test
     public void getAvailableActivitiesTest() throws Exception {
+        when(authManager.getNetId()).thenReturn(userId);
         when(matchingServiceImpl.findActivitiesByUserId(userId)).thenReturn(List.of());
         when(activityPublisher.getTimeSlots(List.of())).thenReturn(List.of());
         // when(FunctionUtils.filterTimeSlots(List.of(), List.of())).thenReturn(List.of());
@@ -99,6 +100,7 @@ public class MatchingControllerTest {
 
     @Test
     public void chooseActivityFail1() throws Exception {
+        when(authManager.getNetId()).thenReturn(userId);
         when(activityPublisher.check(any(Matching.class))).thenReturn(false);
         MvcResult mvcResult = mockMvc
                 .perform(post("/chooseActivity")
@@ -113,6 +115,7 @@ public class MatchingControllerTest {
 
     @Test
     public void chooseActivityFail2() throws Exception {
+        when(authManager.getNetId()).thenReturn(userId);
         when(activityPublisher.check(any(Matching.class))).thenReturn(true);
         when(matchingServiceImpl.findMatchingWithPendingFalse(anyString(), anyLong())).thenReturn(Optional.of(matching));
 
@@ -131,6 +134,7 @@ public class MatchingControllerTest {
     public void chooseActivity() throws Exception {
         Matching savedMatching = new Matching("Niq", 2L, "side", true);
 
+        when(authManager.getNetId()).thenReturn(userId);
         when(activityPublisher.check(any(Matching.class))).thenReturn(true);
         when(matchingServiceImpl.findMatchingWithPendingFalse(anyString(), anyLong())).thenReturn(Optional.empty());
         lenient().when(matchingServiceImpl.save(any(Matching.class))).thenReturn(savedMatching);

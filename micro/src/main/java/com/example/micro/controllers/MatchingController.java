@@ -59,6 +59,11 @@ public class MatchingController {
     @PostMapping("/getAvailableActivities/{userId}")
     public ResponseEntity<List<Pair<Long, String>>> getAvailableActivities(@PathVariable String userId,
                                                                            @RequestBody List<TimeSlot> timeSlots) {
+
+        if (!authManger.getNetId().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         List<Long> selectedActivities = matchingServiceImpl.findActivitiesByUserId(userId);
         List<TimeSlot> occTimeSlots = activityPublisher.getTimeSlots(selectedActivities);
         List<TimeSlot> newTimeSlots = FunctionUtils.filterTimeSlots(timeSlots, occTimeSlots);
@@ -76,8 +81,19 @@ public class MatchingController {
      */
     @PostMapping("/chooseActivity")
     public ResponseEntity<Matching> chooseActivity(@Valid @RequestBody Matching matching) {
-        if (!activityPublisher.check(matching)
-                || matchingServiceImpl.findMatchingWithPendingFalse(matching.getUserId(), matching.getActivityId())
+
+        String userId = matching.getUserId();
+
+        if (!authManger.getNetId().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        if (!activityPublisher.check(matching)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (matchingServiceImpl
+                .findMatchingWithPendingFalse(matching.getUserId(), matching.getActivityId())
                 .isPresent()) {
             return ResponseEntity.badRequest().build();
         }
