@@ -1,5 +1,6 @@
 package com.example.micro.controllers;
 
+import com.example.micro.authentication.AuthManager;
 import com.example.micro.domain.Matching;
 import com.example.micro.publishers.ActivityPublisher;
 import com.example.micro.publishers.NotificationPublisher;
@@ -28,6 +29,7 @@ public class MatchingController {
     private final transient MatchingServiceImpl matchingServiceImpl;
     private final transient ActivityPublisher activityPublisher;
     private final transient NotificationPublisher notificationPublisher;
+    private final transient AuthManager authManger;
 
     /**
      * All arguments constructor, injects the main service component and all 3 publishers into controller.
@@ -36,12 +38,13 @@ public class MatchingController {
      * @param activityPublisher     - for communication with Activity microservice through API Endpoints
      * @param notificationPublisher - for communication with Notification microservice through API Endpoints
      */
-    public MatchingController(MatchingServiceImpl matchingServiceImpl,
-                              ActivityPublisher activityPublisher,
-                              NotificationPublisher notificationPublisher) {
+    public MatchingController(MatchingServiceImpl matchingServiceImpl, ActivityPublisher activityPublisher,
+                              NotificationPublisher notificationPublisher,
+                              AuthManager authManager) {
         this.matchingServiceImpl = matchingServiceImpl;
         this.activityPublisher = activityPublisher;
         this.notificationPublisher = notificationPublisher;
+        this.authManger = authManager;
     }
 
     /**
@@ -55,6 +58,11 @@ public class MatchingController {
     @PostMapping("/getAvailableActivities/{userId}")
     public ResponseEntity<List<Pair<Long, String>>> getAvailableActivities(@PathVariable String userId,
                                                                            @RequestBody List<TimeSlot> timeSlots) {
+
+        if (!authManger.getNetId().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         List<Long> selectedActivities = matchingServiceImpl.findActivitiesByUserId(userId);
         List<TimeSlot> occTimeSlots = activityPublisher.getTimeSlots(selectedActivities);
         List<TimeSlot> newTimeSlots = FunctionUtils.filterTimeSlots(timeSlots, occTimeSlots);
@@ -72,34 +80,72 @@ public class MatchingController {
      */
     @PostMapping("/chooseActivity")
     public ResponseEntity<Matching> chooseActivity(@Valid @RequestBody Matching matching) {
-        if (!activityPublisher.check(matching)
-                || matchingServiceImpl.findMatchingWithPendingFalse(matching.getUserId(), matching.getActivityId())
-                .isPresent()) {
+
+        String userId = matching.getUserId();
+
+        if (!authManger.getNetId().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        if (!activityPublisher.check(matching)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (matchingServiceImpl.findMatchingWithPendingFalse(matching.getUserId(), matching.getActivityId()).isPresent()) {
             return ResponseEntity.badRequest().build();
         }
 
         matching.setPending(true);
         Matching savedMatching = matchingServiceImpl.save(matching);
         String targetId = activityPublisher.getOwnerId(matching.getActivityId());
-        notificationPublisher.notifyUser(matching.getUserId(), targetId,
-                matching.getActivityId(), matching.getPosition(), "notifyOwner");
+        notificationPublisher.notifyUser(matching.getUserId(),
+                        targetId, matching.getActivityId(),
+                        matching.getPosition(),
+                        "notifyOwner");
         return ResponseEntity.ok(savedMatching);
     }
+
+    /**
+     * API Endpoint performs a POST request in order for an owner of a specific activity
+     * to specify that it accepts or declines a user who is asking to take part in his/her activity in a previous request.
+     *
+     * @param matching Matching object representing the User-Activity pair
+     * @param senderId The id of the person that send the request
+     * @param type     The type of the request
+     * @return ResponseEntity object with a message composed of the matching that was accepted or declined
+     */
+    @PostMapping("/decideMatch/{senderId}/{type}")
+    public ResponseEntity<Matching> chooseMatch(@Valid @RequestBody Matching matching,
+                                                @PathVariable String senderId,
+                                                @PathVariable String type) {
+
+        if (!authManger.getNetId().equals(senderId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        if (!senderId.equals(activityPublisher.getOwnerId(matching.getActivityId()))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        if (!matchingServiceImpl.checkId(matching.getUserId(), matching.getActivityId(), matching.getPosition())) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (type.equals("accept")) {
+            return chooseMatchAccept(matching);
+        }
+        if (type.equals("decline")) {
+            return chooseMatchDecline(matching);
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
 
     /**
      * API Endpoint that performs a POST request in order for an owner of a specific activity
      * to specify that it accepts a user who is asking to take part in his/her activity in a previous request.
      *
      * @param matching - Matching object representing the User-Activity pair
-     * @return - ResponseEntity object with a message composed of the matching that was accepted or declined
+     * @return - ResponseEntity object with a message composed of the matching that was accepted
      */
-    @PostMapping("/decideMatchAccept/{senderId}")
-    public ResponseEntity<Matching> chooseMatchAccept(@Valid @RequestBody Matching matching, @PathVariable String senderId) {
-        String ownerId = activityPublisher.getOwnerId(matching.getActivityId());
-        if (ownerId.equals(senderId)
-                || !matchingServiceImpl.checkId(matching.getUserId(), matching.getActivityId(), matching.getPosition())) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Matching> chooseMatchAccept(Matching matching) {
         matchingServiceImpl.deleteById(matching.getUserId(), matching.getActivityId(), matching.getPosition());
         matching.setPending(false);
         Matching savedMatching = matchingServiceImpl.save(matching);
@@ -115,29 +161,25 @@ public class MatchingController {
      * to specify that it decline a user who is asking to take part in his/her activity in a previous request.
      *
      * @param matching - Matching object representing the User-Activity pair
-     * @return - ResponseEntity object with a message composed of the matching that was accepted or declined
+     * @return - ResponseEntity object with a message composed of the matching that was declined
      */
-    @PostMapping("/decideMatchDecline/{senderId}")
-    public ResponseEntity<Matching> chooseMatchDecline(@Valid @RequestBody Matching matching,
-                                                       @PathVariable String senderId) {
-        String ownerId = activityPublisher.getOwnerId(matching.getActivityId());
-        if (ownerId.equals(senderId)
-                || !matchingServiceImpl.checkId(matching.getUserId(), matching.getActivityId(), matching.getPosition())) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Matching> chooseMatchDecline(Matching matching) {
         matchingServiceImpl.deleteById(matching.getUserId(), matching.getActivityId(), matching.getPosition());
         matching.setPending(true);
         return ResponseEntity.ok(matching);
     }
 
     /**
-     * API Endpoint that performs a GET request in order to obtain all the activities that an user was mapped to.
+     * API Endpoint that performs a GET request in order to obtain all the activities that a user was mapped to.
      *
-     * @param userId - String object representing the unique identifier of an User
+     * @param userId - String object representing the unique identifier of a User
      * @return - ResponseEntity object with a message composed of a List of activityID's (which are represented as Longs)
      */
     @GetMapping("/getUserActivities/{userId}")
     public ResponseEntity<List<Long>> getUserActivities(@PathVariable String userId) {
+        if (!authManger.getNetId().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         return ResponseEntity.ok(matchingServiceImpl.findActivitiesByUserId(userId));
     }
 
@@ -151,6 +193,9 @@ public class MatchingController {
      */
     @PostMapping("/unenroll")
     public ResponseEntity<Pair<String, Long>> unenroll(@RequestBody Pair<String, Long> userIdActivityIdPair) {
+        if (!authManger.getNetId().equals(userIdActivityIdPair.getFirst())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         String userId = userIdActivityIdPair.getFirst();
         Long activityId = userIdActivityIdPair.getSecond();
         Optional<Matching> matching = matchingServiceImpl.findMatchingWithPendingFalse(userId, activityId);
@@ -161,6 +206,22 @@ public class MatchingController {
         activityPublisher.unenroll(userIdActivityIdPair.getSecond(), position);
         matchingServiceImpl.deleteById(userId, activityId, position);
         return ResponseEntity.ok(userIdActivityIdPair);
+    }
+
+    /**
+     * API endpoint that deletes all matchings for a specific ActivityId.
+     *
+     * @param activityId Long object
+     * @return - Response Entity of type 204_NO_CONTENT as the Matching was deleted with empty body
+     */
+    @PostMapping("/deleteMatchingByActivityId/{activityId}")
+    public ResponseEntity<Matching> deleteMatchingByActivityId(@PathVariable Long activityId) {
+        String ownerId = activityPublisher.getOwnerId(activityId);
+        if (!authManger.getNetId().equals(ownerId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        matchingServiceImpl.deleteByActivityId(activityId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 
@@ -181,25 +242,20 @@ public class MatchingController {
      * @return - saved Matching obj
      */
     @PostMapping("/save")
-    public ResponseEntity<Matching> saveMatching(
-            @Valid @RequestBody Matching matching
-    ) {
-        return ResponseEntity.ok(
-                matchingServiceImpl.save(matching)
-        );
+    public ResponseEntity<Matching> saveMatching(@Valid @RequestBody Matching matching) {
+        return ResponseEntity.ok(matchingServiceImpl.save(matching));
     }
 
     /**
      * Returns all the timeSlots a user has added in the request body.
      * Mainly for testing purposes of the serializer & deserializer of TimeSlot object
      *
-     * @param userId    ID of an User
+     * @param userId    ID of a User
      * @param timeSlots TimeSlots object
      * @return ResponseEntity with status 200_OK and the List of TimeSlot objects as body
      */
     @PostMapping("/addTimeSlots/{userId}")
-    public ResponseEntity<List<TimeSlot>> addTimeSlots(@PathVariable String userId,
-                                                       @RequestBody List<TimeSlot> timeSlots) {
+    public ResponseEntity<List<TimeSlot>> addTimeSlots(@PathVariable String userId, @RequestBody List<TimeSlot> timeSlots) {
         return ResponseEntity.ok(timeSlots);
     }
 
@@ -214,8 +270,7 @@ public class MatchingController {
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(
-            MethodArgumentNotValidException ex) {
+    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
