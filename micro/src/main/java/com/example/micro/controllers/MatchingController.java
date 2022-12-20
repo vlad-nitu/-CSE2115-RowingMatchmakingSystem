@@ -91,19 +91,43 @@ public class MatchingController {
     }
 
     /**
+     * API Endpoint performs a POST request in order for an owner of a specific activity
+     * to specify that it accepts or declines a user who is asking to take part in his/her activity in a previous request.
+     * @param matching Matching object representing the User-Activity pair
+     * @param senderId The id of the person that send the request
+     * @param type The type of the request
+     * @return ResponseEntity object with a message composed of the matching that was accepted or declined
+     */
+    @PostMapping("/decideMatchAccept/{senderId}/{type}")
+    public ResponseEntity<Matching> chooseMatch(@Valid @RequestBody Matching matching, @PathVariable String senderId, @PathVariable String type){
+        String ownerId = activityPublisher.getOwnerId(matching.getActivityId());
+        if(!authManger.getNetId().equals(senderId)){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        if (ownerId.equals(senderId) ){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        if (!matchingServiceImpl.checkId(matching.getUserId(), matching.getActivityId(), matching.getPosition())){
+            return ResponseEntity.badRequest().build();
+        }
+        if (type.equals("accept")){
+            return chooseMatchAccept(matching);
+        }
+        if(type.equals("decline")){
+            return chooseMatchDecline(matching);
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+
+    /**
      * API Endpoint that performs a POST request in order for an owner of a specific activity
      * to specify that it accepts a user who is asking to take part in his/her activity in a previous request.
      *
      * @param matching - Matching object representing the User-Activity pair
-     * @return - ResponseEntity object with a message composed of the matching that was accepted or declined
+     * @return - ResponseEntity object with a message composed of the matching that was accepted
      */
-    @PostMapping("/decideMatchAccept/{senderId}")
-    public ResponseEntity<Matching> chooseMatchAccept(@Valid @RequestBody Matching matching, @PathVariable String senderId) {
-        String ownerId = activityPublisher.getOwnerId(matching.getActivityId());
-        if (ownerId.equals(senderId)
-                || !matchingServiceImpl.checkId(matching.getUserId(), matching.getActivityId(), matching.getPosition())) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Matching> chooseMatchAccept(Matching matching) {
         matchingServiceImpl.deleteById(matching.getUserId(), matching.getActivityId(), matching.getPosition());
         matching.setPending(false);
         Matching savedMatching = matchingServiceImpl.save(matching);
@@ -119,29 +143,25 @@ public class MatchingController {
      * to specify that it decline a user who is asking to take part in his/her activity in a previous request.
      *
      * @param matching - Matching object representing the User-Activity pair
-     * @return - ResponseEntity object with a message composed of the matching that was accepted or declined
+     * @return - ResponseEntity object with a message composed of the matching that was declined
      */
-    @PostMapping("/decideMatchDecline/{senderId}")
-    public ResponseEntity<Matching> chooseMatchDecline(@Valid @RequestBody Matching matching,
-                                                       @PathVariable String senderId) {
-        String ownerId = activityPublisher.getOwnerId(matching.getActivityId());
-        if (ownerId.equals(senderId)
-                || !matchingServiceImpl.checkId(matching.getUserId(), matching.getActivityId(), matching.getPosition())) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Matching> chooseMatchDecline(Matching matching) {
         matchingServiceImpl.deleteById(matching.getUserId(), matching.getActivityId(), matching.getPosition());
         matching.setPending(true);
         return ResponseEntity.ok(matching);
     }
 
     /**
-     * API Endpoint that performs a GET request in order to obtain all the activities that an user was mapped to.
+     * API Endpoint that performs a GET request in order to obtain all the activities that a user was mapped to.
      *
-     * @param userId - String object representing the unique identifier of an User
+     * @param userId - String object representing the unique identifier of a User
      * @return - ResponseEntity object with a message composed of a List of activityID's (which are represented as Longs)
      */
     @GetMapping("/getUserActivities/{userId}")
     public ResponseEntity<List<Long>> getUserActivities(@PathVariable String userId) {
+        if(!authManger.getNetId().equals(userId)){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         return ResponseEntity.ok(matchingServiceImpl.findActivitiesByUserId(userId));
     }
 
@@ -155,6 +175,9 @@ public class MatchingController {
      */
     @PostMapping("/unenroll")
     public ResponseEntity<Pair<String, Long>> unenroll(@RequestBody Pair<String, Long> userIdActivityIdPair) {
+        if(!authManger.getNetId().equals(userIdActivityIdPair.getFirst())){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         String userId = userIdActivityIdPair.getFirst();
         Long activityId = userIdActivityIdPair.getSecond();
         Optional<Matching> matching = matchingServiceImpl.findMatchingWithPendingFalse(userId, activityId);
