@@ -45,7 +45,7 @@ public class MatchingController {
         this.matchingServiceImpl = matchingServiceImpl;
         this.activityPublisher = activityPublisher;
         this.notificationPublisher = notificationPublisher;
-        this.authManger=authManager;
+        this.authManger = authManager;
     }
 
     /**
