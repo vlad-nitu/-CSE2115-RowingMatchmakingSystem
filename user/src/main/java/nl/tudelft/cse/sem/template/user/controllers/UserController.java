@@ -17,7 +17,6 @@ import nl.tudelft.cse.sem.template.user.services.UserService;
 import javax.validation.Valid;
 import java.util.*;
 
-@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 @RestController
 public class UserController {
 
@@ -57,27 +56,19 @@ public class UserController {
         if (!InputValidation.userGenderValidation(user.getGender())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided gender is invalid!");
         }
-        boolean idMatch = true;
+        if (!InputValidation.validatePositions(user.getPositions())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("One of the positions that you provided is not valid!");
+        }
         if (!user.getUserId().equals(authManager.getNetId())) {
-            user.setUserId(authManager.getNetId());
-            idMatch = false;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided userId does not match your netId! Use "
+                    + authManager.getNetId() + " as the userId.");
         }
         Optional<User> foundUser = userService.findUserById(user.getUserId());
         if (foundUser.isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with the given ID already exists!");
         }
-
-        if (!InputValidation.validatePositions(user.getPositions())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("One of the positions that you provided is not valid!");
-        }
-
         return ResponseEntity.ok(userService.save(user));
-        if (idMatch) {
-            return ResponseEntity.ok(userService.save(user));
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(userService.save(user)
-                + "\nThe given ID does not match your netID and was automatically adjusted!");
     }
 
     /**

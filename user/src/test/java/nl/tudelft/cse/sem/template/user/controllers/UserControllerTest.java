@@ -22,11 +22,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-
-import java.util.List;
+import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -104,7 +100,21 @@ public class UserControllerTest {
                 .thenReturn(user);
         when(authManager.getNetId()).thenReturn(user.getUserId());
 
+        user.setPositions(new HashSet<>(Set.of("invalid")));
         MvcResult mvcResult = mockMvc
+                .perform(post("/createUser")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(user))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        boolean expected = contentAsString.contains("One of the positions that you provided is not valid!");
+        assertThat(expected);
+
+        user.setPositions(positions);
+        mvcResult = mockMvc
                 .perform(post("/createUser")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(user))
@@ -113,7 +123,7 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String contentAsString = mvcResult.getResponse().getContentAsString();
+        contentAsString = mvcResult.getResponse().getContentAsString();
         User obtained = objectMapper.readValue(contentAsString, User.class);
         assertThat(obtained).isEqualTo(user);
 
@@ -127,7 +137,7 @@ public class UserControllerTest {
                 .andExpect(status().is4xxClientError())
                 .andReturn();
         contentAsString = mvcResult.getResponse().getContentAsString();
-        boolean expected = contentAsString.contains("The provided ID is invalid!");
+        expected = contentAsString.contains("The provided ID is invalid!");
         assertThat(expected);
 
         user.setUserId("Valid");
@@ -145,21 +155,22 @@ public class UserControllerTest {
         assertThat(expected);
 
         user.setGender('M');
-        when(authManager.getNetId()).thenReturn("");
+        when(authManager.getNetId()).thenReturn("netId");
         mvcResult = mockMvc
                 .perform(post("/createUser")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(user))
                 )
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(status().isOk())
+                .andExpect(status().is4xxClientError())
                 .andReturn();
         contentAsString = mvcResult.getResponse().getContentAsString();
-        expected = contentAsString.contains("The given ID does not match your netID and was automatically adjusted!");
+        expected = contentAsString.contains("The provided userId does not match your netId! Use netId as the userId");
         assertThat(expected);
 
         lenient().when(userService.findUserById(anyString()))
                 .thenReturn(Optional.of(new User()));
+        when(authManager.getNetId()).thenReturn(user.getUserId());
         mvcResult = mockMvc
                 .perform(post("/createUser")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -171,7 +182,6 @@ public class UserControllerTest {
         contentAsString = mvcResult.getResponse().getContentAsString();
         expected = contentAsString.contains("User with the given ID already exists!");
         assertThat(expected);
-
     }
 
     @Test
