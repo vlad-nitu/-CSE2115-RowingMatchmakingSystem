@@ -189,9 +189,9 @@ public class UserController {
      * @return List of BaseNotification objects representing notifications
      */
     @GetMapping("/getNotifications")
-    public ResponseEntity<List<BaseNotification>> getNotifications() {
+    public ResponseEntity<List<String>> getNotifications() {
         String userId = authManager.getNetId();
-        List<BaseNotification> response = notificationPublisher.getNotifications(userId);
+        List<String> response = notificationPublisher.getNotifications(userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

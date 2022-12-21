@@ -1,5 +1,7 @@
 package nl.tudelft.cse.sem.template.user.publishers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Cleanup;
 import lombok.Generated;
 import nl.tudelft.cse.sem.template.user.utils.BaseNotification;
@@ -31,11 +33,11 @@ public class NotificationPublisher {
      * @param userId the id of the user requesting the notifications
      * @return a list containing the received notifications, if any are present
      */
-    public List<BaseNotification> getNotifications(String userId) {
+    public List<String> getNotifications(String userId) {
         try {
             @Cleanup
             Response res = userUtils.getRequest("/getNotifications/" + userId);
-            ArrayList<BaseNotification> notifications = res.readEntity(new GenericType<>() {});
+            List<String> notifications = res.readEntity(new GenericType<List<String>>(){});
             return notifications;
         } catch (Exception e) {
             System.out.println(e.getMessage());
