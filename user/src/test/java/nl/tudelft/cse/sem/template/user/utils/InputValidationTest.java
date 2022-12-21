@@ -2,6 +2,8 @@ package nl.tudelft.cse.sem.template.user.utils;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class InputValidationTest {
@@ -22,5 +24,13 @@ class InputValidationTest {
         assertTrue(InputValidation.userGenderValidation(genderValidf));
         char genderInvalid = 'N';
         assertFalse(InputValidation.userGenderValidation(genderInvalid));
+    }
+
+    @Test
+    void userPositionsValidation() {
+        Set<String> validPositions = Set.of("coach");
+        assertTrue(InputValidation.validatePositions(validPositions));
+        Set<String> invalidPositions = Set.of("invalid");
+        assertFalse(InputValidation.validatePositions(invalidPositions));
     }
 }
