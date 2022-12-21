@@ -142,12 +142,13 @@ public class UserService {
      *
      * @param userId - the ID of the user
      * @return Set {@literal <}TimeSlot{@literal >} containing the timeslots the user is able to fulfill
+     *      or an indication that an error was encountered
      */
     public Set<TimeSlot> findTimeSlotsById(String userId) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isPresent()) {
             return user.get().getTimeSlots();
         }
-        return new HashSet<>();
+        return null;
     }
 }

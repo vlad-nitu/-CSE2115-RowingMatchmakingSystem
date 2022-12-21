@@ -8,6 +8,7 @@ import nl.tudelft.cse.sem.template.user.publishers.ActivityPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.MatchingPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.NotificationPublisher;
 import nl.tudelft.cse.sem.template.user.services.UserService;
+import nl.tudelft.cse.sem.template.user.utils.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +26,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.lenient;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.mockito.Mockito.when;
@@ -326,6 +327,28 @@ public class UserControllerTest {
     }
 
     @Test
+    public void sendTimeSlotsTest() throws Exception {
+        Set<TimeSlot> expected = timeSlots;
+        when(userService.findTimeSlotsById(userId)).thenReturn(expected);
+        MvcResult mvcResult = mockMvc
+                .perform(get("/sendTimeSlots/LotteKremer"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("[{\"start\":\"2022-12-14 07:00\",\"end\":\"2022-12-14 19:15\"}]");
+
+        expected = null;
+        userId = "noSuchUser";
+        when(userService.findTimeSlotsById(userId)).thenReturn(expected);
+        mvcResult = mockMvc
+                .perform(get("/sendTimeSlots/noSuchUser"))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("There is no user with the given userId!");
+    }
+
+    @Test
     void sendEmail() throws Exception {
         String expected = "test@domain.com";
         when(userService.findEmailById(userId)).thenReturn(expected);
@@ -363,6 +386,27 @@ public class UserControllerTest {
         when(notificationPublisher.getNotifications(null)).thenReturn(expected);
         mvcResult = mockMvc
                 .perform(get("/getNotifications"))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Something went wrong!");
+    }
+
+    @Test
+    void getAvailableActivities() throws Exception {
+        List<Pair<Long, String>> expected = List.of(new Pair<Long, String>(1L, "testGetAvailableActivities"));
+        when(matchingPublisher.getAvailableActivities(any(), anySet())).thenReturn(expected);
+        MvcResult mvcResult = mockMvc
+                .perform(get("/getAvailableActivities"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("testGetAvailableActivities");
+
+        expected = null;
+        when(matchingPublisher.getAvailableActivities(any(), anySet())).thenReturn(expected);
+        mvcResult = mockMvc
+                .perform(get("/getAvailableActivities"))
                 .andExpect(status().is4xxClientError())
                 .andReturn();
         contentAsString = mvcResult.getResponse().getContentAsString();

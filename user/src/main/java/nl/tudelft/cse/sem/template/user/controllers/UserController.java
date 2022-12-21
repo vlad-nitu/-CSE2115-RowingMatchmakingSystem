@@ -151,6 +151,20 @@ public class UserController {
     }
 
     /**
+     * API Endpoint that performs a GET request in order to obtain and send the timeslots the User selected.
+     *
+     * @param userId - String object representing the unique identifier of a User
+     * @return - ResponseEntity object with a message composed of a Set of TimeSlots which represent the timeslots
+     *      the User specified or the encountered problem description
+     */
+    @GetMapping("/sendTimeSlots/{userId}")
+    public ResponseEntity sendTimeSlots(@PathVariable String userId) {
+        Set<TimeSlot> responseBody = userService.findTimeSlotsById(userId);
+        return responseBody == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                noSuchUserIdError) : ResponseEntity.ok(responseBody);
+    }
+
+    /**
      * API Endpoint that performs a GET request in order to obtain and send the user's e-mail address.
      *
      * @param userId - String object representing the unique identifier of a User
@@ -188,32 +202,40 @@ public class UserController {
                                          @PathVariable String type) throws Exception {
         if (!activity.getOwnerId().equals(authManager.getNetId())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided ownerId does not match your netId! Use "
-                    + authManager.getNetId() + " as the userId.");
+                    + authManager.getNetId() + " as the ownerId.");
         }
-        try {
-            activityPublisher.createActivity(activity);
+        BaseActivity response = activityPublisher.createActivity(activity);
+        return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong!")
+                : ResponseEntity.status(HttpStatus.OK).body(response);
+       /* try {
             return ResponseEntity.ok(activity);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong.");
-        }
+        }*/
     }
 
     /**
      * API Endpoint that performs a GET request in order to get all the activities that the user can enroll to.
      *
      * @return A list of pairs that contain the activity id and the timeslot in String representation
+     *      or the encountered problem description
      */
     @GetMapping("/getAvailableActivities")
-    public ResponseEntity<List<Pair<Long, String>>> getAvailableActivities() {
+    public ResponseEntity getAvailableActivities() {
         String userId = authManager.getNetId();
         Set<TimeSlot> timeslots = userService.findTimeSlotsById(userId);
-        return ResponseEntity.ok(matchingPublisher.getAvailableActivities(userId, timeslots));
+        if (timeslots == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(noSuchUserIdError);
+        }
+        List<Pair<Long, String>> response = matchingPublisher.getAvailableActivities(userId, timeslots);
+        return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong!")
+                : ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**
      * API Endpoint that performs a GET request in order to get a list of notifications.
      *
-     * @return List of BaseNotification objects representing notifications
+     * @return List of BaseNotification objects representing notifications or the encountered problem description
      */
     @GetMapping("/getNotifications")
     public ResponseEntity getNotifications() {

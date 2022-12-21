@@ -2,7 +2,6 @@ package nl.tudelft.cse.sem.template.user.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -16,7 +15,83 @@ public class BaseActivity {
     private TimeSlot timeSlot;
     private Set<String> positions;
     private String certificate;
-    private String type;
+    private boolean isCompetitive;
+    private char gender;
+    private String organisation;
+
+
+    /**
+     * Gets activity id.
+     *
+     * @return the activity id
+     */
+    public Long getActivityId() {
+        return activityId;
+    }
+
+    /**
+     * Sets activity id.
+     *
+     * @param activityId the activity id
+     */
+    public void setActivityId(Long activityId) {
+        this.activityId = activityId;
+    }
+
+    /**
+     * Is competitive boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isCompetitive() {
+        return isCompetitive;
+    }
+
+    /**
+     * Sets competitive.
+     *
+     * @param competitive the competitive
+     */
+    public void setCompetitive(boolean competitive) {
+        isCompetitive = competitive;
+    }
+
+    /**
+     * Gets gender.
+     *
+     * @return the gender
+     */
+    public char getGender() {
+        return gender;
+    }
+
+    /**
+     * Sets gender.
+     *
+     * @param gender the gender
+     */
+    public void setGender(char gender) {
+        this.gender = gender;
+    }
+
+    /**
+     * Gets organisation.
+     *
+     * @return the organisation
+     */
+    public String getOrganisation() {
+        return organisation;
+    }
+
+    /**
+     * Sets organisation.
+     *
+     * @param organisation the organisation
+     */
+    public void setOrganisation(String organisation) {
+        this.organisation = organisation;
+    }
+
 
     /**
      * Gets positions.
@@ -36,41 +111,6 @@ public class BaseActivity {
         this.positions = positions;
     }
 
-    /**
-     * Gets type.
-     *
-     * @return the type
-     */
-    public String getType() {
-        return type;
-    }
-
-    /**
-     * Sets type.
-     *
-     * @param type the type
-     */
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    /**
-     * Gets activity id.
-     *
-     * @return the activity id
-     */
-    public Long getActivityId() {
-        return activityId;
-    }
-
-    /**
-     * Sets activity id.
-     *
-     * @param activityId the activity id
-     */
-    public void setActivityId(Long activityId) {
-        this.activityId = activityId;
-    }
 
     /**
      * Gets owner id.
