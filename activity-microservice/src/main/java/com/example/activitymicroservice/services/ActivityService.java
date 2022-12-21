@@ -82,11 +82,39 @@ public class ActivityService {
      * @throws Exception if the position does not exist in the Activity.
      */
     public void takeSpot(Pair<Long, String> posTaken) throws Exception {
-        Activity activity = this.findActivity(posTaken.getFirst());
-        boolean isPosition = activity.getPositions().remove(posTaken.getSecond());
-        if (!isPosition) {
+        Optional<Activity> activity = this.findActivityOptional(posTaken.getFirst());
+        if (activity.isEmpty()) {
+            throw new Exception("Activity was not found");
+        }
+        //Probably will be needed for a test because it says that the list is immutable, so I create a new one
+        List<String> updatedPositions = new ArrayList<>(activity.get().getPositions());
+        updatedPositions.remove(posTaken.getSecond());
+        if (updatedPositions.remove(posTaken.getSecond())) {
+            activity.get().setPositions(updatedPositions);
+            activityRepository.save(activity.get());
+        } else {
             throw new Exception("The wished position was not found");
         }
+    }
+
+    /**
+     * Occupies a certain position in an Activity.
+     *
+     * @param posTaken Pair of a Long and String object representing the ID of the activity and the
+     *                 position occupied respectively
+     * @throws Exception if the position does not exist in the Activity.
+     */
+    public List<String> unenrollPosition(Pair<Long, String> posTaken) throws Exception {
+        Optional<Activity> activity = this.findActivityOptional(posTaken.getFirst());
+        if (activity.isEmpty()) {
+            throw new Exception("Activity was not found");
+        }
+        //need to do this for a test because it says that the list is immutable, so I create a new one
+        List<String> updatedPositions = new ArrayList<>(activity.get().getPositions());
+        updatedPositions.add(posTaken.getSecond());
+        activity.get().setPositions(updatedPositions);
+        activityRepository.save(activity.get());
+        return activity.get().getPositions();
     }
 
     /**

@@ -3,8 +3,6 @@ package com.example.notificationmicroservice.utils;
 import lombok.AllArgsConstructor;
 
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @AllArgsConstructor
 public class InputValidation {
@@ -29,7 +27,7 @@ public class InputValidation {
     }
 
     /**
-     * Checks whether the type is valid
+     * Checks whether the type is valid.
      *
      * @param type - string to be validated
      * @return true, if valid

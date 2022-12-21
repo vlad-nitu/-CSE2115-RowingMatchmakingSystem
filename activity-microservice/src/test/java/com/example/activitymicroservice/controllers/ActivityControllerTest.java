@@ -6,12 +6,14 @@ import com.example.activitymicroservice.domain.Training;
 import com.example.activitymicroservice.publishers.MatchingPublisher;
 import com.example.activitymicroservice.publishers.UserPublisher;
 import com.example.activitymicroservice.services.ActivityService;
+import com.example.activitymicroservice.utils.Pair;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -19,6 +21,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -102,5 +105,45 @@ class ActivityControllerTest {
 
         Activity returned = objectMapper.readValue(res.getResponse().getContentAsString(), Activity.class);
         assertThat(returned).isEqualTo(act);
+    }
+
+    @Test
+    void unenrollNullIdAndBadPosition() throws Exception {
+        Pair<Long, String> nullId = new Pair(null, "cox");
+        mockMvc.perform(post("/unenrollPosition")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(null))
+                )
+                .andExpect(status().isBadRequest());
+
+        Pair<Long, String> badPosition = new Pair(2L, "badPos");
+        mockMvc.perform(post("/unenrollPosition")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(nullId))
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void unenrollActivityFails() throws Exception {
+        Pair<Long, String> posTaken = new Pair(2L, "cox");
+        doThrow(new Exception()).when(activityService).unenrollPosition(posTaken);
+        mockMvc
+                .perform(post("/unenrollPosition")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(posTaken))
+                )
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    void unenrollSuccess() throws Exception {
+        Pair<Long, String> posTaken = new Pair(2L, "cox");
+        mockMvc
+                .perform(post("/unenrollPosition")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(posTaken))
+                )
+                .andExpect(status().isOk());
     }
 }

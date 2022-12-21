@@ -76,10 +76,10 @@ public class NotificationController {
      */
     @PostMapping("/notifyUser")
     public ResponseEntity<String> notifyUser(@RequestBody @Valid Notification notification) {
-        if(!InputValidation.validatePosition(notification.getPosition())) {
+        if (!InputValidation.validatePosition(notification.getPosition())) {
             return ResponseEntity.badRequest().body("Invalid position");
         }
-        if(!InputValidation.validateType(notification.getType())) {
+        if (!InputValidation.validateType(notification.getType())) {
             return ResponseEntity.badRequest().body("Invalid notification type");
         }
         if (!strategy.handleNotification(notification)) {
