@@ -29,6 +29,8 @@ public class UserController {
     private final transient NotificationPublisher notificationPublisher;
     private final transient AuthManager authManager;
 
+    private static final String noSuchUserIdError = "There is no user with the given userId!";
+
     /**
      * All argument constructor, injects the main service component, authentication manager
      * and all publishers into the controller.
@@ -50,6 +52,7 @@ public class UserController {
      *
      * @param user the User that needs to be added
      * @return ResponseEntity object with a message composed of the User that was added
+     *      or the encountered problem description
      */
     @PostMapping("/createUser")
     public ResponseEntity createUser(@Valid @RequestBody User user) {
@@ -59,20 +62,19 @@ public class UserController {
         if (!InputValidation.userGenderValidation(user.getGender())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided gender is invalid!");
         }
-        boolean idMatch = true;
+        if (!InputValidation.validatePositions(user.getPositions())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("One of the positions that you provided is not valid!");
+        }
         if (!user.getUserId().equals(authManager.getNetId())) {
-            user.setUserId(authManager.getNetId());
-            idMatch = false;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided userId does not match your netId! Use "
+                    + authManager.getNetId() + " as the userId.");
         }
         Optional<User> foundUser = userService.findUserById(user.getUserId());
         if (foundUser.isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with the given ID already exists!");
         }
-        if (idMatch) {
-            return ResponseEntity.ok(userService.save(user));
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(userService.save(user)
-                + "\nThe given ID does not match your netID and was automatically adjusted!");
+        return ResponseEntity.ok(userService.save(user));
     }
 
     /**
@@ -81,10 +83,15 @@ public class UserController {
      * @param userId - String object representing the unique identifier of a User
      * @return - ResponseEntity object with a message composed of the competitiveness
      *      (which is a boolean, either true for competitive or false for non-competitive users)
+     *      or the encountered problem description
      */
     @GetMapping("/sendCompetitiveness/{userId}")
-    public ResponseEntity<Boolean> sendCompetitiveness(@PathVariable String userId) {
-        return ResponseEntity.ok(userService.findCompetitivenessByUserId(userId));
+    public ResponseEntity sendCompetitiveness(@PathVariable String userId) {
+        String responseBody = userService.findCompetitivenessByUserId(userId);
+        if (responseBody.equals("error")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(noSuchUserIdError);
+        }
+        return responseBody.equals("true") ? ResponseEntity.ok(true) : ResponseEntity.ok(false);
     }
 
     /**
@@ -92,10 +99,13 @@ public class UserController {
      *
      * @param userId - String object representing the unique identifier of a User
      * @return - ResponseEntity object with a message composed of the gender of the User (a character, F/M)
+     *      or the encountered problem description
      */
     @GetMapping("/sendGender/{userId}")
-    public ResponseEntity<Character> sendGender(@PathVariable String userId) {
-        return ResponseEntity.ok(userService.findGenderById(userId));
+    public ResponseEntity sendGender(@PathVariable String userId) {
+        Character responseBody = userService.findGenderById(userId);
+        return responseBody == ' ' ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                noSuchUserIdError) : ResponseEntity.ok(responseBody);
     }
 
     /**
@@ -103,10 +113,13 @@ public class UserController {
      *
      * @param userId - String object representing the unique identifier of a User
      * @return - ResponseEntity object with a message composed of the certificate ('none' if no certificate is entered)
+     *      or the encountered problem description
      */
     @GetMapping("/sendCertificate/{userId}")
-    public ResponseEntity<String> sendCertificate(@PathVariable String userId) {
-        return ResponseEntity.ok(userService.findCertificateById(userId));
+    public ResponseEntity sendCertificate(@PathVariable String userId) {
+        String responseBody = userService.findCertificateById(userId);
+        return responseBody == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                noSuchUserIdError) : ResponseEntity.ok(responseBody);
     }
 
     /**
@@ -114,10 +127,13 @@ public class UserController {
      *
      * @param userId - String object representing the unique identifier of a User
      * @return - ResponseEntity object with a message composed of the organization
+     *      or the encountered problem description
      */
     @GetMapping("/sendOrganization/{userId}")
-    public ResponseEntity<String> sendOrganization(@PathVariable String userId) {
-        return ResponseEntity.ok(userService.findOrganisationById(userId));
+    public ResponseEntity sendOrganization(@PathVariable String userId) {
+        String responseBody = userService.findOrganisationById(userId);
+        return responseBody == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                noSuchUserIdError) : ResponseEntity.ok(responseBody);
     }
 
     /**
@@ -125,11 +141,13 @@ public class UserController {
      *
      * @param userId - String object representing the unique identifier of a User
      * @return - ResponseEntity object with a message composed of a Set of strings which represent the positions
-     *          the User can take in a rowing boat
+     *      the User can take in a rowing boat or the encountered problem description
      */
     @GetMapping("/sendPositions/{userId}")
-    public ResponseEntity<Set<String>> sendPositions(@PathVariable String userId) {
-        return ResponseEntity.ok(userService.findPositionsById(userId));
+    public ResponseEntity sendPositions(@PathVariable String userId) {
+        Set<String> responseBody = userService.findPositionsById(userId);
+        return responseBody == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                noSuchUserIdError) : ResponseEntity.ok(responseBody);
     }
 
     /**
@@ -137,10 +155,13 @@ public class UserController {
      *
      * @param userId - String object representing the unique identifier of a User
      * @return - ResponseEntity object with a message composed of the e-mail address
+     *      or the encountered problem description
      */
     @GetMapping("/sendEmail/{userId}")
-    public ResponseEntity<String> sendEmail(@PathVariable String userId) {
-        return ResponseEntity.ok(userService.findEmailById(userId));
+    public ResponseEntity sendEmail(@PathVariable String userId) {
+        String responseBody = userService.findEmailById(userId);
+        return responseBody == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                noSuchUserIdError) : ResponseEntity.ok(responseBody);
     }
 
     /**

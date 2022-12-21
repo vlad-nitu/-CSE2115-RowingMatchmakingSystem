@@ -14,6 +14,7 @@ import java.util.Set;
 
 @AllArgsConstructor
 @Service
+@SuppressWarnings("PMD.ReturnEmptyCollectionRatherThanNull")
 public class UserService {
 
     private final transient UserRepository userRepository;
@@ -52,21 +53,21 @@ public class UserService {
      * Finds competitiveness corresponding to the given userId.
      *
      * @param userId - the ID of the user
-     * @return boolean defining whether the user is competetive
+     * @return String defining whether the user is competitive or an indication that an error was encountered
      */
-    public boolean findCompetitivenessByUserId(String userId) {
+    public String findCompetitivenessByUserId(String userId) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isPresent()) {
-            return user.get().isCompetitive();
+            return user.get().isCompetitive() ? "true" : "false";
         }
-        return false;
+        return "error";
     }
 
     /**
      * Finds the gender corresponding to the given userId.
      *
      * @param userId - the ID of the user
-     * @return character defining the user's gender
+     * @return character defining the user's gender or an indication that an error was encountered
      */
     public Character findGenderById(String userId) {
         Optional<User> user = userRepository.findById(userId);
@@ -81,7 +82,7 @@ public class UserService {
      * Finds the certificate possessed by the user with the given ID.
      *
      * @param userId - the ID of the user
-     * @return String containing the user's certificate
+     * @return String containing the user's certificate or an indication that an error was encountered
      */
     public String findCertificateById(String userId) {
         Optional<User> user = userRepository.findById(userId);
@@ -96,7 +97,7 @@ public class UserService {
      * Finds the organisation corresponding to the given userId.
      *
      * @param userId - the ID of the user
-     * @return String containing the organisation the user is a part of
+     * @return String containing the organisation the user is a part of or an indication that an error was encountered
      */
     public String findOrganisationById(String userId) {
         Optional<User> user = userRepository.findById(userId);
@@ -110,7 +111,7 @@ public class UserService {
      * Finds the e-mail address corresponding to the given userId.
      *
      * @param userId - the ID of the user
-     * @return String containing the user's e-mail address
+     * @return String containing the user's e-mail address or an indication that an error was encountered
      */
     public String findEmailById(String userId) {
         Optional<User> user = userRepository.findById(userId);
@@ -126,13 +127,14 @@ public class UserService {
      *
      * @param userId - the ID of the user
      * @return Set {@literal <}String{@literal >} containing the positions the user is able to fulfill
+     *      or an indication that an error was encountered
      */
     public Set<String> findPositionsById(String userId) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isPresent()) {
             return user.get().getPositions();
         }
-        return new HashSet<>();
+        return null;
     }
 
     /**
