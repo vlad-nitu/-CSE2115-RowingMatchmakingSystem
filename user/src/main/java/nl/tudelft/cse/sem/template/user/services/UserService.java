@@ -57,7 +57,7 @@ public class UserService {
     public String findCompetitivenessByUserId(String userId) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isPresent()) {
-            return user.get().isCompetitive() ? "true" : "false";
+            return user.get().getIsCompetitive() ? "true" : "false";
         }
         return "error";
     }
