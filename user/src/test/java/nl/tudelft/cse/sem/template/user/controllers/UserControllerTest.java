@@ -487,4 +487,35 @@ public class UserControllerTest {
         contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("Something went wrong!");
     }
+
+    @Test
+    void chooseActivity() throws Exception {
+        BaseMatching baseMatching = new BaseMatching();
+        when(authManager.getNetId()).thenReturn(user.getUserId());
+        when(matchingPublisher.chooseActivity(any())).thenReturn(baseMatching);
+        MvcResult mvcResult = mockMvc
+                .perform(post("/chooseActivity")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(baseMatching))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        BaseMatching obtained = objectMapper.readValue(contentAsString, BaseMatching.class);
+        assertThat(obtained).isEqualTo(baseMatching);
+
+        when(matchingPublisher.chooseActivity(any())).thenReturn(null);
+        mvcResult = mockMvc
+                .perform(post("/chooseActivity")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(baseMatching))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Something went wrong!");
+
+    }
 }

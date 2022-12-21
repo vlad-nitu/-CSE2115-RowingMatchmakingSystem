@@ -284,11 +284,12 @@ public class UserController {
      * @return the matching in which the user has requested to participate
      */
     @PostMapping("/chooseActivity")
-    public ResponseEntity<BaseMatching> chooseActivity(@RequestBody BaseMatching matching) throws Exception {
+    public ResponseEntity chooseActivity(@RequestBody BaseMatching matching) throws Exception {
         String userId = authManager.getNetId();
         matching.setUserId(userId);
         BaseMatching response = matchingPublisher.chooseActivity(matching);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong!")
+                : ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**
