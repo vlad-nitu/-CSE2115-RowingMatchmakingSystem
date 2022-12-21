@@ -175,14 +175,18 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong.");
         }
     }
-    //TODO: add userService method for querying timeSlots
-    /*@GetMapping("/getAvailableActivities")
+
+    /**
+     * API Endpoint that performs a GET request in order to get all the activities that the user can enroll to.
+     *
+     * @return A list of pairs that contain the activity id and the timeslot in String representation
+     */
+    @GetMapping("/getAvailableActivities")
     public ResponseEntity<List<Pair<Long, String>>> getAvailableActivities() {
         String userId = authManager.getNetId();
-        Set<TimeSlot> timeslots = userService.
+        Set<TimeSlot> timeslots = userService.findTimeSlotsById(userId);
         return ResponseEntity.ok(matchingPublisher.getAvailableActivities(userId, timeslots));
-    }*/
-    //TODO: figure out the bug
+    }
 
     /**
      * API Endpoint that performs a GET request in order to get a list of notifications.

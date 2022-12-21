@@ -4,6 +4,7 @@ package nl.tudelft.cse.sem.template.user.services;
 import lombok.AllArgsConstructor;
 import nl.tudelft.cse.sem.template.user.domain.User;
 import nl.tudelft.cse.sem.template.user.repositories.UserRepository;
+import nl.tudelft.cse.sem.template.user.utils.TimeSlot;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -130,6 +131,20 @@ public class UserService {
         Optional<User> user = userRepository.findById(userId);
         if (user.isPresent()) {
             return user.get().getPositions();
+        }
+        return new HashSet<>();
+    }
+
+    /**
+     * Finds the timeslots the user with the given userId is available.
+     *
+     * @param userId - the ID of the user
+     * @return Set {@literal <}TimeSlot{@literal >} containing the timeslots the user is able to fulfill
+     */
+    public Set<TimeSlot> findTimeSlotsById(String userId) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isPresent()) {
+            return user.get().getTimeSlots();
         }
         return new HashSet<>();
     }
