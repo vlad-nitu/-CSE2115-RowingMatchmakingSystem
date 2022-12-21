@@ -4,6 +4,8 @@ package com.example.activitymicroservice.controllers;
 
 import com.example.activitymicroservice.authentication.AuthManager;
 import com.example.activitymicroservice.domain.Activity;
+import com.example.activitymicroservice.domain.Competition;
+import com.example.activitymicroservice.domain.Training;
 import com.example.activitymicroservice.publishers.MatchingPublisher;
 import com.example.activitymicroservice.publishers.UserPublisher;
 import com.example.activitymicroservice.services.ActivityService;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.InvalidObjectException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
@@ -31,13 +34,17 @@ public class ActivityController {
     private final transient UserPublisher userPublisher;
     private final transient MatchingPublisher matchingPublisher;
     private final transient AuthManager authManager;
-
-    /** Constructor for injection.
+    private final transient Validator training;
+    private final transient Validator trainingCox;
+    private final transient Validator competition;
+    private final transient Validator competitionCox;
+    /**
+     * Constructor for injection.
      *
-     * @param activityService activity service
-     * @param userPublisher user publisher
+     * @param activityService   activity service
+     * @param userPublisher     user publisher
      * @param matchingPublisher matching publisher
-     * @param authManager authentication manager
+     * @param authManager       authentication manager
      */
     public ActivityController(ActivityService activityService,
                               UserPublisher userPublisher, MatchingPublisher matchingPublisher, AuthManager authManager) {
@@ -45,6 +52,24 @@ public class ActivityController {
         this.userPublisher = userPublisher;
         this.matchingPublisher = matchingPublisher;
         this.authManager = authManager;
+
+        training = new PositionValidator();
+
+        trainingCox = new CertificateValidator();
+        trainingCox.setNext(training);
+
+        Validator organizationValidator = new OrganisationValidator();
+        organizationValidator.setNext(training);
+
+        Validator competitvnessValidator = new CompetitivenessValidator();
+        competitvnessValidator.setNext(organizationValidator);
+
+        competition = new GenderValidator();
+        competition.setNext(competitvnessValidator);
+
+        competitionCox = new CertificateValidator();
+        competitionCox.setNext(competition);
+
     }
 
     @GetMapping("/sendOwnerId/{activityId}")
@@ -72,7 +97,7 @@ public class ActivityController {
             return ResponseEntity.ok();
         } catch (Exception e) {
             e.printStackTrace();
-            return  ResponseEntity.badRequest();
+            return ResponseEntity.badRequest();
         }
     }
 
@@ -80,10 +105,10 @@ public class ActivityController {
      * API Endpoint that performs a GET request in order to
      * check if a User is eligible for a certain Activity.
      *
-     * @param userId String object representing the User's ID
+     * @param userId     String object representing the User's ID
      * @param activityId Long object representing the Activity's ID
-     * @param position String object representing the position the User is applying to
-     * @return  ResponseEntity object with a boolean to certify if the User is eligible for that Activity or not
+     * @param position   String object representing the position the User is applying to
+     * @return ResponseEntity object with a boolean to certify if the User is eligible for that Activity or not
      */
     @GetMapping("/check/{userId}/{activityId}/{position}")
     public ResponseEntity<Boolean> check(@PathVariable String userId,
@@ -94,6 +119,10 @@ public class ActivityController {
         String organisation = this.userPublisher.getOrganisation(userId);
         String certificate = this.userPublisher.getCertificate(userId);
         List<String> listPositions = this.userPublisher.getPositions(userId);
+
+        if()
+
+
         return ResponseEntity.ok(this.activityService.checkUser(activity, gender,
                 certificate, organisation, competitiveness, listPositions, position));
     }
@@ -108,7 +137,7 @@ public class ActivityController {
      * Pair(Activity.ID, Position) that a certain User can enrol to.
      *
      * @param timeSlots the List of TimeSlots of a User
-     * @param userId the ID of the User
+     * @param userId    the ID of the User
      * @return a List of Pair(Activity.ID, Position)
      */
     @PostMapping("/sendAvailableActivities/{userId}")
@@ -116,24 +145,22 @@ public class ActivityController {
                                                                             @PathVariable String userId)
             throws InvalidObjectException {
         List<Pair<Long, String>> list = new ArrayList<>();
-        Validator positionValidator = new PositionValidator();
 
-        Validator certificateValidator = new CertificateValidator();
-        certificateValidator.setNext(positionValidator);
 
-        Validator genderValidator = new GenderValidator();
-        genderValidator.setNext(certificateValidator);
-
-        Validator organizationValidator = new OrganisationValidator();
-        organizationValidator.setNext(genderValidator);
-
-        Validator competitivenessValidator = new CompetitivenessValidator();
-        competitivenessValidator.setNext(organizationValidator);
-
-        List<Activity> activityList = activityService.getActivitiesByTimeSlot(timeSlots);
+        List<Activity> activityList = activityService.getActivitiesByTimeSlot(timeSlots, LocalDateTime.now());
         for (Activity activity : activityList) {
             for (String position : activity.getPositions()) {
-                boolean isValid = competitivenessValidator.handle(activity, userPublisher, position, userId);
+                Validator validator;
+                if (activity instanceof Competition && position.equals("cox")) {
+                    validator = competitionCox;
+                } else if (activity instanceof Competition) {
+                    validator = competition;
+                } else if (activity instanceof Training && position.equals("cox")) {
+                    validator = trainingCox;
+                } else {
+                    validator = training;
+                }
+                boolean isValid = validator.handle(activity, userPublisher, position, userId);
                 if (isValid) {
                     list.add(new Pair<>(activity.getActivityId(), position));
                 }
@@ -143,7 +170,8 @@ public class ActivityController {
     }
 
 
-    /** API endpoint that performs a DELETE request for the given activityId.
+    /**
+     * API endpoint that performs a DELETE request for the given activityId.
      *
      * @param activityId the id of the activity to be deleted
      * @return the deleted activity

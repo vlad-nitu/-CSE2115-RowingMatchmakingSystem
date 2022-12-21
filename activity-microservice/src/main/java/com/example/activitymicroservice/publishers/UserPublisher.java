@@ -94,6 +94,18 @@ public class UserPublisher {
         }
     }
 
+    public String getTimeslots(String userId) {
+        try {
+            @Cleanup
+            Response res = activityUtils.getRequest("/sendCertificate/" + userId);
+            String certificate = res.readEntity(new GenericType<>() {});
+            return  certificate;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return "";
+        }
+    }
+
     /**
      * Request the positions the user can fill in.
      *
