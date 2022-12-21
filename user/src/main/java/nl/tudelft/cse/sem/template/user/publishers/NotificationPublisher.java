@@ -15,6 +15,7 @@ import java.util.List;
 
 @Service
 @Generated
+@SuppressWarnings("PMD.ReturnEmptyCollectionRatherThanNull")
 public class NotificationPublisher {
 
     private final transient UserUtils userUtils;
@@ -41,7 +42,7 @@ public class NotificationPublisher {
             return notifications;
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return new ArrayList<>();
+            return null;
         }
     }
 

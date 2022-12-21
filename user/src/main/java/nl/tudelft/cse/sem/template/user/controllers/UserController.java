@@ -186,12 +186,13 @@ public class UserController {
     @PostMapping("/createActivity/{type}")
     public ResponseEntity createActivity(@Valid @RequestBody BaseActivity activity,
                                          @PathVariable String type) throws Exception {
-        String userId = authManager.getNetId();
-        activity.setOwnerId(userId);
-        activity.setType(type);
+        if (!activity.getOwnerId().equals(authManager.getNetId())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided ownerId does not match your netId! Use "
+                    + authManager.getNetId() + " as the userId.");
+        }
         try {
             activityPublisher.createActivity(activity);
-            return ResponseEntity.status(HttpStatus.OK).body("Activity created!");
+            return ResponseEntity.ok(activity);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong.");
         }
@@ -215,10 +216,11 @@ public class UserController {
      * @return List of BaseNotification objects representing notifications
      */
     @GetMapping("/getNotifications")
-    public ResponseEntity<List<String>> getNotifications() {
+    public ResponseEntity getNotifications() {
         String userId = authManager.getNetId();
         List<String> response = notificationPublisher.getNotifications(userId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong!")
+                : ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**

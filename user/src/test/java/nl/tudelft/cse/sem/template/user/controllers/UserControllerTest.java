@@ -39,8 +39,11 @@ public class UserControllerTest {
     private UserService userService;
     @Mock
     private AuthManager authManager;
+    @Mock
     private ActivityPublisher activityPublisher;
+    @Mock
     private MatchingPublisher matchingPublisher;
+    @Mock
     private NotificationPublisher notificationPublisher;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -342,5 +345,27 @@ public class UserControllerTest {
                 .andReturn();
         contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("There is no user with the given userId!");
+    }
+
+    @Test
+    void getNotifications() throws Exception {
+        List<String> expected = List.of("A new user has applied as a cox for activity with Id: 1",
+                "A new user has applied as a cox for activity with Id: 2");
+        when(notificationPublisher.getNotifications(null)).thenReturn(expected);
+        MvcResult mvcResult = mockMvc
+                .perform(get("/getNotifications"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains(expected);
+
+        expected = null;
+        when(notificationPublisher.getNotifications(null)).thenReturn(expected);
+        mvcResult = mockMvc
+                .perform(get("/getNotifications"))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Something went wrong!");
     }
 }
