@@ -8,6 +8,7 @@ import nl.tudelft.cse.sem.template.user.publishers.ActivityPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.MatchingPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.NotificationPublisher;
 import nl.tudelft.cse.sem.template.user.services.UserService;
+import nl.tudelft.cse.sem.template.user.utils.BaseActivity;
 import nl.tudelft.cse.sem.template.user.utils.BaseMatching;
 import nl.tudelft.cse.sem.template.user.utils.Pair;
 import org.junit.jupiter.api.BeforeEach;
@@ -517,5 +518,36 @@ public class UserControllerTest {
         contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("Something went wrong!");
 
+    }
+
+    @Test
+    void unenroll() throws Exception {
+        BaseActivity baseActivity = new BaseActivity();
+        Pair<String, Long> expected = new Pair<>();
+        when(authManager.getNetId()).thenReturn(user.getUserId());
+        when(matchingPublisher.unenroll(any())).thenReturn(expected);
+        MvcResult mvcResult = mockMvc
+                .perform(post("/unenroll")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(baseActivity))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        Pair<String, Long> obtained = objectMapper.readValue(contentAsString, Pair.class);
+        assertThat(obtained).isEqualTo(expected);
+
+        when(matchingPublisher.unenroll(any())).thenReturn(null);
+        mvcResult = mockMvc
+                .perform(post("/unenroll")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(baseActivity))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Something went wrong!");
     }
 }

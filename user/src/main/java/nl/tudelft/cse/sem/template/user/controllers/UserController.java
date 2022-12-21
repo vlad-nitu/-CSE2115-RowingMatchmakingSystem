@@ -299,12 +299,13 @@ public class UserController {
      * @return the userId and activityId pair from the matching that is now cancelled
      */
     @PostMapping("/unenroll")
-    public ResponseEntity<Pair<String, Long>> unenroll(@RequestBody BaseActivity activity) throws Exception {
+    public ResponseEntity unenroll(@RequestBody BaseActivity activity) throws Exception {
         String userId = authManager.getNetId();
         Long activityId = activity.getActivityId();
         Pair<String, Long> userIdActivityIdPair = new Pair<String, Long>(userId, activityId);
         Pair<String, Long> response = matchingPublisher.unenroll(userIdActivityIdPair);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong!")
+                : ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**

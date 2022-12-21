@@ -2,12 +2,15 @@ package nl.tudelft.cse.sem.template.user.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 import java.util.Set;
 
 /**
  * The type Base activity.
  */
 @AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode
 public class BaseActivity {
     private Long activityId;
