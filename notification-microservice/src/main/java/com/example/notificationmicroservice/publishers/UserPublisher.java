@@ -29,7 +29,7 @@ public class UserPublisher {
     public String getEmail(String userId) {
         try {
             @Cleanup
-            Response res = notificationUtils.getRequest("/getEmail/" + userId);
+            Response res = notificationUtils.getRequest("/sendEmail/" + userId);
             return res.readEntity(new GenericType<>() {});
         } catch (Exception e) {
             System.out.println("Bad request");
