@@ -7,6 +7,7 @@ import com.example.activitymicroservice.domain.Activity;
 import com.example.activitymicroservice.publishers.MatchingPublisher;
 import com.example.activitymicroservice.publishers.UserPublisher;
 import com.example.activitymicroservice.services.ActivityService;
+import com.example.activitymicroservice.utils.InputValidation;
 import com.example.activitymicroservice.utils.Pair;
 import com.example.activitymicroservice.utils.TimeSlot;
 import com.example.activitymicroservice.validators.Validator;
@@ -17,12 +18,13 @@ import com.example.activitymicroservice.validators.CertificateValidator;
 import com.example.activitymicroservice.validators.CompetitivenessValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.InvalidObjectException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 public class ActivityController {
@@ -31,12 +33,13 @@ public class ActivityController {
     private final transient MatchingPublisher matchingPublisher;
     private final transient AuthManager authManager;
 
-    /** Constructor for injection.
+    /**
+     * Constructor for injection.
      *
-     * @param activityService activity service
-     * @param userPublisher user publisher
+     * @param activityService   activity service
+     * @param userPublisher     user publisher
      * @param matchingPublisher matching publisher
-     * @param authManager authentication manager
+     * @param authManager       authentication manager
      */
     public ActivityController(ActivityService activityService,
                               UserPublisher userPublisher, MatchingPublisher matchingPublisher, AuthManager authManager) {
@@ -71,7 +74,7 @@ public class ActivityController {
             return ResponseEntity.ok();
         } catch (Exception e) {
             e.printStackTrace();
-            return  ResponseEntity.badRequest();
+            return ResponseEntity.badRequest();
         }
     }
 
@@ -79,10 +82,10 @@ public class ActivityController {
      * API Endpoint that performs a GET request in order to
      * check if a User is eligible for a certain Activity.
      *
-     * @param userId String object representing the User's ID
+     * @param userId     String object representing the User's ID
      * @param activityId Long object representing the Activity's ID
-     * @param position String object representing the position the User is applying to
-     * @return  ResponseEntity object with a boolean to certify if the User is eligible for that Activity or not
+     * @param position   String object representing the position the User is applying to
+     * @return ResponseEntity object with a boolean to certify if the User is eligible for that Activity or not
      */
     @GetMapping("/check/{userId}/{activityId}/{position}")
     public ResponseEntity<Boolean> check(@PathVariable String userId,
@@ -97,9 +100,20 @@ public class ActivityController {
                 certificate, organisation, competitiveness, listPositions, position));
     }
 
+    /**
+     * API enpoint that allows for creating an Activity object and persisting it to the DB.
+     *
+     * @param activity - Activity object that you will create
+     * @return - 200_OK, if activity was created, or 400_BAD_REQUEST if the Activity object failed input validation stage
+     */
     @PostMapping("/createActivity")
     public ResponseEntity<Activity> createActivity(@RequestBody Activity activity) {
-        return ResponseEntity.ok(this.activityService.save(activity));
+
+        if (InputValidation.validatePositions(activity.getPositions())) {
+            return ResponseEntity.ok(this.activityService.save(activity));
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     /**
@@ -107,7 +121,7 @@ public class ActivityController {
      * Pair(Activity.ID, Position) that a certain User can enrol to.
      *
      * @param timeSlots the List of TimeSlots of a User
-     * @param userId the ID of the User
+     * @param userId    the ID of the User
      * @return a List of Pair(Activity.ID, Position)
      */
     @PostMapping("/sendAvailableActivities/{userId}")
@@ -142,7 +156,8 @@ public class ActivityController {
     }
 
 
-    /** API endpoint that performs a DELETE request for the given activityId.
+    /**
+     * API endpoint that performs a DELETE request for the given activityId.
      *
      * @param activityId the id of the activity to be deleted
      * @return the deleted activity
@@ -162,6 +177,26 @@ public class ActivityController {
         activityService.deleteById(activityId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(activity.get());
     }
+
+    /**
+     * Handles BAD_REQUEST exceptions thrown by the Validator of Activity entities
+     * Acts as a parser of the BAD_REQUEST exception messageb bodies.
+     *
+     * @param ex exception
+     * @return a Mapping fieldName -> errorMessage
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
+    }
+
 
 }
 

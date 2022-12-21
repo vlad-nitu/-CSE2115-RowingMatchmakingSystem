@@ -66,6 +66,13 @@ public class UserController {
         if (foundUser.isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with the given ID already exists!");
         }
+
+        if (!InputValidation.validatePositions(user.getPositions())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("One of the positions that you provided is not valid!");
+        }
+
+        return ResponseEntity.ok(userService.save(user));
         if (idMatch) {
             return ResponseEntity.ok(userService.save(user));
         }
