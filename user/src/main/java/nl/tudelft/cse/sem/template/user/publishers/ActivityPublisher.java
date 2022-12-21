@@ -1,5 +1,6 @@
 package nl.tudelft.cse.sem.template.user.publishers;
 
+import lombok.Cleanup;
 import nl.tudelft.cse.sem.template.user.utils.BaseActivity;
 import nl.tudelft.cse.sem.template.user.utils.UserUtils;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class ActivityPublisher {
      * @return BaseActivity object representation of the created activity or null if an error was encountered
      */
     public BaseActivity createActivity(BaseActivity activity) throws Exception {
-
+        @Cleanup
         Response res = userUtils.postRequest("/createActivity", activity);
         return res.getStatus() == 200 ? res.readEntity(new GenericType<BaseActivity>(){}) : null;
     }

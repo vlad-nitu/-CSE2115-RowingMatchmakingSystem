@@ -207,7 +207,7 @@ public class UserController {
         BaseActivity response = activityPublisher.createActivity(activity);
         return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong!")
                 : ResponseEntity.status(HttpStatus.OK).body(response);
-       /* try {
+        /* try {
             return ResponseEntity.ok(activity);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong.");
@@ -221,7 +221,7 @@ public class UserController {
      *      or the encountered problem description
      */
     @GetMapping("/getAvailableActivities")
-    public ResponseEntity getAvailableActivities() {
+    public ResponseEntity getAvailableActivities() throws Exception {
         String userId = authManager.getNetId();
         Set<TimeSlot> timeslots = userService.findTimeSlotsById(userId);
         if (timeslots == null) {
@@ -251,16 +251,17 @@ public class UserController {
      *
      * @param type - either 'accept' or 'decline'
      * @param matching - the matching that is accepted or declined
-     * @return the match if the decision was successful
+     * @return the match if the decision was successful or the encountered problem description
      */
     @PostMapping("/decideMatch/{type}")
-    public ResponseEntity decideMatch(@PathVariable String type, @RequestBody BaseMatching matching) {
+    public ResponseEntity decideMatch(@PathVariable String type, @RequestBody BaseMatching matching) throws Exception {
         if (!type.equals("accept") && !type.equals("decline")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Decision can only be 'accept' or 'decline'.");
         }
         String userId = authManager.getNetId();
         BaseMatching response = matchingPublisher.decideMatch(userId, type, matching);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong!")
+                : ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**
@@ -269,7 +270,7 @@ public class UserController {
      * @return a list of activity id's
      */
     @GetMapping("/getUserActivities")
-    public ResponseEntity<List<Long>> getUserActivities() {
+    public ResponseEntity<List<Long>> getUserActivities() throws Exception {
         String userId = authManager.getNetId();
         List<Long> response = matchingPublisher.getUserActivities(userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -296,7 +297,7 @@ public class UserController {
      * @return the userId and activityId pair from the matching that is now cancelled
      */
     @PostMapping("/unenroll")
-    public ResponseEntity<Pair<String, Long>> unenroll(@RequestBody BaseActivity activity) {
+    public ResponseEntity<Pair<String, Long>> unenroll(@RequestBody BaseActivity activity) throws Exception {
         String userId = authManager.getNetId();
         Long activityId = activity.getActivityId();
         Pair<String, Long> userIdActivityIdPair = new Pair<String, Long>(userId, activityId);

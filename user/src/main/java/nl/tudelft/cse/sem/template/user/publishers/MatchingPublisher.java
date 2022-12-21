@@ -35,35 +35,24 @@ public class MatchingPublisher {
      * @param userId - the id of the user requesting to see the available activities
      * @param timeSlots - the timeslots where the user is available for an activity
      * @return a list of pairs which give the combination of activity id and time slot of the activity
+     *      or null if an error is encountered
      */
-    public List<Pair<Long, String>> getAvailableActivities(String userId, Set<TimeSlot> timeSlots) {
-        try {
-            @Cleanup
-            Response res = userUtils.postRequest("/getAvailableActivities/" + userId, timeSlots);
-            List<Pair<Long, String>> availableActivities = res.readEntity(new GenericType<>() {});
-            return availableActivities;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return new ArrayList<Pair<Long, String>>();
-        }
+    public List<Pair<Long, String>> getAvailableActivities(String userId, Set<TimeSlot> timeSlots) throws Exception {
+        @Cleanup
+        Response res = userUtils.postRequest("/getAvailableActivities/" + userId, timeSlots);
+        return res.getStatus() == 200 ? res.readEntity(new GenericType<>() {}) : null;
     }
 
     /**
      * Request the activities where the user is participating in.
      *
      * @param userId the id of the user for which the request is made
-     * @return list of activity id's
+     * @return list of activity id's or null if an error is encountered
      */
-    public List<Long> getUserActivities(String userId) {
-        try {
-            @Cleanup
-            Response res = userUtils.getRequest("/getUserActivities/" + userId);
-            List<Long> activityIds = res.readEntity(new GenericType<>() {});
-            return activityIds;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return new ArrayList<Long>();
-        }
+    public List<Long> getUserActivities(String userId) throws Exception {
+        @Cleanup
+        Response res = userUtils.getRequest("/getUserActivities/" + userId);
+        return res.getStatus() == 200 ? res.readEntity(new GenericType<>() {}) : null;
     }
 
     /**
@@ -72,18 +61,12 @@ public class MatchingPublisher {
      * @param userId the id of the owner who is deciding
      * @param type accept or decline, based on the choice of the owner of the activity
      * @param matching the matching that is reviewed
-     * @return a copy of the result of the matching after the decision
+     * @return a copy of the result of the matching after the decision or null if an error is encountered
      */
-    public BaseMatching decideMatch(String userId, String type, BaseMatching matching) {
-        try {
-            @Cleanup
-            Response res = userUtils.postRequest("/decideMatch/" + userId + "/" + type, matching);
-            BaseMatching matchResult = res.readEntity(new GenericType<>() {});
-            return matchResult;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return new BaseMatching();
-        }
+    public BaseMatching decideMatch(String userId, String type, BaseMatching matching) throws Exception {
+        @Cleanup
+        Response res = userUtils.postRequest("/decideMatch/" + userId + "/" + type, matching);
+        return res.getStatus() == 200 ? res.readEntity(new GenericType<>() {}) : null;
     }
 
     /**
@@ -91,9 +74,10 @@ public class MatchingPublisher {
      *
      * @param matching a matching with the chosen activity id, user id, pending as true
      *                 (as owner still needs to accept) and the timeSlot of the activity
-     * @return the copy of the saved match, none if an exception is thrown
+     * @return the copy of the saved match or null if an error is encountered
      */
     public BaseMatching chooseActivity(BaseMatching matching) throws Exception {
+        @Cleanup
         Response res = userUtils.postRequest("/chooseActivity", matching);
         return res.getStatus() == 200 ? res.readEntity(new GenericType<>() {}) : null;
     }
@@ -103,18 +87,12 @@ public class MatchingPublisher {
      *
      * @param userIdActivityIdPair A pair which is the combination of the activity id from the activity
      *                             where the user wants to unenroll from and the user id itself
-     * @return a copy of the pair when unenrollment was succesful
+     * @return a copy of the pair when unenrollment was succesful or null if an error is encountered
      */
-    public Pair<String, Long> unenroll(Pair<String, Long> userIdActivityIdPair) {
-        try {
-            @Cleanup
-            Response res = userUtils.postRequest("/unenroll", userIdActivityIdPair);
-            Pair<String, Long> receivedPair = res.readEntity(new GenericType<>() {});
-            return receivedPair;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return new Pair<String, Long>();
-        }
+    public Pair<String, Long> unenroll(Pair<String, Long> userIdActivityIdPair) throws Exception {
+        @Cleanup
+        Response res = userUtils.postRequest("/unenroll", userIdActivityIdPair);
+        return res.getStatus() == 200 ? res.readEntity(new GenericType<>() {}) : null;
     }
 
 }

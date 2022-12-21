@@ -43,7 +43,7 @@ public class BaseActivity {
      *
      * @return the boolean
      */
-    public boolean isCompetitive() {
+    public boolean getCompetitive() {
         return isCompetitive;
     }
 

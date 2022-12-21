@@ -8,6 +8,7 @@ import nl.tudelft.cse.sem.template.user.publishers.ActivityPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.MatchingPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.NotificationPublisher;
 import nl.tudelft.cse.sem.template.user.services.UserService;
+import nl.tudelft.cse.sem.template.user.utils.BaseMatching;
 import nl.tudelft.cse.sem.template.user.utils.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -418,6 +419,48 @@ public class UserControllerTest {
         when(matchingPublisher.getAvailableActivities(any(), anySet())).thenReturn(expected);
         mvcResult = mockMvc
                 .perform(get("/getAvailableActivities"))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Something went wrong!");
+    }
+
+    @Test
+    void decideMatch() throws Exception {
+        BaseMatching baseMatching = new BaseMatching();
+        when(authManager.getNetId()).thenReturn(user.getUserId());
+        when(matchingPublisher.decideMatch(user.getUserId(), "accept", baseMatching)).thenReturn(baseMatching);
+        MvcResult mvcResult = mockMvc
+                .perform(post("/decideMatch/accept")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(baseMatching))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        BaseMatching obtained = objectMapper.readValue(contentAsString, BaseMatching.class);
+        assertThat(obtained).isEqualTo(baseMatching);
+
+        mvcResult = mockMvc
+                .perform(post("/decideMatch/invalid")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(baseMatching))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Decision can only be 'accept' or 'decline'.");
+
+        when(authManager.getNetId()).thenReturn("invalid");
+        when(matchingPublisher.decideMatch("invalid", "accept", baseMatching)).thenReturn(null);
+        mvcResult = mockMvc
+                .perform(post("/decideMatch/accept")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(baseMatching))
+                )
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is4xxClientError())
                 .andReturn();
         contentAsString = mvcResult.getResponse().getContentAsString();
