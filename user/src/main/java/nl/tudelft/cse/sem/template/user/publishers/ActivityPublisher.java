@@ -20,24 +20,17 @@ public class ActivityPublisher {
         this.userUtils = new UserUtils("http://localhost:8084/");
     }
 
-    // We still need to find a way here to make a distinction between a competition and a training
-    // I would maybe suggest to send all the information necessary for a competition together with the type
-    // and then to make the logic division between this in activity?
 
     /**
      * Create a new activity.
      *
      * @param activity all the information that needs to included in the activity
+     * @return BaseActivity object representation of the created activity or null if an error was encountered
      */
     public BaseActivity createActivity(BaseActivity activity) throws Exception {
-        try {
-            Response res = userUtils.postRequest("/createActivity", activity);
-            BaseActivity baseActivity = res.readEntity(new GenericType<BaseActivity>(){});
-            return baseActivity;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
+
+        Response res = userUtils.postRequest("/createActivity", activity);
+        return res.getStatus() == 200 ? res.readEntity(new GenericType<BaseActivity>(){}) : null;
     }
 
 }

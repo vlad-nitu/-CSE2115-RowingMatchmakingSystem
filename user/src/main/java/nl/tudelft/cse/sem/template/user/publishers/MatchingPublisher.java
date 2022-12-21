@@ -93,16 +93,9 @@ public class MatchingPublisher {
      *                 (as owner still needs to accept) and the timeSlot of the activity
      * @return the copy of the saved match, none if an exception is thrown
      */
-    public BaseMatching chooseActivity(BaseMatching matching) {
-        try {
-            @Cleanup
-            Response res = userUtils.postRequest("/chooseActivity", matching);
-            BaseMatching matchResult = res.readEntity(new GenericType<>() {});
-            return matchResult;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return new BaseMatching();
-        }
+    public BaseMatching chooseActivity(BaseMatching matching) throws Exception {
+        Response res = userUtils.postRequest("/chooseActivity", matching);
+        return res.getStatus() == 200 ? res.readEntity(new GenericType<>() {}) : null;
     }
 
     /**

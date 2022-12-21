@@ -395,14 +395,25 @@ public class UserControllerTest {
     @Test
     void getAvailableActivities() throws Exception {
         List<Pair<Long, String>> expected = List.of(new Pair<Long, String>(1L, "testGetAvailableActivities"));
+        when(userService.findTimeSlotsById(null)).thenReturn(new HashSet<>());
         when(matchingPublisher.getAvailableActivities(any(), anySet())).thenReturn(expected);
         MvcResult mvcResult = mockMvc
                 .perform(get("/getAvailableActivities"))
                 .andExpect(status().isOk())
                 .andReturn();
         String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).doesNotContain("There is no user with the given userId!");
         assertThat(contentAsString).contains("testGetAvailableActivities");
 
+        when(userService.findTimeSlotsById(null)).thenReturn(null);
+        mvcResult = mockMvc
+                .perform(get("/getAvailableActivities"))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("There is no user with the given userId!");
+
+        when(userService.findTimeSlotsById(null)).thenReturn(new HashSet<>());
         expected = null;
         when(matchingPublisher.getAvailableActivities(any(), anySet())).thenReturn(expected);
         mvcResult = mockMvc

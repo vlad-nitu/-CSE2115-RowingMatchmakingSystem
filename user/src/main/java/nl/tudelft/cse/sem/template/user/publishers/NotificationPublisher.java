@@ -32,18 +32,12 @@ public class NotificationPublisher {
      * Requests all the notifications that are collected for the user and have not been seen yet.
      *
      * @param userId the id of the user requesting the notifications
-     * @return a list containing the received notifications, if any are present
+     * @return a list containing the received notifications or null if an error was encountered
      */
-    public List<String> getNotifications(String userId) {
-        try {
-            @Cleanup
-            Response res = userUtils.getRequest("/getNotifications/" + userId);
-            List<String> notifications = res.readEntity(new GenericType<List<String>>(){});
-            return notifications;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
+    public List<String> getNotifications(String userId) throws Exception {
+        @Cleanup
+        Response res = userUtils.getRequest("/getNotifications/" + userId);
+        return res.getStatus() == 200 ? res.readEntity(new GenericType<List<String>>(){}) : null;
     }
 
 }

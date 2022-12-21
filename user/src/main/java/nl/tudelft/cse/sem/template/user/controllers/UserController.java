@@ -238,7 +238,7 @@ public class UserController {
      * @return List of BaseNotification objects representing notifications or the encountered problem description
      */
     @GetMapping("/getNotifications")
-    public ResponseEntity getNotifications() {
+    public ResponseEntity getNotifications() throws Exception {
         String userId = authManager.getNetId();
         List<String> response = notificationPublisher.getNotifications(userId);
         return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong!")
@@ -282,7 +282,7 @@ public class UserController {
      * @return the matching in which the user has requested to participate
      */
     @PostMapping("/chooseActivity")
-    public ResponseEntity<BaseMatching> chooseActivity(@RequestBody BaseMatching matching) {
+    public ResponseEntity<BaseMatching> chooseActivity(@RequestBody BaseMatching matching) throws Exception {
         String userId = authManager.getNetId();
         matching.setUserId(userId);
         BaseMatching response = matchingPublisher.chooseActivity(matching);
