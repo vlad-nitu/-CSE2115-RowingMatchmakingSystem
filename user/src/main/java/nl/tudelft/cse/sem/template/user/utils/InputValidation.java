@@ -16,7 +16,7 @@ public class InputValidation {
             "starboard side rower",
             "sculling rower");
 
-    private static final Pattern patternMF = Pattern.compile("[^mf]", Pattern.CASE_INSENSITIVE);
+    private static final Set<Character> possibleGenders = Set.of('M', 'm', 'F', 'f');
 
     /**
      * Validates the userId by checking if it contains special characters.
@@ -39,11 +39,7 @@ public class InputValidation {
      * @return boolean defining whether the input passed the validation
      */
     public static boolean userGenderValidation(Character gender) {
-
-        Matcher matcher = patternMF.matcher(gender.toString());
-
-        return !matcher.find();
-
+        return possibleGenders.contains(gender);
     }
 
     /**
