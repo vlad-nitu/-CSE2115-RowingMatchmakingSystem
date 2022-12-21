@@ -19,6 +19,7 @@ import java.util.Optional;
 @Service
 public class ActivityService {
 
+    private static LocalDateTime checkTime;
     private final transient ActivityRepository activityRepository;
 
     public List<Activity> findAll() {
@@ -39,7 +40,6 @@ public class ActivityService {
                                                   List<TimeSlot> timeSlots, LocalDateTime currentTime) {
         List<Activity> activityList = new ArrayList<>();
         for (Activity activity : activities) {
-            LocalDateTime checkTime;
             if (activity instanceof Competition) {
                 checkTime = currentTime.minusDays(1);
             } else {

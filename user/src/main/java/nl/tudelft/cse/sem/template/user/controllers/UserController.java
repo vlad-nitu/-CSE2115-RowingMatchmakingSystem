@@ -111,7 +111,7 @@ public class UserController {
     }
 
     /**
-     * API Endpoint that performs a GET request in order to obtain and send the timeslots of an User
+     * API Endpoint that performs a GET request in order to obtain and send the timeslots of a User.
      *
      * @param userId - String object representing the unique identifier of a User
      * @return - ResponseEntity object with a Set of Timeslot objects representing the timeslots

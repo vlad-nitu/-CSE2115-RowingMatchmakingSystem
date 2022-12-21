@@ -109,16 +109,17 @@ public class UserService {
     }
 
     /**
-     * Finds the timeslots the user with the given userId is available for
+     * Finds the timeslots that the user with the given userId is available for.
      *
      * @param userId - the ID of the user
-     * @return Set of Timeslots
+     * @return Set of Timeslots that the user is available for enrollment
      */
     public Set<TimeSlot> findTimeSlotsById(String userId) {
         Optional<User> user = userRepository.findById(userId);
-        if (user.isPresent())
+        if (user.isPresent()) {
             return user.get().getTimeSlots();
-        else
+        } else {
             return null;
+        }
     }
 }

@@ -25,12 +25,12 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.InvalidObjectException;
-import java.sql.Time;
 import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
 public class ActivityController {
+    private final transient String coxCertificate = "cox";
     private final transient ActivityService activityService;
     private final transient UserPublisher userPublisher;
     private final transient MatchingPublisher matchingPublisher;
@@ -123,11 +123,11 @@ public class ActivityController {
             return ResponseEntity.ok(false);
         }
         Validator validator;
-        if (activity instanceof Competition && position.equals("cox")) {
+        if (activity instanceof Competition && position.equals(coxCertificate)) {
             validator = competitionCox;
         } else if (activity instanceof Competition) {
             validator = competition;
-        } else if (activity instanceof Training && position.equals("cox")) {
+        } else if (activity instanceof Training && position.equals(coxCertificate)) {
             validator = trainingCox;
         } else {
             validator = training;
@@ -165,17 +165,17 @@ public class ActivityController {
         for (Activity activity : activityList) {
             for (String position : activity.getPositions()) {
                 Validator validator;
-                if (activity instanceof Competition && position.equals("cox")) {
+                if (activity instanceof Competition && position.equals(coxCertificate)) {
                     validator = competitionCox;
                 } else if (activity instanceof Competition) {
                     validator = competition;
-                } else if (activity instanceof Training && position.equals("cox")) {
+                } else if (activity instanceof Training && position.equals(coxCertificate)) {
                     validator = trainingCox;
                 } else {
                     validator = training;
                 }
                 try {
-                    boolean isValid = validator.handle(activity, userPublisher, position, userId);
+                    validator.handle(activity, userPublisher, position, userId);
                     list.add(new Pair<>(activity.getActivityId(), position));
                 } catch (InvalidObjectException e) {
                     continue;
