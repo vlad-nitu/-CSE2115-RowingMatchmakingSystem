@@ -4,6 +4,7 @@ import nl.tudelft.cse.sem.template.user.authentication.AuthManager;
 import nl.tudelft.cse.sem.template.user.publishers.ActivityPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.MatchingPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.NotificationPublisher;
+import nl.tudelft.cse.sem.template.user.utils.BaseActivity;
 import nl.tudelft.cse.sem.template.user.utils.InputValidation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,6 +16,7 @@ import nl.tudelft.cse.sem.template.user.domain.User;
 import nl.tudelft.cse.sem.template.user.services.UserService;
 
 import javax.validation.Valid;
+import javax.ws.rs.core.Response;
 import java.util.*;
 
 @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
@@ -149,6 +151,28 @@ public class UserController {
     @GetMapping(value = "/findAll", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<User>> findAllUsers() {
         return ResponseEntity.ok(userService.findAll());
+    }
+
+    /**
+     * API Endpoint that performs a POST request in order to create an activity.
+     *
+     * @param activity - BaseActivity representing the activity
+     * @return ResponseEntity object with status OK or INTERNAL_SERVER_ERROR
+     *      and descriptive body
+     * @throws Exception - caught exception
+     */
+    @PostMapping("/createActivity/{type}")
+    public ResponseEntity createActivity(@Valid @RequestBody BaseActivity activity,
+                                         @PathVariable String type) throws Exception {
+        String userId = authManager.getNetId();
+        activity.setOwnerId(userId);
+        activity.setType(type);
+        try {
+            activityPublisher.createActivity(activity);
+            return ResponseEntity.status(HttpStatus.OK).body("Activity created!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong.");
+        }
     }
 
     /**

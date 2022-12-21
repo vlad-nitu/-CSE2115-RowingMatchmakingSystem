@@ -4,6 +4,8 @@ import nl.tudelft.cse.sem.template.user.utils.BaseActivity;
 import nl.tudelft.cse.sem.template.user.utils.UserUtils;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.core.Response;
+
 @Service
 public class ActivityPublisher {
     private final transient UserUtils userUtils;

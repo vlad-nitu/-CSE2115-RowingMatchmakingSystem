@@ -10,6 +10,7 @@ import nl.tudelft.cse.sem.template.user.utils.BaseActivity;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import javax.ws.rs.core.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ public class ActivityPublisherTest {
         activityPublisher = new ActivityPublisher(userUtils);
         TimeSlot timeSlot = new TimeSlot(LocalDateTime.of(2022, 12, 15, 16, 15),
                 LocalDateTime.of(2022, 12, 15, 17, 45));
-        activity = new BaseActivity(1L, "LotteKremer", timeSlot, List.of("cox"), "C4");
+        activity = new BaseActivity(1L, "LotteKremer", timeSlot, Set.of("cox"), "C4", "training");
     }
 
     @Test
