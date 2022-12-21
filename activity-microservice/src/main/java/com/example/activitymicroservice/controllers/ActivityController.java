@@ -25,6 +25,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.InvalidObjectException;
+import java.sql.Time;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -38,6 +39,7 @@ public class ActivityController {
     private final transient Validator trainingCox;
     private final transient Validator competition;
     private final transient Validator competitionCox;
+
     /**
      * Constructor for injection.
      *
@@ -114,17 +116,29 @@ public class ActivityController {
     public ResponseEntity<Boolean> check(@PathVariable String userId,
                                          @PathVariable Long activityId, @PathVariable String position) {
         Activity activity = this.activityService.findActivity(activityId);
-        Character gender = this.userPublisher.getGender(userId);
-        boolean competitiveness = this.userPublisher.getCompetitiveness(userId);
-        String organisation = this.userPublisher.getOrganisation(userId);
-        String certificate = this.userPublisher.getCertificate(userId);
-        List<String> listPositions = this.userPublisher.getPositions(userId);
 
-        if()
+        List<Activity> activities = activityService.getActivitiesByTimeSlot(List.of(activity),
+                new ArrayList<>(userPublisher.getTimeslots(userId)), LocalDateTime.now());
+        if (activities.isEmpty()) {
+            return ResponseEntity.ok(false);
+        }
+        Validator validator;
+        if (activity instanceof Competition && position.equals("cox")) {
+            validator = competitionCox;
+        } else if (activity instanceof Competition) {
+            validator = competition;
+        } else if (activity instanceof Training && position.equals("cox")) {
+            validator = trainingCox;
+        } else {
+            validator = training;
+        }
+        try {
+            boolean isValid = validator.handle(activity, userPublisher, position, userId);
+            return ResponseEntity.ok(isValid);
+        } catch (InvalidObjectException e) {
+            return ResponseEntity.ok(false);
+        }
 
-
-        return ResponseEntity.ok(this.activityService.checkUser(activity, gender,
-                certificate, organisation, competitiveness, listPositions, position));
     }
 
     @PostMapping("/createActivity")
@@ -142,12 +156,12 @@ public class ActivityController {
      */
     @PostMapping("/sendAvailableActivities/{userId}")
     public ResponseEntity<List<Pair<Long, String>>> sendAvailableActivities(@RequestBody List<TimeSlot> timeSlots,
-                                                                            @PathVariable String userId)
-            throws InvalidObjectException {
+                                                                            @PathVariable String userId) {
         List<Pair<Long, String>> list = new ArrayList<>();
 
 
-        List<Activity> activityList = activityService.getActivitiesByTimeSlot(timeSlots, LocalDateTime.now());
+        List<Activity> activityList =
+                activityService.getActivitiesByTimeSlot(activityService.findAll(), timeSlots, LocalDateTime.now());
         for (Activity activity : activityList) {
             for (String position : activity.getPositions()) {
                 Validator validator;
@@ -160,9 +174,11 @@ public class ActivityController {
                 } else {
                     validator = training;
                 }
-                boolean isValid = validator.handle(activity, userPublisher, position, userId);
-                if (isValid) {
+                try {
+                    boolean isValid = validator.handle(activity, userPublisher, position, userId);
                     list.add(new Pair<>(activity.getActivityId(), position));
+                } catch (InvalidObjectException e) {
+                    continue;
                 }
             }
         }

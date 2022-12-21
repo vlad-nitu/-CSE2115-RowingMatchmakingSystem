@@ -35,9 +35,10 @@ public class ActivityService {
      * @param timeSlots List of TimeSlots
      * @return List of Activities
      */
-    public List<Activity> getActivitiesByTimeSlot(List<TimeSlot> timeSlots, LocalDateTime currentTime) {
+    public List<Activity> getActivitiesByTimeSlot(List<Activity> activities,
+                                                  List<TimeSlot> timeSlots, LocalDateTime currentTime) {
         List<Activity> activityList = new ArrayList<>();
-        for (Activity activity : activityRepository.findAll()) {
+        for (Activity activity : activities) {
             LocalDateTime checkTime;
             if (activity instanceof Competition) {
                 checkTime = currentTime.minusDays(1);

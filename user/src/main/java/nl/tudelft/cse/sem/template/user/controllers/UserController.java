@@ -1,6 +1,7 @@
 package nl.tudelft.cse.sem.template.user.controllers;
 
 import nl.tudelft.cse.sem.template.user.utils.InputValidation;
+import nl.tudelft.cse.sem.template.user.utils.TimeSlot;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -116,7 +117,7 @@ public class UserController {
      * @return - ResponseEntity object with a Set of Timeslot objects representing the timeslots
      */
     @GetMapping("/sendTimeSlots/{userId}")
-    public ResponseEntity<Set<String>> sendTimeSlots(@PathVariable String userId) {
+    public ResponseEntity<Set<TimeSlot>> sendTimeSlots(@PathVariable String userId) {
         return ResponseEntity.ok(userService.findTimeSlotsById(userId));
     }
 
