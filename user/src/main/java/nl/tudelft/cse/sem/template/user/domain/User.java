@@ -25,7 +25,7 @@ public class User {
 
     @NotNull(message = "Competitiveness level is mandatory and cannot be null")
     @Column(name = "iscompetitive")
-    private boolean isCompetitive;
+    private Boolean isCompetitive;
 
     @Column(name = "gender")
     private char gender;
