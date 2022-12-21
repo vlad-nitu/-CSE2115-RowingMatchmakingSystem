@@ -466,4 +466,25 @@ public class UserControllerTest {
         contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("Something went wrong!");
     }
+
+    @Test
+    void getUserActivities() throws Exception {
+        List<Long> expected = List.of(1L, 2L);
+        when(matchingPublisher.getUserActivities(null)).thenReturn(expected);
+        MvcResult mvcResult = mockMvc
+                .perform(get("/getUserActivities"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains(expected.toString().replace(" ",""));
+
+        expected = null;
+        when(matchingPublisher.getUserActivities(null)).thenReturn(expected);
+        mvcResult = mockMvc
+                .perform(get("/getUserActivities"))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Something went wrong!");
+    }
 }

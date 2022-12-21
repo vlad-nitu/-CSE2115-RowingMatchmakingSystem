@@ -267,13 +267,14 @@ public class UserController {
     /**
      * API Endpoint that performs a GET request to get all the activities the User takes part in.
      *
-     * @return a list of activity id's
+     * @return a list of activity id's or the encountered problem description
      */
     @GetMapping("/getUserActivities")
-    public ResponseEntity<List<Long>> getUserActivities() throws Exception {
+    public ResponseEntity getUserActivities() throws Exception {
         String userId = authManager.getNetId();
         List<Long> response = matchingPublisher.getUserActivities(userId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong!")
+                : ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**
