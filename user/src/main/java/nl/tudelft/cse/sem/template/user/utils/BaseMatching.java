@@ -6,6 +6,7 @@ import lombok.*;
 @EqualsAndHashCode
 @NoArgsConstructor
 @Getter
+@Setter
 public class BaseMatching {
     private String userId;
 

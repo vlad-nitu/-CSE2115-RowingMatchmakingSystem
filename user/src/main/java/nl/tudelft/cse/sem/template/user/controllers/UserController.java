@@ -1,5 +1,6 @@
 package nl.tudelft.cse.sem.template.user.controllers;
 
+import com.fasterxml.jackson.databind.ser.Serializers;
 import nl.tudelft.cse.sem.template.user.authentication.AuthManager;
 import nl.tudelft.cse.sem.template.user.publishers.ActivityPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.MatchingPublisher;
@@ -197,7 +198,7 @@ public class UserController {
 
     /**
      * API Endpoint that performs a POST request in order to decide whether another User is accepted as a
-     * match or declined (by the owner of the activity)
+     * match or declined (by the owner of the activity).
      *
      * @param type - either 'accept' or 'decline'
      * @param matching - the matching that is accepted or declined
@@ -210,6 +211,47 @@ public class UserController {
         }
         String userId = authManager.getNetId();
         BaseMatching response = matchingPublisher.decideMatch(userId, type, matching);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    /**
+     * API Endpoint that performs a GET request to get all the activities the User takes part in.
+     *
+     * @return a list of activity id's
+     */
+    @GetMapping("/getUserActivities")
+    public ResponseEntity<List<Long>> getUserActivities() {
+        String userId = authManager.getNetId();
+        List<Long> response = matchingPublisher.getUserActivities(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    /**
+     * API Endpoint that performs a POST request in order to let the user choose to participate in an activity.
+     *
+     * @param matching the activity the user wants to participate in
+     * @return the matching in which the user has requested to participate
+     */
+    @PostMapping("/chooseActivity")
+    public ResponseEntity<BaseMatching> chooseActivity(@RequestBody BaseMatching matching) {
+        String userId = authManager.getNetId();
+        matching.setUserId(userId);
+        BaseMatching response = matchingPublisher.chooseActivity(matching);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    /**
+     * API Endpoint that performs a POST request in order to unenroll from an activity.
+     *
+     * @param activity the activity where the user wants to unenroll from.
+     * @return the userId and activityId pair from the matching that is now cancelled
+     */
+    @PostMapping("/unenroll")
+    public ResponseEntity<Pair<String, Long>> unenroll(@RequestBody BaseActivity activity) {
+        String userId = authManager.getNetId();
+        Long activityId = activity.getActivityId();
+        Pair<String, Long> userIdActivityIdPair = new Pair<String, Long>(userId, activityId);
+        Pair<String, Long> response = matchingPublisher.unenroll(userIdActivityIdPair);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
