@@ -137,7 +137,6 @@ public class MatchingController {
         return ResponseEntity.badRequest().build();
     }
 
-
     /**
      * API Endpoint that performs a POST request in order for an owner of a specific activity
      * to specify that it accepts a user who is asking to take part in his/her activity in a previous request.

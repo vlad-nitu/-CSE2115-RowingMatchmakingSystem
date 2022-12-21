@@ -1,14 +1,12 @@
 package nl.tudelft.cse.sem.template.user.utils;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @AllArgsConstructor
 @EqualsAndHashCode
 @NoArgsConstructor
+@Getter
 public class BaseMatching {
-
     private String userId;
 
     private Long activityId;

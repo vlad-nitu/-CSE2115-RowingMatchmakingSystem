@@ -195,6 +195,23 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    /**
+     * API Endpoint that performs a POST request in order to decide whether another User is accepted as a
+     * match or declined (by the owner of the activity)
+     *
+     * @param type - either 'accept' or 'decline'
+     * @param matching - the matching that is accepted or declined
+     * @return the match if the decision was successful
+     */
+    @PostMapping("/decideMatch/{type}")
+    public ResponseEntity decideMatch(@PathVariable String type, @RequestBody BaseMatching matching) {
+        if (!type.equals("accept") && !type.equals("decline")){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Decision can only be 'accept' or 'decline'.");
+        }
+        String userId = authManager.getNetId();
+        BaseMatching response = matchingPublisher.decideMatch(userId, type, matching);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
     /**
      * Handles BAD_REQUEST exceptions thrown by the Validator of User entities
