@@ -213,42 +213,68 @@ public class UserControllerTest {
         String contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("true");
 
-        /*expected = "error";
+        expected = "false";
         when(userService.findCompetitivenessByUserId(userId)).thenReturn(expected);
-        MvcResult failMvcResult = mockMvc
+        mvcResult = mockMvc
+                .perform(get("/sendCompetitiveness/LotteKremer"))
+                .andExpect(status().isOk())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("false");
+
+        expected = "error";
+        userId = "noSuchUser";
+        when(userService.findCompetitivenessByUserId(userId)).thenReturn(expected);
+        mvcResult = mockMvc
                 .perform(get("/sendCompetitiveness/noSuchUser"))
                 .andExpect(status().is4xxClientError())
                 .andReturn();
         contentAsString = mvcResult.getResponse().getContentAsString();
-        assertThat(contentAsString).contains("There is no user with the given userId!");*/
+        assertThat(contentAsString).contains("There is no user with the given userId!");
     }
 
     @Test
     public void sendGenderTest() throws Exception {
         Character expected = 'F';
         when(userService.findGenderById(userId)).thenReturn(expected);
-
         MvcResult mvcResult = mockMvc
                 .perform(get("/sendGender/LotteKremer"))
                 .andExpect(status().isOk())
                 .andReturn();
-
         String contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("F");
+
+        expected = ' ';
+        userId = "noSuchUser";
+        when(userService.findGenderById(userId)).thenReturn(expected);
+        mvcResult = mockMvc
+                .perform(get("/sendGender/noSuchUser"))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("There is no user with the given userId!");
     }
 
     @Test
     public void sendCertificateTest() throws Exception {
         String expected = "C4";
         when(userService.findCertificateById(userId)).thenReturn(expected);
-
         MvcResult mvcResult = mockMvc
                 .perform(get("/sendCertificate/LotteKremer"))
                 .andExpect(status().isOk())
                 .andReturn();
-
         String contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("C4");
+
+        expected = null;
+        userId = "noSuchUser";
+        when(userService.findCertificateById(userId)).thenReturn(expected);
+        mvcResult = mockMvc
+                .perform(get("/sendCertificate/noSuchUser"))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("There is no user with the given userId!");
     }
 
     @Test
@@ -259,24 +285,41 @@ public class UserControllerTest {
                 .perform(get("/sendOrganization/LotteKremer"))
                 .andExpect(status().isOk())
                 .andReturn();
-
         String contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("Laga");
+
+        expected = null;
+        userId = "noSuchUser";
+        when(userService.findOrganisationById(userId)).thenReturn(expected);
+        mvcResult = mockMvc
+                .perform(get("/sendOrganization/noSuchUser"))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("There is no user with the given userId!");
     }
 
     @Test
     public void sendPositionsTest() throws Exception {
         Set<String> expected = Set.of("Cox", "Coach");
         when(userService.findPositionsById(userId)).thenReturn(expected);
-
         MvcResult mvcResult = mockMvc
                 .perform(get("/sendPositions/LotteKremer"))
                 .andExpect(status().isOk())
                 .andReturn();
-
         String contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("Cox");
         assertThat(contentAsString).contains("Coach");
+
+        expected = null;
+        userId = "noSuchUser";
+        when(userService.findPositionsById(userId)).thenReturn(expected);
+        mvcResult = mockMvc
+                .perform(get("/sendPositions/noSuchUser"))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("There is no user with the given userId!");
     }
 
     @Test
@@ -287,8 +330,17 @@ public class UserControllerTest {
                 .perform(get("/sendEmail/LotteKremer"))
                 .andExpect(status().isOk())
                 .andReturn();
-
         String contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("test@domain.com");
+
+        expected = null;
+        userId = "noSuchUser";
+        when(userService.findEmailById(userId)).thenReturn(expected);
+        mvcResult = mockMvc
+                .perform(get("/sendEmail/noSuchUser"))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("There is no user with the given userId!");
     }
 }

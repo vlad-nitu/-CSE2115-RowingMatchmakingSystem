@@ -53,9 +53,11 @@ class UserServiceTest {
         Optional<User> expected = Optional.of(new User("id", true, 'f', "organisation",
                 "certificate", "test@domain.com", new HashSet<>(), new HashSet<>()));
         when(userRepository.findById("id")).thenReturn(expected);
-        assertThat(userService.findCompetitivenessByUserId("id")).isEqualTo(expected.get().isCompetitive());
+        assertThat(userService.findCompetitivenessByUserId("id")).isEqualTo(String.valueOf(expected.get().isCompetitive()));
+        expected.get().setCompetitive(false);
+        assertThat(userService.findCompetitivenessByUserId("id")).isEqualTo(String.valueOf(expected.get().isCompetitive()));
         when(userRepository.findById("")).thenReturn(Optional.empty());
-        assertThat(userService.findCompetitivenessByUserId("")).isEqualTo(false);
+        assertThat(userService.findCompetitivenessByUserId("")).isEqualTo("error");
     }
 
     @Test
@@ -95,7 +97,7 @@ class UserServiceTest {
         when(userRepository.findById("id")).thenReturn(expected);
         assertThat(userService.findPositionsById("id")).isEqualTo(expected.get().getPositions());
         when(userRepository.findById("")).thenReturn(Optional.empty());
-        assertThat(userService.findPositionsById("")).isEqualTo(new HashSet<>());
+        assertThat(userService.findPositionsById("")).isEqualTo(null);
     }
 
     @Test

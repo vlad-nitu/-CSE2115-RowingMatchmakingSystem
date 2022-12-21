@@ -13,6 +13,7 @@ import java.util.Set;
 
 @AllArgsConstructor
 @Service
+@SuppressWarnings("PMD.ReturnEmptyCollectionRatherThanNull")
 public class UserService {
 
     private final transient UserRepository userRepository;
@@ -131,6 +132,6 @@ public class UserService {
         if (user.isPresent()) {
             return user.get().getPositions();
         }
-        return new HashSet<>();
+        return null;
     }
 }

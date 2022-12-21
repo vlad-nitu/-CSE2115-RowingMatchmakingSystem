@@ -25,6 +25,8 @@ public class UserController {
     private final transient MatchingPublisher matchingPublisher;
     private final transient NotificationPublisher notificationPublisher;
     private final transient AuthManager authManager;
+    
+    private static final String noSuchUserIdError = "There is no user with the given userId!";
 
     /**
      * All argument constructor, injects the main service component, authentication manager
@@ -82,7 +84,7 @@ public class UserController {
     public ResponseEntity sendCompetitiveness(@PathVariable String userId) {
         String responseBody = userService.findCompetitivenessByUserId(userId);
         if (responseBody.equals("error")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is no user with the given userId!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(noSuchUserIdError);
         }
         return responseBody.equals("true") ? ResponseEntity.ok(true) : ResponseEntity.ok(false);
     }
@@ -97,7 +99,7 @@ public class UserController {
     public ResponseEntity sendGender(@PathVariable String userId) {
         Character responseBody = userService.findGenderById(userId);
         return responseBody == ' ' ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                "There is no user with the given userId!") : ResponseEntity.ok(responseBody);
+                noSuchUserIdError) : ResponseEntity.ok(responseBody);
     }
 
     /**
@@ -109,7 +111,8 @@ public class UserController {
     @GetMapping("/sendCertificate/{userId}")
     public ResponseEntity sendCertificate(@PathVariable String userId) {
         String responseBody = userService.findCertificateById(userId);
-        return ResponseEntity.ok();
+        return responseBody == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                noSuchUserIdError) : ResponseEntity.ok(responseBody);
     }
 
     /**
@@ -119,8 +122,10 @@ public class UserController {
      * @return - ResponseEntity object with a message composed of the organization
      */
     @GetMapping("/sendOrganization/{userId}")
-    public ResponseEntity<String> sendOrganization(@PathVariable String userId) {
-        return ResponseEntity.ok(userService.findOrganisationById(userId));
+    public ResponseEntity sendOrganization(@PathVariable String userId) {
+        String responseBody = userService.findOrganisationById(userId);
+        return responseBody == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                noSuchUserIdError) : ResponseEntity.ok(responseBody);
     }
 
     /**
@@ -131,8 +136,10 @@ public class UserController {
      *          the User can take in a rowing boat
      */
     @GetMapping("/sendPositions/{userId}")
-    public ResponseEntity<Set<String>> sendPositions(@PathVariable String userId) {
-        return ResponseEntity.ok(userService.findPositionsById(userId));
+    public ResponseEntity sendPositions(@PathVariable String userId) {
+        Set<String> responseBody = userService.findPositionsById(userId);
+        return responseBody == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                noSuchUserIdError) : ResponseEntity.ok(responseBody);
     }
 
     /**
@@ -142,8 +149,10 @@ public class UserController {
      * @return - ResponseEntity object with a message composed of the e-mail address
      */
     @GetMapping("/sendEmail/{userId}")
-    public ResponseEntity<String> sendEmail(@PathVariable String userId) {
-        return ResponseEntity.ok(userService.findEmailById(userId));
+    public ResponseEntity sendEmail(@PathVariable String userId) {
+        String responseBody = userService.findEmailById(userId);
+        return responseBody == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                noSuchUserIdError) : ResponseEntity.ok(responseBody);
     }
 
     /**
