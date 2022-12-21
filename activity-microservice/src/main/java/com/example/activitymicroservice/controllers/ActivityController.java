@@ -63,11 +63,11 @@ public class ActivityController {
         Validator organizationValidator = new OrganisationValidator();
         organizationValidator.setNext(training);
 
-        Validator competitvnessValidator = new CompetitivenessValidator();
-        competitvnessValidator.setNext(organizationValidator);
+        Validator competitivenessValidator = new CompetitivenessValidator();
+        competitivenessValidator.setNext(organizationValidator);
 
         competition = new GenderValidator();
-        competition.setNext(competitvnessValidator);
+        competition.setNext(competitivenessValidator);
 
         competitionCox = new CertificateValidator();
         competitionCox.setNext(competition);
