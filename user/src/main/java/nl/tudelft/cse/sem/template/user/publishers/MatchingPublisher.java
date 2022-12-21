@@ -11,6 +11,7 @@ import nl.tudelft.cse.sem.template.user.utils.BaseMatching;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
@@ -35,7 +36,7 @@ public class MatchingPublisher {
      * @param timeSlots - the timeslots where the user is available for an activity
      * @return a list of pairs which give the combination of activity id and time slot of the activity
      */
-    public List<Pair<Long, String>> getAvailableActivities(String userId, List<TimeSlot> timeSlots) {
+    public List<Pair<Long, String>> getAvailableActivities(String userId, Set<TimeSlot> timeSlots) {
         try {
             @Cleanup
             Response res = userUtils.postRequest("/getAvailableActivities/" + userId, timeSlots);

@@ -9,7 +9,9 @@ import nl.tudelft.cse.sem.template.user.utils.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.ws.rs.core.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,13 +26,13 @@ public class MatchingPublisherTest {
     private MatchingPublisher matchingPublisher;
 
     private BaseMatching matching;
-    private List<TimeSlot> timeSlots;
+    private Set<TimeSlot> timeSlots;
 
     @BeforeEach
     void setUp() {
         matchingPublisher = new MatchingPublisher(userUtils);
         matching = new BaseMatching("LotteKremer", 1L, "cox", true);
-        timeSlots = new ArrayList<>();
+        timeSlots = new HashSet<>();
         timeSlots.add(new TimeSlot(LocalDateTime.of(2003, 12, 1, 23, 15),
                 LocalDateTime.of(2002, 11, 2, 15, 0)));
         timeSlots.add(new TimeSlot(LocalDateTime.of(2003, 12, 1, 23, 15),
