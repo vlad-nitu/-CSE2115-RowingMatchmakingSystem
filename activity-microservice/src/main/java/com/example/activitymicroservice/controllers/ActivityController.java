@@ -117,6 +117,10 @@ public class ActivityController {
                                          @PathVariable Long activityId, @PathVariable String position) {
         Activity activity = this.activityService.findActivity(activityId);
 
+        if (!activity.getPositions().contains(position)) {
+            return ResponseEntity.ok(false);
+        }
+
         List<Activity> activities = activityService.getActivitiesByTimeSlot(List.of(activity),
                 new ArrayList<>(userPublisher.getTimeslots(userId)), LocalDateTime.now());
         if (activities.isEmpty()) {

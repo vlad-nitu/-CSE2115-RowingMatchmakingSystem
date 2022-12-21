@@ -41,9 +41,9 @@ public class ActivityService {
         List<Activity> activityList = new ArrayList<>();
         for (Activity activity : activities) {
             if (activity instanceof Competition) {
-                checkTime = currentTime.minusDays(1);
+                checkTime = currentTime.plusDays(1);
             } else {
-                checkTime = currentTime.minusMinutes(30);
+                checkTime = currentTime.plusMinutes(30);
             }
             for (TimeSlot timeSlot : timeSlots) {
                 if (activity.getTimeSlot().isIncluded(timeSlot, checkTime)) {
