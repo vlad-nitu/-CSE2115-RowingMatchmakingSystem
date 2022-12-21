@@ -88,7 +88,6 @@ public class ActivityService {
         }
         //Probably will be needed for a test because it says that the list is immutable, so I create a new one
         List<String> updatedPositions = new ArrayList<>(activity.get().getPositions());
-        updatedPositions.remove(posTaken.getSecond());
         if (updatedPositions.remove(posTaken.getSecond())) {
             activity.get().setPositions(updatedPositions);
             activityRepository.save(activity.get());
