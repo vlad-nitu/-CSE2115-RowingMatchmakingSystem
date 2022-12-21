@@ -4,6 +4,7 @@ import com.example.notificationmicroservice.authentication.AuthManager;
 import com.example.notificationmicroservice.domain.Notification;
 import com.example.notificationmicroservice.services.NotificationDatabaseService;
 import com.example.notificationmicroservice.strategy.NotificationStrategy;
+import com.example.notificationmicroservice.utils.InputValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -75,6 +76,12 @@ public class NotificationController {
      */
     @PostMapping("/notifyUser")
     public ResponseEntity<String> notifyUser(@RequestBody @Valid Notification notification) {
+        if(!InputValidation.validatePosition(notification.getPosition())) {
+            return ResponseEntity.badRequest().body("Invalid position");
+        }
+        if(!InputValidation.validateType(notification.getType())) {
+            return ResponseEntity.badRequest().body("Invalid notification type");
+        }
         if (!strategy.handleNotification(notification)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(strategy.getFailureMessage());
         }
