@@ -4,10 +4,7 @@ import nl.tudelft.cse.sem.template.user.authentication.AuthManager;
 import nl.tudelft.cse.sem.template.user.publishers.ActivityPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.MatchingPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.NotificationPublisher;
-import nl.tudelft.cse.sem.template.user.utils.BaseActivity;
-import nl.tudelft.cse.sem.template.user.utils.InputValidation;
-import nl.tudelft.cse.sem.template.user.utils.Pair;
-import nl.tudelft.cse.sem.template.user.utils.TimeSlot;
+import nl.tudelft.cse.sem.template.user.utils.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -180,11 +177,24 @@ public class UserController {
     //TODO: add userService method for querying timeSlots
     /*@GetMapping("/getAvailableActivities")
     public ResponseEntity<List<Pair<Long, String>>> getAvailableActivities() {
-        //Likewise get userId from token. With the id query the database for List<Timeslots> timeslots.
         String userId = authManager.getNetId();
         Set<TimeSlot> timeslots = userService.
         return ResponseEntity.ok(matchingPublisher.getAvailableActivities(userId, timeslots));
     }*/
+    //TODO: figure out the bug
+
+    /**
+     * API Endpoint that performs a GET request in order to get a list of notifications.
+     *
+     * @return List of BaseNotification objects representing notifications
+     */
+    @GetMapping("/getNotifications")
+    public ResponseEntity<List<BaseNotification>> getNotifications() {
+        String userId = authManager.getNetId();
+        List<BaseNotification> response = notificationPublisher.getNotifications(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 
     /**
      * Handles BAD_REQUEST exceptions thrown by the Validator of User entities
