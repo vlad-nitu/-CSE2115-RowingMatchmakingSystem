@@ -231,7 +231,7 @@ public class UserController {
      */
     @PostMapping("/decideMatch/{type}")
     public ResponseEntity decideMatch(@PathVariable String type, @RequestBody BaseMatching matching) {
-        if (!type.equals("accept") && !type.equals("decline")){
+        if (!type.equals("accept") && !type.equals("decline")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Decision can only be 'accept' or 'decline'.");
         }
         String userId = authManager.getNetId();
