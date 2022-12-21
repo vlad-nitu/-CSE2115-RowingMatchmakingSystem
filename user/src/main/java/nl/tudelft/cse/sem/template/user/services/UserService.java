@@ -7,6 +7,7 @@ import nl.tudelft.cse.sem.template.user.repositories.UserRepository;
 import nl.tudelft.cse.sem.template.user.utils.TimeSlot;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -119,7 +120,7 @@ public class UserService {
         if (user.isPresent()) {
             return user.get().getTimeSlots();
         } else {
-            return null;
+            return Set.of();
         }
     }
 }
