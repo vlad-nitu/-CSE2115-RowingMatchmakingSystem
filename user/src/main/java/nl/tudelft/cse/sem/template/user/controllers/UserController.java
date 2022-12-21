@@ -1,5 +1,6 @@
 package nl.tudelft.cse.sem.template.user.controllers;
 
+import nl.tudelft.cse.sem.template.user.authentication.AuthManager;
 import nl.tudelft.cse.sem.template.user.publishers.ActivityPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.MatchingPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.NotificationPublisher;
@@ -16,7 +17,7 @@ import nl.tudelft.cse.sem.template.user.services.UserService;
 import javax.validation.Valid;
 import java.util.*;
 
-//TODO parse or personalise error messages
+@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 @RestController
 public class UserController {
 
@@ -24,18 +25,22 @@ public class UserController {
     private final transient ActivityPublisher activityPublisher;
     private final transient MatchingPublisher matchingPublisher;
     private final transient NotificationPublisher notificationPublisher;
+    private final transient AuthManager authManager;
 
     /**
-     * All argument constructor, injects the main service component and all (4 now 0) publishers into the controller.
+     * All argument constructor, injects the main service component, authentication manager
+     * and all publishers into the controller.
      *
      * @param userService - user service implementation
+     * @param authManager - authentication manager implementation
      */
-    public UserController(UserService userService, ActivityPublisher activityPublisher,
-                          MatchingPublisher matchingPublisher, NotificationPublisher notificationPublisher) {
+    public UserController(UserService userService, ActivityPublisher activityPublisher, MatchingPublisher matchingPublisher,
+                          NotificationPublisher notificationPublisher, AuthManager authManager) {
         this.userService = userService;
         this.activityPublisher = activityPublisher;
         this.matchingPublisher = matchingPublisher;
         this.notificationPublisher = notificationPublisher;
+        this.authManager = authManager;
     }
 
     /**
@@ -52,19 +57,28 @@ public class UserController {
         if (!InputValidation.userGenderValidation(user.getGender())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided gender is invalid!");
         }
+        boolean idMatch = true;
+        if (!user.getUserId().equals(authManager.getNetId())) {
+            user.setUserId(authManager.getNetId());
+            idMatch = false;
+        }
         Optional<User> foundUser = userService.findUserById(user.getUserId());
         if (foundUser.isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with the given ID already exists!");
         }
-        return ResponseEntity.ok(userService.save(user));
+        if (idMatch) {
+            return ResponseEntity.ok(userService.save(user));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(userService.save(user)
+                + "\nThe given ID does not match your netID and was automatically adjusted!");
     }
 
     /**
      * API Endpoint that performs a GET request in order to obtain and send the competitiveness of the User.
      *
      * @param userId - String object representing the unique identifier of a User
-     * @return - ResponseEntity object with a message composed of the competitiveness (which is a boolean,
-     *         either true for competitive or false for non-competitive users)
+     * @return - ResponseEntity object with a message composed of the competitiveness
+     *      (which is a boolean, either true for competitive or false for non-competitive users)
      */
     @GetMapping("/sendCompetitiveness/{userId}")
     public ResponseEntity<Boolean> sendCompetitiveness(@PathVariable String userId) {

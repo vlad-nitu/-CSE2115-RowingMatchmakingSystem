@@ -3,6 +3,7 @@ package nl.tudelft.cse.sem.template.user.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import nl.tudelft.cse.sem.template.user.authentication.AuthManager;
 import nl.tudelft.cse.sem.template.user.publishers.ActivityPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.MatchingPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.NotificationPublisher;
@@ -28,7 +29,6 @@ import java.util.Set;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -41,6 +41,8 @@ public class UserControllerTest {
     MockMvc mockMvc;
     @Mock
     private UserService userService;
+    @Mock
+    private AuthManager authManager;
     private ActivityPublisher activityPublisher;
     private MatchingPublisher matchingPublisher;
     private NotificationPublisher notificationPublisher;
@@ -75,7 +77,8 @@ public class UserControllerTest {
                 LocalDateTime.of(2022, 12, 14, 19, 15)));
         user = new User(userId, competitive, gender, organization, certificate, email, positions, timeSlots);
 
-        this.userController = new UserController(userService, activityPublisher, matchingPublisher, notificationPublisher);
+        this.userController = new UserController(userService, activityPublisher,
+                matchingPublisher, notificationPublisher, authManager);
 
         mockMvc = MockMvcBuilders
                 .standaloneSetup(userController)
@@ -99,6 +102,7 @@ public class UserControllerTest {
 
         lenient().when(userService.save(user))
                 .thenReturn(user);
+        when(authManager.getNetId()).thenReturn(user.getUserId());
 
         MvcResult mvcResult = mockMvc
                 .perform(post("/createUser")
@@ -141,6 +145,19 @@ public class UserControllerTest {
         assertThat(expected);
 
         user.setGender('M');
+        when(authManager.getNetId()).thenReturn("");
+        mvcResult = mockMvc
+                .perform(post("/createUser")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(user))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        expected = contentAsString.contains("The given ID does not match your netID and was automatically adjusted!");
+        assertThat(expected);
+
         lenient().when(userService.findUserById(anyString()))
                 .thenReturn(Optional.of(new User()));
         mvcResult = mockMvc
@@ -154,6 +171,7 @@ public class UserControllerTest {
         contentAsString = mvcResult.getResponse().getContentAsString();
         expected = contentAsString.contains("User with the given ID already exists!");
         assertThat(expected);
+
     }
 
     @Test
