@@ -204,15 +204,23 @@ public class UserControllerTest {
 
     @Test
     public void sendCompetitivenessTest() throws Exception {
-        Boolean expected = true;
+        String expected = "true";
         when(userService.findCompetitivenessByUserId(userId)).thenReturn(expected);
         MvcResult mvcResult = mockMvc
                 .perform(get("/sendCompetitiveness/LotteKremer"))
                 .andExpect(status().isOk())
                 .andReturn();
-
         String contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("true");
+
+        /*expected = "error";
+        when(userService.findCompetitivenessByUserId(userId)).thenReturn(expected);
+        MvcResult failMvcResult = mockMvc
+                .perform(get("/sendCompetitiveness/noSuchUser"))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("There is no user with the given userId!");*/
     }
 
     @Test

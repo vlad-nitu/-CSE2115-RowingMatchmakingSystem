@@ -53,12 +53,12 @@ public class UserService {
      * @param userId - the ID of the user
      * @return boolean defining whether the user is competetive
      */
-    public boolean findCompetitivenessByUserId(String userId) {
+    public String findCompetitivenessByUserId(String userId) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isPresent()) {
-            return user.get().isCompetitive();
+            return user.get().isCompetitive() ? "true" : "false";
         }
-        return false;
+        return "error";
     }
 
     /**

@@ -79,8 +79,12 @@ public class UserController {
      *      (which is a boolean, either true for competitive or false for non-competitive users)
      */
     @GetMapping("/sendCompetitiveness/{userId}")
-    public ResponseEntity<Boolean> sendCompetitiveness(@PathVariable String userId) {
-        return ResponseEntity.ok(userService.findCompetitivenessByUserId(userId));
+    public ResponseEntity sendCompetitiveness(@PathVariable String userId) {
+        String responseBody = userService.findCompetitivenessByUserId(userId);
+        if (responseBody.equals("error")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is no user with the given userId!");
+        }
+        return responseBody.equals("true") ? ResponseEntity.ok(true) : ResponseEntity.ok(false);
     }
 
     /**
@@ -90,8 +94,10 @@ public class UserController {
      * @return - ResponseEntity object with a message composed of the gender of the User (a character, F/M)
      */
     @GetMapping("/sendGender/{userId}")
-    public ResponseEntity<Character> sendGender(@PathVariable String userId) {
-        return ResponseEntity.ok(userService.findGenderById(userId));
+    public ResponseEntity sendGender(@PathVariable String userId) {
+        Character responseBody = userService.findGenderById(userId);
+        return responseBody == ' ' ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                "There is no user with the given userId!") : ResponseEntity.ok(responseBody);
     }
 
     /**
@@ -101,8 +107,9 @@ public class UserController {
      * @return - ResponseEntity object with a message composed of the certificate ('none' if no certificate is entered)
      */
     @GetMapping("/sendCertificate/{userId}")
-    public ResponseEntity<String> sendCertificate(@PathVariable String userId) {
-        return ResponseEntity.ok(userService.findCertificateById(userId));
+    public ResponseEntity sendCertificate(@PathVariable String userId) {
+        String responseBody = userService.findCertificateById(userId);
+        return ResponseEntity.ok();
     }
 
     /**
