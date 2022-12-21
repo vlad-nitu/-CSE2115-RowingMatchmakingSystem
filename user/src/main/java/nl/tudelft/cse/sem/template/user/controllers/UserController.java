@@ -49,6 +49,7 @@ public class UserController {
      *
      * @param user the User that needs to be added
      * @return ResponseEntity object with a message composed of the User that was added
+     *      or the encountered problem description
      */
     @PostMapping("/createUser")
     public ResponseEntity createUser(@Valid @RequestBody User user) {
@@ -79,6 +80,7 @@ public class UserController {
      * @param userId - String object representing the unique identifier of a User
      * @return - ResponseEntity object with a message composed of the competitiveness
      *      (which is a boolean, either true for competitive or false for non-competitive users)
+     *      or the encountered problem description
      */
     @GetMapping("/sendCompetitiveness/{userId}")
     public ResponseEntity sendCompetitiveness(@PathVariable String userId) {
@@ -94,6 +96,7 @@ public class UserController {
      *
      * @param userId - String object representing the unique identifier of a User
      * @return - ResponseEntity object with a message composed of the gender of the User (a character, F/M)
+     *      or the encountered problem description
      */
     @GetMapping("/sendGender/{userId}")
     public ResponseEntity sendGender(@PathVariable String userId) {
@@ -107,6 +110,7 @@ public class UserController {
      *
      * @param userId - String object representing the unique identifier of a User
      * @return - ResponseEntity object with a message composed of the certificate ('none' if no certificate is entered)
+     *      or the encountered problem description
      */
     @GetMapping("/sendCertificate/{userId}")
     public ResponseEntity sendCertificate(@PathVariable String userId) {
@@ -120,6 +124,7 @@ public class UserController {
      *
      * @param userId - String object representing the unique identifier of a User
      * @return - ResponseEntity object with a message composed of the organization
+     *      or the encountered problem description
      */
     @GetMapping("/sendOrganization/{userId}")
     public ResponseEntity sendOrganization(@PathVariable String userId) {
@@ -133,7 +138,7 @@ public class UserController {
      *
      * @param userId - String object representing the unique identifier of a User
      * @return - ResponseEntity object with a message composed of a Set of strings which represent the positions
-     *          the User can take in a rowing boat
+     *      the User can take in a rowing boat or the encountered problem description
      */
     @GetMapping("/sendPositions/{userId}")
     public ResponseEntity sendPositions(@PathVariable String userId) {
@@ -147,6 +152,7 @@ public class UserController {
      *
      * @param userId - String object representing the unique identifier of a User
      * @return - ResponseEntity object with a message composed of the e-mail address
+     *      or the encountered problem description
      */
     @GetMapping("/sendEmail/{userId}")
     public ResponseEntity sendEmail(@PathVariable String userId) {
