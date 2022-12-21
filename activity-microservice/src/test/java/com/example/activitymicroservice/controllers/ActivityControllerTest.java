@@ -119,7 +119,7 @@ class ActivityControllerTest {
         Pair<Long, String> badPosition = new Pair(2L, "badPos");
         mockMvc.perform(post("/unenrollPosition")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(nullId))
+                        .content(objectMapper.writeValueAsString(badPosition))
                 )
                 .andExpect(status().isBadRequest());
     }
