@@ -5,14 +5,15 @@ import nl.tudelft.cse.sem.template.user.domain.User;
 import nl.tudelft.cse.sem.template.user.publishers.ActivityPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.MatchingPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.NotificationPublisher;
-import nl.tudelft.cse.sem.template.user.services.UserService;
-import nl.tudelft.cse.sem.template.user.utils.*;
+import nl.tudelft.cse.sem.template.user.utils.InputValidation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import nl.tudelft.cse.sem.template.user.domain.User;
+import nl.tudelft.cse.sem.template.user.services.UserService;
 
 import javax.validation.Valid;
 import java.util.*;
@@ -26,7 +27,7 @@ public class UserController {
     private final transient MatchingPublisher matchingPublisher;
     private final transient NotificationPublisher notificationPublisher;
     private final transient AuthManager authManager;
-
+    
     private static final String noSuchUserIdError = "There is no user with the given userId!";
 
     private static final String genericPublisherError = "Something went wrong!";

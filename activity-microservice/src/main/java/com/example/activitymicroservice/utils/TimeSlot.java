@@ -34,16 +34,13 @@ public class TimeSlot {
      * @param t1 a TimeSLot object that we check if the current one is included
      * @return a boolean
      */
-    public boolean isIncluded(TimeSlot t1) {
+    public boolean isIncluded(TimeSlot t1, LocalDateTime checkTime) {
         if (t1 == null) {
             return false;
         }
-        if (this.getStart().isAfter(t1.getStart()) || this.getStart().isEqual(t1.getStart())) {
-            if (this.getEnd().isBefore(t1.getEnd()) || this.getEnd().isEqual(t1.getEnd())) {
-                return true;
-            }
-        }
-        return false;
+        return (this.getStart().isAfter(t1.getStart()) || this.getStart().isEqual(t1.getStart()))
+                && (this.getEnd().isBefore(t1.getEnd()) || this.getEnd().isEqual(t1.getEnd()))
+                && (this.start.isAfter(checkTime));
     }
 
     public boolean overlaps(TimeSlot o) {

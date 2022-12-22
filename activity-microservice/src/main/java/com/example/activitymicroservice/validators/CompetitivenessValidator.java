@@ -20,10 +20,8 @@ public class CompetitivenessValidator extends BaseValidator {
      */
     public boolean handle(Activity activity, UserPublisher userPublisher,
                           String position, String userId) throws InvalidObjectException {
-        if (activity instanceof Competition) {
-            if (((Competition) activity).isCompetitive() != userPublisher.getCompetitiveness(userId)) {
-                throw new InvalidObjectException("Competitiveness does not match");
-            }
+        if (((Competition) activity).isCompetitive() && !userPublisher.getCompetitiveness(userId)) {
+            throw new InvalidObjectException("Competitiveness does not match");
         }
         return super.checkNext(activity, userPublisher, position, userId);
     }
