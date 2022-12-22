@@ -22,7 +22,25 @@ public class BaseActivity {
     private String organisation;
     private String type; // "activity" or "competition"
 
-    public BaseActivity(Long activityId, String ownerId, TimeSlot timeSlot, Set<String> positions, String certificate, boolean isCompetitive, char gender, String organisation) {
+    /**
+     * All args constructor.
+     *
+     * @param activityId - Long activityId
+     * @param ownerId - String ownerId
+     * @param timeSlot - timeSlot
+     * @param positions - Set String positions
+     * @param certificate - String certificate
+     * @param isCompetitive - Boolean value
+     * @param gender - character
+     * @param organisation - String organisation
+     */
+    public BaseActivity(Long activityId, String ownerId,
+                        TimeSlot timeSlot,
+                        Set<String> positions,
+                        String certificate,
+                        boolean isCompetitive,
+                        char gender,
+                        String organisation) {
         this.activityId = activityId;
         this.ownerId = ownerId;
         this.timeSlot = timeSlot;

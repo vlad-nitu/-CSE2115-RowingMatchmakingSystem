@@ -294,14 +294,13 @@ public class UserController {
     /**
      * API Endpoint that performs a POST request in order to unenroll from an activity.
      *
-     * @param activity the activity where the user wants to unenroll from.
+     * @param activityId the activityId Long attribute where the user wants to unenroll from.
      * @return the userId and activityId pair from the matching that is now cancelled
      *      or the encountered problem description
      */
     @PostMapping("/unenroll")
-    public ResponseEntity unenroll(@RequestBody BaseActivity activity) throws Exception {
+    public ResponseEntity unenroll(@RequestBody Long activityId) throws Exception {
         String userId = authManager.getNetId();
-        Long activityId = activity.getActivityId();
         Pair<String, Long> userIdActivityIdPair = new Pair<String, Long>(userId, activityId);
         Pair<String, Long> response = matchingPublisher.unenroll(userIdActivityIdPair);
         return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericPublisherError)

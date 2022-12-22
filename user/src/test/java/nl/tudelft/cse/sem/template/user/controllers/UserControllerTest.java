@@ -529,7 +529,7 @@ public class UserControllerTest {
         MvcResult mvcResult = mockMvc
                 .perform(post("/unenroll")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(baseActivity))
+                        .content(objectMapper.writeValueAsString(1L))
                 )
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
@@ -542,7 +542,7 @@ public class UserControllerTest {
         mvcResult = mockMvc
                 .perform(post("/unenroll")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(baseActivity))
+                        .content(objectMapper.writeValueAsString(1L))
                 )
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is4xxClientError())
