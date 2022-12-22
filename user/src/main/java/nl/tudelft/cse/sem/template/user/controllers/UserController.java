@@ -308,8 +308,12 @@ public class UserController {
     }
 
     @GetMapping("/cancelActivity/{activityId}")
-    public ResponseEntity<BaseActivity> cancelActivity(@PathVariable Long activityId) {
-        return ResponseEntity.ok(activityPublisher.cancelActivity(activityId));
+    public ResponseEntity<String> cancelActivity(@PathVariable Long activityId) {
+        Integer statusCode = activityPublisher.cancelActivity(activityId);
+        if (statusCode == 204)
+            return ResponseEntity.status(HttpStatus.OK).body("Activity was deleted successfully");
+        else
+            return ResponseEntity.status(statusCode).body("Activity deletion was not successful");
     }
 
 

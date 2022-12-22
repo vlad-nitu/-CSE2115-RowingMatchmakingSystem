@@ -41,14 +41,12 @@ public class ActivityPublisher {
      * @param activityId the id of the activity
      * @return the canceled activity
      */
-    public BaseActivity cancelActivity(Long activityId) {
+    public Integer cancelActivity(Long activityId) {
 
         try {
             @Cleanup
             Response res = userUtils.postRequest("/cancelActivity/" + activityId, null);
-            BaseActivity activity = res.readEntity(new GenericType<>() {
-            });
-            return activity;
+            return res.getStatus();
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
