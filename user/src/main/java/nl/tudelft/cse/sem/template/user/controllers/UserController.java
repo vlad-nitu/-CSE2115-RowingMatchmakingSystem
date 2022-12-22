@@ -47,6 +47,7 @@ public class UserController {
         this.authManager = authManager;
     }
 
+    //TODO: decide whether netId should be automatically injected as the userId
     /**
      * API Endpoint that performs a POST request in order to save a new User to the database.
      *
