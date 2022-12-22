@@ -35,7 +35,7 @@ public class ActivityService {
      * @return List of Activities
      */
     public List<Activity> getActivitiesByTimeSlot(List<Activity> activities,
-                                                  Set<TimeSlot> timeSlots) {
+                                                  List<TimeSlot> timeSlots) {
         LocalDateTime currentTime = LocalDateTime.now();
         List<Activity> activityList = new ArrayList<>();
         for (Activity activity : activities) {

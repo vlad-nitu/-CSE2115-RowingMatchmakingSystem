@@ -161,7 +161,12 @@ public class UserController {
      */
     @GetMapping("/sendTimeSlots/{userId}")
     public ResponseEntity sendTimeSlots(@PathVariable String userId) {
-        Set<TimeSlot> responseBody = userService.findTimeSlotsById(userId);
+        Set<TimeSlot> timeSlotSet = userService.findTimeSlotsById(userId);
+        List<TimeSlot> responseBody = null;
+        if (timeSlotSet != null) {
+            responseBody = new ArrayList<>(timeSlotSet);
+        }
+
         return responseBody == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 noSuchUserIdError) : ResponseEntity.ok(responseBody);
     }
@@ -191,7 +196,6 @@ public class UserController {
         return ResponseEntity.ok(userService.findAll());
     }
 
-    //TODO: manually test and possibly debug all the APIs below
     /**
      * API Endpoint that performs a POST request in order to create an activity.
      *

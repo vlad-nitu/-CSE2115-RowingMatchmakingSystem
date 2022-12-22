@@ -252,7 +252,7 @@ class ActivityControllerTest {
         Activity activity = new Training();
         activity.setActivityId(1L);
         activity.setPositions(List.of("cox", "rower"));
-        Set<TimeSlot> timeSlotSet = new HashSet<>();
+        List<TimeSlot> timeSlotSet = new ArrayList<>();
         TimeSlot timeSlot = new TimeSlot(LocalDateTime.of(2001, 12, 1, 23, 15),
                 LocalDateTime.of(2002, 11, 2, 15, 00));
         TimeSlot timeSlot1 = new TimeSlot(LocalDateTime.of(2004, 12, 1, 23, 15),
@@ -281,7 +281,7 @@ class ActivityControllerTest {
         Activity activity = new Training();
         activity.setActivityId(1L);
         activity.setPositions(List.of("cox", "rower"));
-        Set<TimeSlot> timeSlotSet = new HashSet<>();
+        List<TimeSlot> timeSlotSet = new ArrayList<>();
         TimeSlot timeSlot = new TimeSlot(LocalDateTime.of(2001, 12, 1, 23, 15),
                 LocalDateTime.of(2002, 11, 2, 15, 00));
         TimeSlot timeSlot1 = new TimeSlot(LocalDateTime.of(2004, 12, 1, 23, 15),
@@ -316,7 +316,7 @@ class ActivityControllerTest {
         Activity activity = new Training();
         activity.setActivityId(1L);
         activity.setPositions(List.of("cox", "rower"));
-        Set<TimeSlot> timeSlotSet = new HashSet<>();
+        List<TimeSlot> timeSlotSet = new ArrayList<>();
         TimeSlot timeSlot = new TimeSlot(LocalDateTime.of(2001, 12, 1, 23, 15),
                 LocalDateTime.of(2002, 11, 2, 15, 00));
         TimeSlot timeSlot1 = new TimeSlot(LocalDateTime.of(2004, 12, 1, 23, 15),
@@ -349,7 +349,7 @@ class ActivityControllerTest {
         Activity activity = new Competition();
         activity.setActivityId(1L);
         activity.setPositions(List.of("cox", "rower"));
-        Set<TimeSlot> timeSlotSet = new HashSet<>();
+        List<TimeSlot> timeSlotSet = new ArrayList<>();
         TimeSlot timeSlot = new TimeSlot(LocalDateTime.of(2001, 12, 1, 23, 15),
                 LocalDateTime.of(2002, 11, 2, 15, 00));
         TimeSlot timeSlot1 = new TimeSlot(LocalDateTime.of(2004, 12, 1, 23, 15),
@@ -385,7 +385,7 @@ class ActivityControllerTest {
         Activity activity = new Competition();
         activity.setActivityId(1L);
         activity.setPositions(List.of("cox", "rower"));
-        Set<TimeSlot> timeSlotSet = new HashSet<>();
+        List<TimeSlot> timeSlotSet = new ArrayList<>();
         TimeSlot timeSlot = new TimeSlot(LocalDateTime.of(2001, 12, 1, 23, 15),
                 LocalDateTime.of(2002, 11, 2, 15, 00));
         TimeSlot timeSlot1 = new TimeSlot(LocalDateTime.of(2004, 12, 1, 23, 15),

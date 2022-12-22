@@ -95,7 +95,7 @@ class ActivityServiceTest {
                 LocalDateTime.of(2003, 12, 1, 23, 15),
                 LocalDateTime.of(2004, 11, 2, 15, 00)
         ));
-        Set<TimeSlot> timeSlotSet = Set.of(
+        List<TimeSlot> timeSlotSet = List.of(
                 new TimeSlot(
                         LocalDateTime.of(2023, 11, 1, 23, 15),
                         LocalDateTime.of(2024, 11, 2, 15, 00)

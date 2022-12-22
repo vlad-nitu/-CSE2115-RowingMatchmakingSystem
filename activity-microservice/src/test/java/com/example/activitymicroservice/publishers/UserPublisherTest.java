@@ -110,9 +110,9 @@ public class UserPublisherTest {
 
     @Test
     void getTimeSlotsGood() throws Exception {
-        Response res = Response.ok(timeSlots).build();
+        Response res = Response.ok(new ArrayList<>(timeSlots)).build();
         when(activityUtils.getRequest("/sendTimeSlots/" + userId)).thenReturn(res);
-        assertThat(userPublisher.getTimeslots(userId)).isEqualTo(timeSlots);
+        assertThat(userPublisher.getTimeslots(userId)).isEqualTo(new ArrayList<>(timeSlots));
     }
 
     @Test
