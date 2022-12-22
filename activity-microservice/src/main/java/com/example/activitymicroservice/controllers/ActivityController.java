@@ -9,6 +9,7 @@ import com.example.activitymicroservice.domain.Training;
 import com.example.activitymicroservice.publishers.MatchingPublisher;
 import com.example.activitymicroservice.publishers.UserPublisher;
 import com.example.activitymicroservice.services.ActivityService;
+import com.example.activitymicroservice.utils.InputValidation;
 import com.example.activitymicroservice.utils.Pair;
 import com.example.activitymicroservice.utils.TimeSlot;
 import com.example.activitymicroservice.validators.Validator;
@@ -18,6 +19,7 @@ import com.example.activitymicroservice.validators.OrganisationValidator;
 import com.example.activitymicroservice.validators.CertificateValidator;
 import com.example.activitymicroservice.validators.CompetitivenessValidator;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -114,13 +116,13 @@ public class ActivityController {
      * @return ResponseEntity object that specifies if the request could be done
      */
     @PostMapping("/takeAvailableSpot")
-    public ResponseEntity takeAvailableSpot(@RequestBody @Valid Pair<Long, String> posTaken) {
+    public ResponseEntity<String> takeAvailableSpot(@RequestBody @Valid Pair<Long, String> posTaken) {
         try {
             if (!InputValidation.validatePosition(posTaken.getSecond())) {
                 return ResponseEntity.badRequest().body("Invalid Position");
             }
             activityService.takeSpot(posTaken);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(posTaken.getSecond());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().build();
@@ -263,6 +265,16 @@ public class ActivityController {
             e.printStackTrace();
             return ResponseEntity.status(500).build();
         }
+    }
+
+    /**
+     * Find all activities.
+     *
+     * @return - Response of a list of users
+     */
+    @GetMapping(value = "/findAll", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Activity>> findAllUsers() {
+        return ResponseEntity.ok(activityService.findAll());
     }
 
     /**
