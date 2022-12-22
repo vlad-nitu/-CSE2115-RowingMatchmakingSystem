@@ -1,6 +1,7 @@
 package com.example.activitymicroservice.publishers;
 
 import com.example.activitymicroservice.utils.ActivityUtils;
+import com.example.activitymicroservice.utils.TimeSlot;
 import org.h2.engine.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import javax.ws.rs.core.Response;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @ExtendWith(MockitoExtension.class)
 public class UserPublisherTest {
@@ -22,10 +28,18 @@ public class UserPublisherTest {
     private UserPublisher userPublisher;
     private String userId;
 
+    private Set<TimeSlot> timeSlots;
+
     @BeforeEach
     void setUp() {
         userPublisher = new UserPublisher(activityUtils);
         userId = "Razvan";
+
+        timeSlots = new HashSet<TimeSlot>();
+        timeSlots.add(new TimeSlot(LocalDateTime.of(2003, 12, 1, 23, 15),
+                LocalDateTime.of(2002, 11, 2, 15, 0)));
+        timeSlots.add(new TimeSlot(LocalDateTime.of(2003, 12, 1, 23, 15),
+                LocalDateTime.of(2002, 11, 2, 15, 0)));
     }
 
     @Test
@@ -80,4 +94,30 @@ public class UserPublisherTest {
         assertThat(userPublisher.getCertificate(userId)).isEqualTo("");
     }
 
+    @Test
+    void getPositionsGood() throws Exception {
+        List<String> list = List.of("cox", "rower");
+        Response res = Response.ok(list).build();
+        when(activityUtils.getRequest("/sendPositions/" + userId)).thenReturn(res);
+        assertThat(userPublisher.getPositions(userId)).isEqualTo(list);
+    }
+
+    @Test
+    void getPositionsFail() throws Exception {
+        when(activityUtils.getRequest("/sendPositions/" + userId)).thenThrow(new Exception("NotGood"));
+        assertThat(userPublisher.getPositions(userId).isEmpty()).isTrue();
+    }
+
+    @Test
+    void getTimeSlotsGood() throws Exception {
+        Response res = Response.ok(timeSlots).build();
+        when(activityUtils.getRequest("/sendTimeSlots/" + userId)).thenReturn(res);
+        assertThat(userPublisher.getTimeslots(userId)).isEqualTo(timeSlots);
+    }
+
+    @Test
+    void getTimeSlotsFail() throws Exception {
+        when(activityUtils.getRequest("/sendTimeSlots/" + userId)).thenThrow(new Exception("NotGood"));
+        assertThat(userPublisher.getTimeslots(userId).isEmpty()).isTrue();
+    }
 }
