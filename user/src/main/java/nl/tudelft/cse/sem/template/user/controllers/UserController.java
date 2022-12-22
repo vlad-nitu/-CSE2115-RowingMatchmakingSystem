@@ -5,6 +5,7 @@ import nl.tudelft.cse.sem.template.user.publishers.ActivityPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.MatchingPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.NotificationPublisher;
 import nl.tudelft.cse.sem.template.user.utils.InputValidation;
+import nl.tudelft.cse.sem.template.user.utils.TimeSlot;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -159,6 +160,17 @@ public class UserController {
         String responseBody = userService.findEmailById(userId);
         return responseBody == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 noSuchUserIdError) : ResponseEntity.ok(responseBody);
+    }
+
+    /**
+     * API Endpoint that performs a GET request in order to obtain and send the timeslots of a User.
+     *
+     * @param userId - String object representing the unique identifier of a User
+     * @return - ResponseEntity object with a Set of Timeslot objects representing the timeslots
+     */
+    @GetMapping("/sendTimeSlots/{userId}")
+    public ResponseEntity<Set<TimeSlot>> sendTimeSlots(@PathVariable String userId) {
+        return ResponseEntity.ok(userService.findTimeSlotsById(userId));
     }
 
     /**

@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -18,6 +19,7 @@ import java.util.Optional;
 @Service
 public class ActivityService {
 
+    private static LocalDateTime checkTime;
     private final transient ActivityRepository activityRepository;
 
     public List<Activity> findAll() {
@@ -34,11 +36,17 @@ public class ActivityService {
      * @param timeSlots List of TimeSlots
      * @return List of Activities
      */
-    public List<Activity> getActivitiesByTimeSlot(List<TimeSlot> timeSlots) {
+    public List<Activity> getActivitiesByTimeSlot(List<Activity> activities,
+                                                  List<TimeSlot> timeSlots, LocalDateTime currentTime) {
         List<Activity> activityList = new ArrayList<>();
-        for (Activity activity : activityRepository.findAll()) {
+        for (Activity activity : activities) {
+            if (activity instanceof Competition) {
+                checkTime = currentTime.plusDays(1);
+            } else {
+                checkTime = currentTime.plusMinutes(30);
+            }
             for (TimeSlot timeSlot : timeSlots) {
-                if (activity.getTimeSlot().isIncluded(timeSlot)) {
+                if (activity.getTimeSlot().isIncluded(timeSlot, checkTime)) {
                     activityList.add(activity);
                     break;
                 }
@@ -119,13 +127,13 @@ public class ActivityService {
     /**
      * Checks if an Activity can be approached by a User with a certain set of features.
      *
-     * @param activity the given Activity
-     * @param gender the gender of the User
-     * @param certificate the certificate of the User
-     * @param organisation the organisation of the User
+     * @param activity        the given Activity
+     * @param gender          the gender of the User
+     * @param certificate     the certificate of the User
+     * @param organisation    the organisation of the User
      * @param competitiveness the competitiveness of the User
-     * @param listPositions the list of positions the User can occupy
-     * @param position the position the User wants to occupy
+     * @param listPositions   the list of positions the User can occupy
+     * @param position        the position the User wants to occupy
      * @return a boolean representing weather the User is eligible for the Activity or not
      */
     public boolean checkUser(Activity activity, Character gender,
