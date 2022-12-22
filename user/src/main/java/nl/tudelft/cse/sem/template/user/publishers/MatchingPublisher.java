@@ -39,7 +39,8 @@ public class MatchingPublisher {
      */
     public List<Pair<Long, String>> getAvailableActivities(String userId, Set<TimeSlot> timeSlots) throws Exception {
         @Cleanup
-        Response res = userUtils.postRequest("/getAvailableActivities/" + userId, timeSlots);
+        Response res = userUtils.postRequest("/getAvailableActivities/" + userId,
+                new ArrayList<TimeSlot>(timeSlots));
         return res.getStatus() == 200 ? res.readEntity(new GenericType<>() {}) : null;
     }
 
