@@ -35,7 +35,7 @@ class UserServiceTest {
     @Test
     void findUserByIdTest() {
         Optional<User> expected = Optional.of(new User("id", true, 'f', "organisation",
-                "certificate", new HashSet<>(), new HashSet<>()));
+                "certificate", "test@domain.com", new HashSet<>(), new HashSet<>()));
         when(userService.findUserById("id")).thenReturn(expected);
         assertThat(userService.findUserById("id")).isEqualTo(expected);
         verify(userRepository, times(1)).findById("id");
@@ -51,40 +51,64 @@ class UserServiceTest {
     @Test
     void findCompetitivenessByUserIdTest() {
         Optional<User> expected = Optional.of(new User("id", true, 'f', "organisation",
-                "certificate", new HashSet<>(), new HashSet<>()));
+                "certificate", "test@domain.com", new HashSet<>(), new HashSet<>()));
         when(userRepository.findById("id")).thenReturn(expected);
-        assertThat(userService.findCompetitivenessByUserId("id")).isEqualTo(expected.get().isCompetitive());
+        assertThat(userService.findCompetitivenessByUserId("id"))
+                .isEqualTo(String.valueOf(expected.get().getIsCompetitive()));
+        expected.get().setIsCompetitive(false);
+        assertThat(userService.findCompetitivenessByUserId("id"))
+                .isEqualTo(String.valueOf(expected.get().getIsCompetitive()));
+        when(userRepository.findById("")).thenReturn(Optional.empty());
+        assertThat(userService.findCompetitivenessByUserId("")).isEqualTo("error");
     }
 
     @Test
     void findGenderByIdTest() {
         Optional<User> expected = Optional.of(new User("id", true, 'f', "organisation",
-                "certificate", new HashSet<>(), new HashSet<>()));
+                "certificate", "test@domain.com", new HashSet<>(), new HashSet<>()));
         when(userRepository.findById("id")).thenReturn(expected);
         assertThat(userService.findGenderById("id")).isEqualTo(expected.get().getGender());
+        when(userRepository.findById("")).thenReturn(Optional.empty());
+        assertThat(userService.findGenderById("")).isEqualTo(' ');
     }
 
     @Test
     void findCertificateByIdTest() {
         Optional<User> expected = Optional.of(new User("id", true, 'f', "organisation",
-                "certificate", new HashSet<>(), new HashSet<>()));
+                "certificate", "test@domain.com", new HashSet<>(), new HashSet<>()));
         when(userRepository.findById("id")).thenReturn(expected);
         assertThat(userService.findCertificateById("id")).isEqualTo(expected.get().getCertificate());
+        when(userRepository.findById("")).thenReturn(Optional.empty());
+        assertThat(userService.findCertificateById("")).isEqualTo(null);
     }
 
     @Test
     void findOrganisationByIdTest() {
         Optional<User> expected = Optional.of(new User("id", true, 'f', "organisation",
-                "certificate", new HashSet<>(), new HashSet<>()));
+                "certificate", "test@domain.com", new HashSet<>(), new HashSet<>()));
         when(userRepository.findById("id")).thenReturn(expected);
         assertThat(userService.findOrganisationById("id")).isEqualTo(expected.get().getOrganisation());
+        when(userRepository.findById("")).thenReturn(Optional.empty());
+        assertThat(userService.findOrganisationById("")).isEqualTo(null);
     }
 
     @Test
     void findPositionsByIdTest() {
         Optional<User> expected = Optional.of(new User("id", true, 'f', "organisation",
-                "certificate", new HashSet<>(), new HashSet<>()));
+                "certificate", "test@domain.com", new HashSet<>(), new HashSet<>()));
         when(userRepository.findById("id")).thenReturn(expected);
         assertThat(userService.findPositionsById("id")).isEqualTo(expected.get().getPositions());
+        when(userRepository.findById("")).thenReturn(Optional.empty());
+        assertThat(userService.findPositionsById("")).isEqualTo(null);
+    }
+
+    @Test
+    void findEmailById() {
+        Optional<User> expected = Optional.of(new User("id", true, 'f', "organisation",
+                "certificate", "test@domain.com", new HashSet<>(), new HashSet<>()));
+        when(userRepository.findById("id")).thenReturn(expected);
+        assertThat(userService.findEmailById("id")).isEqualTo(expected.get().getEmail());
+        when(userRepository.findById("")).thenReturn(Optional.empty());
+        assertThat(userService.findEmailById("")).isEqualTo(null);
     }
 }
