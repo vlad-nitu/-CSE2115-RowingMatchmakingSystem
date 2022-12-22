@@ -18,7 +18,7 @@ public class AuthManagerTests {
     }
 
     @Test
-    public void getNetidTest() {
+    public void getUseridTest() {
         // Arrange
         String expected = "user123";
         var authenticationToken = new UsernamePasswordAuthenticationToken(
@@ -28,7 +28,7 @@ public class AuthManagerTests {
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
         // Act
-        String actual = authManager.getNetId();
+        String actual = authManager.getUserId();
 
         // Assert
         assertThat(actual).isEqualTo(expected);

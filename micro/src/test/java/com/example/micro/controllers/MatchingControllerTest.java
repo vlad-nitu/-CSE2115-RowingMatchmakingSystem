@@ -1,20 +1,5 @@
 package com.example.micro.controllers;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.example.micro.authentication.AuthManager;
 import com.example.micro.domain.Matching;
 import com.example.micro.publishers.ActivityPublisher;
@@ -23,11 +8,6 @@ import com.example.micro.services.MatchingServiceImpl;
 import com.example.micro.utils.Pair;
 import com.example.micro.utils.TimeSlot;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,6 +18,19 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 public class MatchingControllerTest {
@@ -80,7 +73,7 @@ public class MatchingControllerTest {
 
     @Test
     public void getAvailableActivitiesTest() throws Exception {
-        when(authManager.getNetId()).thenReturn(userId);
+        when(authManager.getUserId()).thenReturn(userId);
         when(matchingServiceImpl.findActivitiesByUserId(userId)).thenReturn(List.of());
         when(activityPublisher.getTimeSlots(List.of())).thenReturn(List.of());
         // when(FunctionUtils.filterTimeSlots(List.of(), List.of())).thenReturn(List.of());
@@ -101,7 +94,7 @@ public class MatchingControllerTest {
     @Test
     void getAvailableActivitiesUnauthorizedTest() throws Exception {
 
-        lenient().when(authManager.getNetId()).thenReturn("Niq");
+        lenient().when(authManager.getUserId()).thenReturn("Niq");
         lenient().when(matchingServiceImpl.findActivitiesByUserId(userId)).thenReturn(List.of());
         lenient().when(activityPublisher.getTimeSlots(List.of())).thenReturn(List.of());
         // when(FunctionUtils.filterTimeSlots(List.of(), List.of())).thenReturn(List.of());
@@ -122,7 +115,7 @@ public class MatchingControllerTest {
 
     @Test
     public void chooseActivityFail1() throws Exception {
-        when(authManager.getNetId()).thenReturn(userId);
+        when(authManager.getUserId()).thenReturn(userId);
         when(activityPublisher.check(any(Matching.class))).thenReturn(false);
         MvcResult mvcResult = mockMvc
                 .perform(post("/chooseActivity")
@@ -137,7 +130,7 @@ public class MatchingControllerTest {
 
     @Test
     public void chooseActivityFail2() throws Exception {
-        when(authManager.getNetId()).thenReturn(userId);
+        when(authManager.getUserId()).thenReturn(userId);
         when(activityPublisher.check(any(Matching.class))).thenReturn(true);
         when(matchingServiceImpl.findMatchingWithPendingFalse(anyString(), anyLong())).thenReturn(Optional.of(matching));
 
@@ -156,7 +149,7 @@ public class MatchingControllerTest {
     public void chooseActivityUnauthorizedTest() throws Exception {
 
         lenient()
-                .when(authManager.getNetId()).thenReturn("Niq");
+                .when(authManager.getUserId()).thenReturn("Niq");
         lenient()
                 .when(activityPublisher.check(any(Matching.class))).thenReturn(true);
         lenient()
@@ -180,7 +173,7 @@ public class MatchingControllerTest {
     public void chooseActivity() throws Exception {
         Matching savedMatching = new Matching("Niq", 2L, "side", true);
 
-        when(authManager.getNetId()).thenReturn(userId);
+        when(authManager.getUserId()).thenReturn(userId);
         when(activityPublisher.check(any(Matching.class))).thenReturn(true);
         when(matchingServiceImpl.findMatchingWithPendingFalse(anyString(), anyLong())).thenReturn(Optional.empty());
         lenient().when(matchingServiceImpl.save(any(Matching.class))).thenReturn(savedMatching);
@@ -207,7 +200,7 @@ public class MatchingControllerTest {
     public void getUserActivitiesTest() throws Exception {
 
         when(matchingServiceImpl.findActivitiesByUserId("Vlad")).thenReturn(List.of(1L));
-        lenient().when(authManager.getNetId()).thenReturn("Vlad");
+        lenient().when(authManager.getUserId()).thenReturn("Vlad");
         MvcResult mvcResult = mockMvc
                 .perform(get("/getUserActivities/Vlad"))
                 .andExpect(status().isOk())
@@ -220,7 +213,7 @@ public class MatchingControllerTest {
 
     @Test
     public void getUserActivitiesTestFails() throws Exception {
-        lenient().when(authManager.getNetId()).thenReturn("Niq");
+        lenient().when(authManager.getUserId()).thenReturn("Niq");
         MvcResult mvcResult = mockMvc
                 .perform(get("/getUserActivities/Vlad"))
                 .andExpect(status().isUnauthorized())
@@ -235,7 +228,7 @@ public class MatchingControllerTest {
     public void unenrollFail() throws Exception {
         // Empty matching found -> badRequest
         Pair<String, Long> expected = new Pair<String, Long>(userId, activityId);
-        lenient().when(authManager.getNetId()).thenReturn(userId);
+        lenient().when(authManager.getUserId()).thenReturn(userId);
         when(matchingServiceImpl.findMatchingWithPendingFalse(userId, activityId))
                 .thenReturn(Optional.empty());
         MvcResult mvcResult = mockMvc
@@ -251,7 +244,7 @@ public class MatchingControllerTest {
     @Test
     public void unenrollUnauthorizedTest() throws Exception {
         Pair<String, Long> expected = new Pair<String, Long>(userId, activityId);
-        lenient().when(authManager.getNetId()).thenReturn("Niq");
+        lenient().when(authManager.getUserId()).thenReturn("Niq");
         lenient().when(matchingServiceImpl.findMatchingWithPendingFalse(userId, activityId))
                 .thenReturn(Optional.empty());
         MvcResult mvcResult = mockMvc
@@ -267,7 +260,7 @@ public class MatchingControllerTest {
     @Test
     public void unenrollTest() throws Exception {
         Pair<String, Long> expected = new Pair<String, Long>(userId, activityId);
-        lenient().when(authManager.getNetId()).thenReturn(userId);
+        lenient().when(authManager.getUserId()).thenReturn(userId);
         when(matchingServiceImpl.findMatchingWithPendingFalse(userId, activityId))
                 .thenReturn(Optional.of(matching));
 
@@ -285,7 +278,7 @@ public class MatchingControllerTest {
 
     @Test
     void deleteMatchingByActivityIdUnauthorizedTest() throws Exception {
-        lenient().when(authManager.getNetId()).thenReturn("Niq");
+        lenient().when(authManager.getUserId()).thenReturn("Niq");
         lenient().when(activityPublisher.getOwnerId(1L)).thenReturn("Vlad");
 
         MvcResult mvcResult = mockMvc
@@ -299,7 +292,7 @@ public class MatchingControllerTest {
     @Test
     void deleteMatchingByActivityIdTest() throws Exception {
         Long activityId = 1L;
-        lenient().when(authManager.getNetId()).thenReturn("Vlad");
+        lenient().when(authManager.getUserId()).thenReturn("Vlad");
         lenient().when(activityPublisher.getOwnerId(1L)).thenReturn("Vlad");
 
         MvcResult mvcResult = mockMvc
@@ -355,7 +348,7 @@ public class MatchingControllerTest {
 
         String ownerId = "Vlad";
         lenient().when(activityPublisher.getOwnerId(matching.getActivityId())).thenReturn(ownerId);
-        lenient().when(authManager.getNetId()).thenReturn("Niq");
+        lenient().when(authManager.getUserId()).thenReturn("Niq");
         MvcResult mvcResult = mockMvc
                 .perform(post("/decideMatch/Vlad/accept")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -374,7 +367,7 @@ public class MatchingControllerTest {
 
         String ownerId = "Vlad";
         lenient().when(activityPublisher.getOwnerId(matching.getActivityId())).thenReturn("Radu");
-        lenient().when(authManager.getNetId()).thenReturn(ownerId);
+        lenient().when(authManager.getUserId()).thenReturn(ownerId);
         MvcResult mvcResult = mockMvc
                 .perform(post("/decideMatch/Vlad/accept")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -392,7 +385,7 @@ public class MatchingControllerTest {
     public void decideMatchFails3() throws Exception {
         String ownerId = "Vlad";
         lenient().when(activityPublisher.getOwnerId(matching.getActivityId())).thenReturn(ownerId);
-        lenient().when(authManager.getNetId()).thenReturn(ownerId);
+        lenient().when(authManager.getUserId()).thenReturn(ownerId);
         lenient().when(matchingServiceImpl.checkId(matching.getUserId(),
                 matching.getActivityId(),
                 matching.getPosition())).thenReturn(false);
@@ -413,7 +406,7 @@ public class MatchingControllerTest {
     public void decideMatchFails4() throws Exception {
         String ownerId = "Vlad";
         lenient().when(activityPublisher.getOwnerId(matching.getActivityId())).thenReturn(ownerId);
-        lenient().when(authManager.getNetId()).thenReturn(ownerId);
+        lenient().when(authManager.getUserId()).thenReturn(ownerId);
         lenient().when(matchingServiceImpl.checkId(matching.getUserId(),
                 matching.getActivityId(),
                 matching.getPosition())).thenReturn(true);
@@ -437,7 +430,7 @@ public class MatchingControllerTest {
                 .when(activityPublisher.getOwnerId(matching.getActivityId())).thenReturn(ownerId);
         lenient()
                 .when(matchingServiceImpl.checkId(anyString(), anyLong(), anyString())).thenReturn(true);
-        lenient().when(authManager.getNetId()).thenReturn(ownerId);
+        lenient().when(authManager.getUserId()).thenReturn(ownerId);
         when(matchingServiceImpl.save(matching)).thenReturn(matching);
 
         doNothing().when(matchingServiceImpl).deleteById(anyString(), anyLong(), anyString());
@@ -466,7 +459,7 @@ public class MatchingControllerTest {
                 .when(activityPublisher.getOwnerId(matching.getActivityId())).thenReturn(ownerId);
         lenient()
                 .when(matchingServiceImpl.checkId(anyString(), anyLong(), anyString())).thenReturn(true);
-        lenient().when(authManager.getNetId()).thenReturn(ownerId);
+        lenient().when(authManager.getUserId()).thenReturn(ownerId);
         doNothing().when(matchingServiceImpl).deleteById(anyString(), anyLong(), anyString());
 
 

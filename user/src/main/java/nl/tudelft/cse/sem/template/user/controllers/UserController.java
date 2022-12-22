@@ -47,7 +47,7 @@ public class UserController {
         this.authManager = authManager;
     }
 
-    //TODO: decide whether netId should be automatically injected as the userId
+    //TODO: decide whether userId should be automatically injected as the userId
     /**
      * API Endpoint that performs a POST request in order to save a new User to the database.
      *
@@ -68,9 +68,9 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("One of the positions that you provided is not valid!");
         }
-        if (!user.getUserId().equals(authManager.getNetId())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided userId does not match your netId! Use "
-                    + authManager.getNetId() + " as the userId.");
+        if (!user.getUserId().equals(authManager.getUserId())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided userId does not match your userId! Use "
+                    + authManager.getUserId() + " as the userId.");
         }
         Optional<User> foundUser = userService.findUserById(user.getUserId());
         if (foundUser.isPresent()) {
@@ -205,9 +205,9 @@ public class UserController {
         if (!type.equals("training") && !type.equals("competition")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Type can only be 'training' or 'competition'.");
         }
-        if (!activity.getOwnerId().equals(authManager.getNetId())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided ownerId does not match your netId! Use "
-                    + authManager.getNetId() + " as the ownerId.");
+        if (!activity.getOwnerId().equals(authManager.getUserId())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided ownerId does not match your userId! Use "
+                    + authManager.getUserId() + " as the ownerId.");
         }
         BaseActivity response = activityPublisher.createActivity(activity);
         return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericPublisherError)
@@ -222,7 +222,7 @@ public class UserController {
      */
     @GetMapping("/getAvailableActivities")
     public ResponseEntity getAvailableActivities() throws Exception {
-        String userId = authManager.getNetId();
+        String userId = authManager.getUserId();
         Set<TimeSlot> timeslots = userService.findTimeSlotsById(userId);
         if (timeslots == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(noSuchUserIdError);
@@ -239,7 +239,7 @@ public class UserController {
      */
     @GetMapping("/getNotifications")
     public ResponseEntity getNotifications() throws Exception {
-        String userId = authManager.getNetId();
+        String userId = authManager.getUserId();
         List<String> response = notificationPublisher.getNotifications(userId);
         return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericPublisherError)
                 : ResponseEntity.status(HttpStatus.OK).body(response);
@@ -258,7 +258,7 @@ public class UserController {
         if (!type.equals("accept") && !type.equals("decline")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Decision can only be 'accept' or 'decline'.");
         }
-        String userId = authManager.getNetId();
+        String userId = authManager.getUserId();
         BaseMatching response = matchingPublisher.decideMatch(userId, type, matching);
         return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericPublisherError)
                 : ResponseEntity.status(HttpStatus.OK).body(response);
@@ -271,7 +271,7 @@ public class UserController {
      */
     @GetMapping("/getUserActivities")
     public ResponseEntity getUserActivities() throws Exception {
-        String userId = authManager.getNetId();
+        String userId = authManager.getUserId();
         List<Long> response = matchingPublisher.getUserActivities(userId);
         return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericPublisherError)
                 : ResponseEntity.status(HttpStatus.OK).body(response);
@@ -285,7 +285,7 @@ public class UserController {
      */
     @PostMapping("/chooseActivity")
     public ResponseEntity chooseActivity(@RequestBody BaseMatching matching) throws Exception {
-        String userId = authManager.getNetId();
+        String userId = authManager.getUserId();
         matching.setUserId(userId);
         BaseMatching response = matchingPublisher.chooseActivity(matching);
         return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericPublisherError)
@@ -301,7 +301,7 @@ public class UserController {
      */
     @PostMapping("/unenroll")
     public ResponseEntity unenroll(@RequestBody BaseActivity activity) throws Exception {
-        String userId = authManager.getNetId();
+        String userId = authManager.getUserId();
         Long activityId = activity.getActivityId();
         Pair<String, Long> userIdActivityIdPair = new Pair<String, Long>(userId, activityId);
         Pair<String, Long> response = matchingPublisher.unenroll(userIdActivityIdPair);

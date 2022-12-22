@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import nl.tudelft.cse.sem.template.user.authentication.AuthManager;
+import nl.tudelft.cse.sem.template.user.domain.User;
 import nl.tudelft.cse.sem.template.user.publishers.ActivityPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.MatchingPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.NotificationPublisher;
@@ -11,6 +12,7 @@ import nl.tudelft.cse.sem.template.user.services.UserService;
 import nl.tudelft.cse.sem.template.user.utils.BaseActivity;
 import nl.tudelft.cse.sem.template.user.utils.BaseMatching;
 import nl.tudelft.cse.sem.template.user.utils.Pair;
+import nl.tudelft.cse.sem.template.user.utils.TimeSlot;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,21 +20,22 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import nl.tudelft.cse.sem.template.user.domain.User;
-import nl.tudelft.cse.sem.template.user.utils.TimeSlot;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.lenient;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -104,7 +107,7 @@ public class UserControllerTest {
 
         lenient().when(userService.save(user))
                 .thenReturn(user);
-        when(authManager.getNetId()).thenReturn(user.getUserId());
+        when(authManager.getUserId()).thenReturn(user.getUserId());
 
         user.setPositions(new HashSet<>(Set.of("invalid")));
         MvcResult mvcResult = mockMvc
@@ -161,7 +164,7 @@ public class UserControllerTest {
         assertThat(expected);
 
         user.setGender('M');
-        when(authManager.getNetId()).thenReturn("netId");
+        when(authManager.getUserId()).thenReturn("userId");
         mvcResult = mockMvc
                 .perform(post("/createUser")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -171,12 +174,12 @@ public class UserControllerTest {
                 .andExpect(status().is4xxClientError())
                 .andReturn();
         contentAsString = mvcResult.getResponse().getContentAsString();
-        expected = contentAsString.contains("The provided userId does not match your netId! Use netId as the userId");
+        expected = contentAsString.contains("The provided userId does not match your userId! Use userId as the userId");
         assertThat(expected);
 
         lenient().when(userService.findUserById(anyString()))
                 .thenReturn(Optional.of(new User()));
-        when(authManager.getNetId()).thenReturn(user.getUserId());
+        when(authManager.getUserId()).thenReturn(user.getUserId());
         mvcResult = mockMvc
                 .perform(post("/createUser")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -429,7 +432,7 @@ public class UserControllerTest {
     @Test
     void decideMatch() throws Exception {
         BaseMatching baseMatching = new BaseMatching();
-        when(authManager.getNetId()).thenReturn(user.getUserId());
+        when(authManager.getUserId()).thenReturn(user.getUserId());
         when(matchingPublisher.decideMatch(user.getUserId(), "accept", baseMatching)).thenReturn(baseMatching);
         MvcResult mvcResult = mockMvc
                 .perform(post("/decideMatch/accept")
@@ -454,7 +457,7 @@ public class UserControllerTest {
         contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("Decision can only be 'accept' or 'decline'.");
 
-        when(authManager.getNetId()).thenReturn("invalid");
+        when(authManager.getUserId()).thenReturn("invalid");
         when(matchingPublisher.decideMatch("invalid", "accept", baseMatching)).thenReturn(null);
         mvcResult = mockMvc
                 .perform(post("/decideMatch/accept")
@@ -492,7 +495,7 @@ public class UserControllerTest {
     @Test
     void chooseActivity() throws Exception {
         BaseMatching baseMatching = new BaseMatching();
-        when(authManager.getNetId()).thenReturn(user.getUserId());
+        when(authManager.getUserId()).thenReturn(user.getUserId());
         when(matchingPublisher.chooseActivity(any())).thenReturn(baseMatching);
         MvcResult mvcResult = mockMvc
                 .perform(post("/chooseActivity")
@@ -524,7 +527,7 @@ public class UserControllerTest {
     void unenroll() throws Exception {
         BaseActivity baseActivity = new BaseActivity();
         Pair<String, Long> expected = new Pair<>();
-        when(authManager.getNetId()).thenReturn(user.getUserId());
+        when(authManager.getUserId()).thenReturn(user.getUserId());
         when(matchingPublisher.unenroll(any())).thenReturn(expected);
         MvcResult mvcResult = mockMvc
                 .perform(post("/unenroll")
@@ -555,7 +558,7 @@ public class UserControllerTest {
     void createActivity() throws Exception {
         BaseActivity baseActivity = new BaseActivity();
         baseActivity.setOwnerId("valid");
-        when(authManager.getNetId()).thenReturn("valid");
+        when(authManager.getUserId()).thenReturn("valid");
         when(activityPublisher.createActivity(any())).thenReturn(baseActivity);
         MvcResult mvcResult = mockMvc
                 .perform(post("/createActivity/training")
@@ -592,7 +595,7 @@ public class UserControllerTest {
         contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("Type can only be 'training' or 'competition'.");
 
-        when(authManager.getNetId()).thenReturn("valid");
+        when(authManager.getUserId()).thenReturn("valid");
         baseActivity.setOwnerId("invalid");
         mvcResult = mockMvc
                 .perform(post("/createActivity/training")
@@ -603,7 +606,7 @@ public class UserControllerTest {
                 .andExpect(status().is4xxClientError())
                 .andReturn();
         contentAsString = mvcResult.getResponse().getContentAsString();
-        assertThat(contentAsString).contains("The provided ownerId does not match your netId! Use valid as the ownerId.");
+        assertThat(contentAsString).contains("The provided ownerId does not match your userId! Use valid as the ownerId.");
 
     }
 }

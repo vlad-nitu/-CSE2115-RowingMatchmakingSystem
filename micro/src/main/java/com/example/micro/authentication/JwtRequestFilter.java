@@ -64,9 +64,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
                 try {
                     if (jwtTokenVerifier.validateToken(token)) {
-                        String netId = jwtTokenVerifier.getNetIdFromToken(token);
+                        String userId = jwtTokenVerifier.getUserIdFromToken(token);
                         var authenticationToken = new UsernamePasswordAuthenticationToken(
-                                netId,
+                                userId,
                                 token, List.of() // no credentials and no authorities l
                         );
                         authenticationToken.setDetails(new WebAuthenticationDetailsSource()

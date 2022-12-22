@@ -9,13 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -56,7 +50,7 @@ public class NotificationController {
      */
     @GetMapping("/getNotifications/{targetId}")
     public ResponseEntity<List<String>> getNotificationsByTarget(@PathVariable String targetId) {
-        if (!authManager.getNetId().equals(targetId)) {
+        if (!authManager.getUserId().equals(targetId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         List<Notification> notifications = notificationDatabaseService.findNotificationsByTargetId(targetId);

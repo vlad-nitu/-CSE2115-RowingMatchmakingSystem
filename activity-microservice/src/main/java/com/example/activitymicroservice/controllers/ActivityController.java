@@ -10,12 +10,7 @@ import com.example.activitymicroservice.services.ActivityService;
 import com.example.activitymicroservice.utils.InputValidation;
 import com.example.activitymicroservice.utils.Pair;
 import com.example.activitymicroservice.utils.TimeSlot;
-import com.example.activitymicroservice.validators.Validator;
-import com.example.activitymicroservice.validators.GenderValidator;
-import com.example.activitymicroservice.validators.PositionValidator;
-import com.example.activitymicroservice.validators.OrganisationValidator;
-import com.example.activitymicroservice.validators.CertificateValidator;
-import com.example.activitymicroservice.validators.CompetitivenessValidator;
+import com.example.activitymicroservice.validators.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -168,7 +163,7 @@ public class ActivityController {
         if (activity.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        if (!authManager.getNetId().equals(activity.get().getOwnerId())) {
+        if (!authManager.getUserId().equals(activity.get().getOwnerId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         if (!matchingPublisher.deleteMatchingByActivityId(activityId)) {

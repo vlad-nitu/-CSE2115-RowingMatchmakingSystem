@@ -1,20 +1,21 @@
 package nl.tudelft.sem.template.authentication.authentication;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import java.lang.reflect.Field;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import nl.tudelft.sem.template.authentication.domain.providers.TimeProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.lang.reflect.Field;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class JwtTokenGeneratorTests {
     private transient JwtTokenGenerator jwtTokenGenerator;
@@ -23,7 +24,7 @@ public class JwtTokenGeneratorTests {
 
     private final String secret = "testSecret123";
 
-    private String netId = "andy";
+    private String userId = "andy";
     private UserDetails user;
 
     /**
@@ -37,7 +38,7 @@ public class JwtTokenGeneratorTests {
         jwtTokenGenerator = new JwtTokenGenerator(timeProvider);
         this.injectSecret(secret);
 
-        user = new User(netId, "someHash", new ArrayList<>());
+        user = new User(userId, "someHash", new ArrayList<>());
     }
 
     @Test
@@ -61,13 +62,13 @@ public class JwtTokenGeneratorTests {
     }
 
     @Test
-    public void generatedTokenHasCorrectNetId() {
+    public void generatedTokenHasCorrectUserId() {
         // Act
         String token = jwtTokenGenerator.generateToken(user);
 
         // Assert
         Claims claims = getClaims(token);
-        assertThat(claims.getSubject()).isEqualTo(netId);
+        assertThat(claims.getSubject()).isEqualTo(userId);
     }
 
     private Claims getClaims(String token) {

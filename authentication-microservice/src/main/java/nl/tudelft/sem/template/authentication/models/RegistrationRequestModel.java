@@ -12,11 +12,11 @@ import javax.validation.constraints.Size;
  */
 @Data
 public class RegistrationRequestModel {
-    @NotBlank(message = "netId is mandatory and cannot be blank")
-    @NotNull(message = "netId is mandatory and cannot be null")
-    @Size(min = 3, max = 20, message = "netId must be between 3 and 20 characters")
-    @Pattern(regexp = "^[a-zA-Z\\d]+$", message = "netId must not contain special characters nor spaces")
-    private String netId;
+    @NotBlank(message = "userId is mandatory and cannot be blank")
+    @NotNull(message = "userId is mandatory and cannot be null")
+    @Size(min = 3, max = 20, message = "userId must be between 3 and 20 characters")
+    @Pattern(regexp = "^[a-zA-Z\\d]+$", message = "userId must not contain special characters nor spaces")
+    private String userId;
 
     @NotBlank(message = "Password is mandatory and cannot be blank")
     @NotNull(message = "Password is mandatory and cannot be null")
