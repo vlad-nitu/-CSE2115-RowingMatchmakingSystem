@@ -10,11 +10,13 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import java.time.LocalDateTime;
 import java.util.Set;
 import javax.ws.rs.core.Response;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 
 @ExtendWith(MockitoExtension.class)
 public class ActivityPublisherTest {
@@ -46,5 +48,18 @@ public class ActivityPublisherTest {
         Response response = Response.status(400).build();
         when(userUtils.postRequest("/createActivity", activity)).thenReturn(response);
         assertThat(activityPublisher.createActivity(activity)).isEqualTo(null);
+    }
+
+    @Test
+    public void cancelActivityValid() throws Exception {
+        Response response = Response.status(204).build();
+        when(userUtils.postRequest("/cancelActivity/1", null)).thenReturn(response);
+        assertThat(activityPublisher.cancelActivity(1L)).isEqualTo(204);
+    }
+
+    @Test
+    public void cancelActivityInvalid() throws Exception {
+        when(userUtils.postRequest("/cancelActivity/1", null)).thenThrow(new Exception("LOL"));
+        assertThat(activityPublisher.cancelActivity(1L)).isEqualTo(null);
     }
 }

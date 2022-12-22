@@ -16,7 +16,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import nl.tudelft.cse.sem.template.user.domain.User;
 import nl.tudelft.cse.sem.template.user.utils.TimeSlot;
@@ -605,5 +607,29 @@ public class UserControllerTest {
         contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("The provided ownerId does not match your netId! Use valid as the ownerId.");
 
+    }
+
+    @Test
+    void cancelActivityValid() throws Exception {
+        when(activityPublisher.cancelActivity(1L)).thenReturn(204);
+        MvcResult mvcResult = mockMvc
+                .perform(get("/cancelActivity/1"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Activity was deleted successfully");
+    }
+
+    @Test
+    void cancelActivityError() throws Exception {
+        when(activityPublisher.cancelActivity(1L)).thenReturn(404);
+        MvcResult mvcResult = mockMvc
+                .perform(get("/cancelActivity/1"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Activity deletion was not successful");
     }
 }
