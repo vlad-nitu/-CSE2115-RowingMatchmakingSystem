@@ -23,6 +23,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.io.InvalidObjectException;
 import java.util.*;
 
@@ -68,13 +69,16 @@ public class ActivityController {
      * @return ResponseEntity object that specifies if the request could be done
      */
     @PostMapping("/takeAvailableSpot")
-    public ResponseEntity.BodyBuilder takeAvailableSpot(@RequestBody Pair<Long, String> posTaken) {
+    public ResponseEntity takeAvailableSpot(@RequestBody @Valid Pair<Long, String> posTaken) {
         try {
-            this.activityService.takeSpot(posTaken);
-            return ResponseEntity.ok();
+            if (!InputValidation.validatePosition(posTaken.getSecond())) {
+                return ResponseEntity.badRequest().body("Invalid Position");
+            }
+            activityService.takeSpot(posTaken);
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -176,6 +180,30 @@ public class ActivityController {
         }
         activityService.deleteById(activityId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(activity.get());
+    }
+
+
+
+    /**
+     * API Endpoint that receives a POST request and opens up a position
+     * that was taken before.
+     *
+     * @param posTaken Pair of a Long and String object representing the ID of the activity and the
+     *                 position occupied respectively
+     * @return ResponseEntity object that specifies if the request could be done
+     */
+    @PostMapping("/unenrollPosition")
+    public ResponseEntity unenrollPosition(@RequestBody @Valid Pair<Long, String> posTaken) {
+        if (!InputValidation.validatePosition(posTaken.getSecond())) {
+            return ResponseEntity.badRequest().body("Invalid position");
+        }
+        try {
+            activityService.unenrollPosition(posTaken);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
+        }
     }
 
     /**

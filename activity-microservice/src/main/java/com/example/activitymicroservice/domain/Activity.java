@@ -1,8 +1,9 @@
 package com.example.activitymicroservice.domain;
 
 import com.example.activitymicroservice.utils.TimeSlot;
+
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -42,9 +43,9 @@ public abstract class Activity {
     @ElementCollection
     @NotNull(message = "Positions list cannot be null")
     @Column(name = "positions")
-    private Set<@NotBlank(message = "Position cannot be blank")
-            @NotNull(message = "Position cannot be null")
-                @Size(min = 3, max = 20, message = "Position name must be between 3 and 20 characters") String> positions;
+    private List<@NotBlank(message = "Position cannot be blank")
+                @NotNull(message = "Position cannot be null")
+                    @Size(min = 3, max = 20, message = "Position name must be between 3 and 20 chars") String> positions;
 
     private String certificate;
 
