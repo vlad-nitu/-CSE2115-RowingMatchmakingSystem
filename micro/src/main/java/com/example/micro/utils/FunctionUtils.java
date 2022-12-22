@@ -19,7 +19,7 @@ public class FunctionUtils {
         for (TimeSlot t : timeSlots) {
             boolean isOverlap = false;
             for (TimeSlot o : occTimeSlots) {
-                if (t.overlaps(o)) {
+                if (o.overlaps(t)) {
                     isOverlap ^= true;
                     break;
                 }

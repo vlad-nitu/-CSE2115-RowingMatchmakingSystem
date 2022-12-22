@@ -1,5 +1,7 @@
 package nl.tudelft.cse.sem.template.user.publishers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Cleanup;
 import lombok.Generated;
 import nl.tudelft.cse.sem.template.user.utils.BaseNotification;
@@ -13,6 +15,7 @@ import java.util.List;
 
 @Service
 @Generated
+@SuppressWarnings("PMD.ReturnEmptyCollectionRatherThanNull")
 public class NotificationPublisher {
 
     private final transient UserUtils userUtils;
@@ -29,18 +32,12 @@ public class NotificationPublisher {
      * Requests all the notifications that are collected for the user and have not been seen yet.
      *
      * @param userId the id of the user requesting the notifications
-     * @return a list containing the received notifications, if any are present
+     * @return a list containing the received notifications or null if an error was encountered
      */
-    public List<BaseNotification> getNotifications(String userId) {
-        try {
-            @Cleanup
-            Response res = userUtils.getRequest("/getNotifications/" + userId);
-            ArrayList<BaseNotification> notifications = res.readEntity(new GenericType<>() {});
-            return notifications;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return new ArrayList<>();
-        }
+    public List<String> getNotifications(String userId) throws Exception {
+        @Cleanup
+        Response res = userUtils.getRequest("/getNotifications/" + userId);
+        return res.getStatus() == 200 ? res.readEntity(new GenericType<List<String>>(){}) : null;
     }
 
 }

@@ -85,7 +85,6 @@ public class NotificationController {
         if (!strategy.handleNotification(notification)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(strategy.getFailureMessage());
         }
-
         return ResponseEntity.ok("Successfully notified");
     }
 

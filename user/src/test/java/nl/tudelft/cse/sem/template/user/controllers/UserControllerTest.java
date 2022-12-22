@@ -8,12 +8,17 @@ import nl.tudelft.cse.sem.template.user.publishers.ActivityPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.MatchingPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.NotificationPublisher;
 import nl.tudelft.cse.sem.template.user.services.UserService;
+import nl.tudelft.cse.sem.template.user.utils.BaseActivity;
+import nl.tudelft.cse.sem.template.user.utils.BaseMatching;
+import nl.tudelft.cse.sem.template.user.utils.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import nl.tudelft.cse.sem.template.user.domain.User;
 import nl.tudelft.cse.sem.template.user.utils.TimeSlot;
@@ -25,7 +30,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.lenient;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.mockito.Mockito.when;
@@ -39,8 +44,11 @@ public class UserControllerTest {
     private UserService userService;
     @Mock
     private AuthManager authManager;
+    @Mock
     private ActivityPublisher activityPublisher;
+    @Mock
     private MatchingPublisher matchingPublisher;
+    @Mock
     private NotificationPublisher notificationPublisher;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -323,6 +331,28 @@ public class UserControllerTest {
     }
 
     @Test
+    public void sendTimeSlotsTest() throws Exception {
+        Set<TimeSlot> expected = timeSlots;
+        when(userService.findTimeSlotsById(userId)).thenReturn(expected);
+        MvcResult mvcResult = mockMvc
+                .perform(get("/sendTimeSlots/LotteKremer"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("[{\"start\":\"2022-12-14 07:00\",\"end\":\"2022-12-14 19:15\"}]");
+
+        expected = null;
+        userId = "noSuchUser";
+        when(userService.findTimeSlotsById(userId)).thenReturn(expected);
+        mvcResult = mockMvc
+                .perform(get("/sendTimeSlots/noSuchUser"))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("There is no user with the given userId!");
+    }
+
+    @Test
     void sendEmail() throws Exception {
         String expected = "test@domain.com";
         when(userService.findEmailById(userId)).thenReturn(expected);
@@ -342,5 +372,264 @@ public class UserControllerTest {
                 .andReturn();
         contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("There is no user with the given userId!");
+    }
+
+    @Test
+    void getNotifications() throws Exception {
+        List<String> expected = List.of("A new user has applied as a cox for activity with Id: 1",
+                "A new user has applied as a cox for activity with Id: 2");
+        when(notificationPublisher.getNotifications(null)).thenReturn(expected);
+        MvcResult mvcResult = mockMvc
+                .perform(get("/getNotifications"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains(expected);
+
+        expected = null;
+        when(notificationPublisher.getNotifications(null)).thenReturn(expected);
+        mvcResult = mockMvc
+                .perform(get("/getNotifications"))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Something went wrong!");
+    }
+
+    @Test
+    void getAvailableActivities() throws Exception {
+        List<Pair<Long, String>> expected = List.of(new Pair<Long, String>(1L, "testGetAvailableActivities"));
+        when(userService.findTimeSlotsById(null)).thenReturn(new HashSet<>());
+        when(matchingPublisher.getAvailableActivities(any(), anySet())).thenReturn(expected);
+        MvcResult mvcResult = mockMvc
+                .perform(get("/getAvailableActivities"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).doesNotContain("There is no user with the given userId!");
+        assertThat(contentAsString).contains("testGetAvailableActivities");
+
+        when(userService.findTimeSlotsById(null)).thenReturn(null);
+        mvcResult = mockMvc
+                .perform(get("/getAvailableActivities"))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("There is no user with the given userId!");
+
+        when(userService.findTimeSlotsById(null)).thenReturn(new HashSet<>());
+        expected = null;
+        when(matchingPublisher.getAvailableActivities(any(), anySet())).thenReturn(expected);
+        mvcResult = mockMvc
+                .perform(get("/getAvailableActivities"))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Something went wrong!");
+    }
+
+    @Test
+    void decideMatch() throws Exception {
+        BaseMatching baseMatching = new BaseMatching();
+        when(authManager.getNetId()).thenReturn(user.getUserId());
+        when(matchingPublisher.decideMatch(user.getUserId(), "accept", baseMatching)).thenReturn(baseMatching);
+        MvcResult mvcResult = mockMvc
+                .perform(post("/decideMatch/accept")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(baseMatching))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        BaseMatching obtained = objectMapper.readValue(contentAsString, BaseMatching.class);
+        assertThat(obtained).isEqualTo(baseMatching);
+
+        mvcResult = mockMvc
+                .perform(post("/decideMatch/invalid")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(baseMatching))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Decision can only be 'accept' or 'decline'.");
+
+        when(authManager.getNetId()).thenReturn("invalid");
+        when(matchingPublisher.decideMatch("invalid", "accept", baseMatching)).thenReturn(null);
+        mvcResult = mockMvc
+                .perform(post("/decideMatch/accept")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(baseMatching))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Something went wrong!");
+    }
+
+    @Test
+    void getUserActivities() throws Exception {
+        List<Long> expected = List.of(1L, 2L);
+        when(matchingPublisher.getUserActivities(null)).thenReturn(expected);
+        MvcResult mvcResult = mockMvc
+                .perform(get("/getUserActivities"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains(expected.toString().replace(" ", ""));
+
+        expected = null;
+        when(matchingPublisher.getUserActivities(null)).thenReturn(expected);
+        mvcResult = mockMvc
+                .perform(get("/getUserActivities"))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Something went wrong!");
+    }
+
+    @Test
+    void chooseActivity() throws Exception {
+        BaseMatching baseMatching = new BaseMatching();
+        when(authManager.getNetId()).thenReturn(user.getUserId());
+        when(matchingPublisher.chooseActivity(any())).thenReturn(baseMatching);
+        MvcResult mvcResult = mockMvc
+                .perform(post("/chooseActivity")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(baseMatching))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        BaseMatching obtained = objectMapper.readValue(contentAsString, BaseMatching.class);
+        assertThat(obtained).isEqualTo(baseMatching);
+
+        when(matchingPublisher.chooseActivity(any())).thenReturn(null);
+        mvcResult = mockMvc
+                .perform(post("/chooseActivity")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(baseMatching))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Something went wrong!");
+
+    }
+
+    @Test
+    void unenroll() throws Exception {
+        BaseActivity baseActivity = new BaseActivity();
+        Pair<String, Long> expected = new Pair<>();
+        when(authManager.getNetId()).thenReturn(user.getUserId());
+        when(matchingPublisher.unenroll(any())).thenReturn(expected);
+        MvcResult mvcResult = mockMvc
+                .perform(post("/unenroll")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(1L))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        Pair<String, Long> obtained = objectMapper.readValue(contentAsString, Pair.class);
+        assertThat(obtained).isEqualTo(expected);
+
+        when(matchingPublisher.unenroll(any())).thenReturn(null);
+        mvcResult = mockMvc
+                .perform(post("/unenroll")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(1L))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Something went wrong!");
+    }
+
+    @Test
+    void createActivity() throws Exception {
+        BaseActivity baseActivity = new BaseActivity();
+        baseActivity.setOwnerId("valid");
+        when(authManager.getNetId()).thenReturn("valid");
+        when(activityPublisher.createActivity(any())).thenReturn(baseActivity);
+        MvcResult mvcResult = mockMvc
+                .perform(post("/createActivity/training")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(baseActivity))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        BaseActivity obtained = objectMapper.readValue(contentAsString, BaseActivity.class);
+        assertThat(obtained).isEqualTo(baseActivity);
+
+        when(activityPublisher.createActivity(any())).thenReturn(null);
+        mvcResult = mockMvc
+                .perform(post("/createActivity/training")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(baseActivity))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Something went wrong!");
+
+        mvcResult = mockMvc
+                .perform(post("/createActivity/invalid")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(baseActivity))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Type can only be 'training' or 'competition'.");
+
+        when(authManager.getNetId()).thenReturn("valid");
+        baseActivity.setOwnerId("invalid");
+        mvcResult = mockMvc
+                .perform(post("/createActivity/training")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(baseActivity))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("The provided ownerId does not match your netId! Use valid as the ownerId.");
+
+    }
+
+    @Test
+    void cancelActivityValid() throws Exception {
+        when(activityPublisher.cancelActivity(1L)).thenReturn(204);
+        MvcResult mvcResult = mockMvc
+                .perform(get("/cancelActivity/1"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Activity was deleted successfully");
+    }
+
+    @Test
+    void cancelActivityError() throws Exception {
+        when(activityPublisher.cancelActivity(1L)).thenReturn(404);
+        MvcResult mvcResult = mockMvc
+                .perform(get("/cancelActivity/1"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Activity deletion was not successful");
     }
 }

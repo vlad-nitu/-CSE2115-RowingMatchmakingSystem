@@ -1,12 +1,12 @@
 package nl.tudelft.cse.sem.template.user.utils;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
+@Getter
+@Setter
 public class BaseNotification {
     private String userId;
     private String targetId;

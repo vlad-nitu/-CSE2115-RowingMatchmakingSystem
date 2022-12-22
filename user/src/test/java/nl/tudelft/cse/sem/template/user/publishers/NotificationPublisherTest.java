@@ -1,20 +1,19 @@
 package nl.tudelft.cse.sem.template.user.publishers;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.when;
-
-import nl.tudelft.cse.sem.template.user.utils.UserUtils;
 import nl.tudelft.cse.sem.template.user.utils.BaseNotification;
-
-import javax.ws.rs.core.Response;
+import nl.tudelft.cse.sem.template.user.utils.UserUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class NotificationPublisherTest {
@@ -43,8 +42,9 @@ public class NotificationPublisherTest {
 
     @Test
     public void getNotificationsTestInvalid() throws Exception {
-        when(userUtils.getRequest("/getNotifications/LotteKremer")).thenThrow(new Exception("Invalid"));
-        assertThat(notificationPublisher.getNotifications("LotteKremer")).isEqualTo(new ArrayList<>());
+        Response response = Response.status(400).build();
+        when(userUtils.getRequest("/getNotifications/LotteKremer")).thenReturn(response);
+        assertThat(notificationPublisher.getNotifications("LotteKremer")).isEqualTo(null);
     }
 
 }
