@@ -148,7 +148,7 @@ public class UserService {
         if (user.isPresent()) {
             return user.get().getTimeSlots();
         } else {
-            return Set.of();
+            return null;
         }
     }
 }

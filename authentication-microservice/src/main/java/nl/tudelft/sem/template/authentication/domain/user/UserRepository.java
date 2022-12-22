@@ -1,8 +1,9 @@
 package nl.tudelft.sem.template.authentication.domain.user;
 
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 /**
  * A DDD repository for quering and persisting user aggregate roots.
@@ -10,12 +11,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserRepository extends JpaRepository<AppUser, String> {
     /**
-     * Find user by NetID.
+     * Find user by UserID.
      */
-    Optional<AppUser> findByNetId(NetId netId);
+    Optional<AppUser> findByUserId(UserId userId);
 
     /**
-     * Check if an existing user already uses a NetID.
+     * Check if an existing user already uses a UserID.
      */
-    boolean existsByNetId(NetId netId);
+    boolean existsByUserId(UserId userId);
 }

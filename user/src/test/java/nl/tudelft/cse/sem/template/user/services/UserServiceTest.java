@@ -2,11 +2,14 @@ package nl.tudelft.cse.sem.template.user.services;
 
 import nl.tudelft.cse.sem.template.user.domain.User;
 import nl.tudelft.cse.sem.template.user.repositories.UserRepository;
+import nl.tudelft.cse.sem.template.user.utils.TimeSlot;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDateTime;
 import java.util.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.*;
@@ -110,5 +113,18 @@ class UserServiceTest {
         assertThat(userService.findEmailById("id")).isEqualTo(expected.get().getEmail());
         when(userRepository.findById("")).thenReturn(Optional.empty());
         assertThat(userService.findEmailById("")).isEqualTo(null);
+    }
+
+    @Test
+    void findTimeSlotsById() {
+        Set<TimeSlot> timeSlots = new HashSet<>();
+        timeSlots.add(new TimeSlot(LocalDateTime.of(2022, 12, 14, 7, 00),
+                LocalDateTime.of(2022, 12, 14, 19, 15)));
+        Optional<User> expected = Optional.of(new User("id", true, 'f', "organisation",
+                "certificate", "test@domain.com", new HashSet<>(), timeSlots));
+        when(userRepository.findById("id")).thenReturn(expected);
+        assertThat(userService.findTimeSlotsById("id")).isEqualTo(timeSlots);
+        when(userRepository.findById("")).thenReturn(Optional.empty());
+        assertThat(userService.findTimeSlotsById("")).isEqualTo(null);
     }
 }

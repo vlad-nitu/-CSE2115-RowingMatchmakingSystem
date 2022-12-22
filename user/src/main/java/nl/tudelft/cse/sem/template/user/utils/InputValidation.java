@@ -3,13 +3,13 @@ package nl.tudelft.cse.sem.template.user.utils;
 import lombok.AllArgsConstructor;
 
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @AllArgsConstructor
 public class InputValidation {
 
-    private static final Pattern patternNoSpecialCharacters = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
+    private static final Pattern patternNoSpecialCharacters = Pattern.compile("[^a-z0-9]", Pattern.CASE_INSENSITIVE);
     private static Set<String> validPositions = Set.of("cox",
             "coach",
             "port side rower",

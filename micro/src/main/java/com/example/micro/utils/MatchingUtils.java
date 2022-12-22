@@ -67,6 +67,7 @@ public class MatchingUtils {
                     .post(Entity.entity(data, APPLICATION_JSON), Response.class);
             return res;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new Exception("Bad request");
         }
     }

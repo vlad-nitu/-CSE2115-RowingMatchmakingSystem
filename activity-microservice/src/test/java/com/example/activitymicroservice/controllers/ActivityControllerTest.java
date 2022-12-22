@@ -73,7 +73,7 @@ class ActivityControllerTest {
         Activity act = new Training();
         act.setOwnerId("Owner");
         when(activityService.findActivityOptional(1L)).thenReturn(Optional.of(act));
-        when(authManager.getNetId()).thenReturn("User");
+        when(authManager.getUserId()).thenReturn("User");
         MvcResult res = mockMvc
                 .perform(post("/cancelActivity/1"))
                 .andExpect(status().isForbidden())
@@ -87,7 +87,7 @@ class ActivityControllerTest {
         Activity act = new Training();
         act.setOwnerId("Owner");
         when(activityService.findActivityOptional(1L)).thenReturn(Optional.of(act));
-        when(authManager.getNetId()).thenReturn("Owner");
+        when(authManager.getUserId()).thenReturn("Owner");
         when(matchingPublisher.deleteMatchingByActivityId(1L)).thenReturn(false);
         MvcResult res = mockMvc
                 .perform(post("/cancelActivity/1"))
@@ -102,7 +102,7 @@ class ActivityControllerTest {
         Activity act = new Training();
         act.setOwnerId("Owner");
         when(activityService.findActivityOptional(1L)).thenReturn(Optional.of(act));
-        when(authManager.getNetId()).thenReturn("Owner");
+        when(authManager.getUserId()).thenReturn("Owner");
         when(matchingPublisher.deleteMatchingByActivityId(1L)).thenReturn(true);
         MvcResult res = mockMvc
                 .perform(post("/cancelActivity/1"))

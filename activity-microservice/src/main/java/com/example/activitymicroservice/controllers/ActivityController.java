@@ -12,12 +12,7 @@ import com.example.activitymicroservice.services.ActivityService;
 import com.example.activitymicroservice.utils.InputValidation;
 import com.example.activitymicroservice.utils.Pair;
 import com.example.activitymicroservice.utils.TimeSlot;
-import com.example.activitymicroservice.validators.Validator;
-import com.example.activitymicroservice.validators.GenderValidator;
-import com.example.activitymicroservice.validators.PositionValidator;
-import com.example.activitymicroservice.validators.OrganisationValidator;
-import com.example.activitymicroservice.validators.CertificateValidator;
-import com.example.activitymicroservice.validators.CompetitivenessValidator;
+import com.example.activitymicroservice.validators.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -176,9 +171,20 @@ public class ActivityController {
 
     }
 
+    /**
+     * API enpoint that allows for creating an Activity object and persisting it to the DB.
+     *
+     * @param activity - Activity object that you will create
+     * @return - 200_OK, if activity was created, or 400_BAD_REQUEST if the Activity object failed input validation stage
+     */
     @PostMapping("/createActivity")
-    public ResponseEntity<Activity> createActivity(@RequestBody Activity activity) {
-        return ResponseEntity.ok(this.activityService.save(activity));
+    public ResponseEntity<Activity> createActivity(@Valid @RequestBody Activity activity) {
+
+        if (InputValidation.validatePositions(activity.getPositions())) {
+            return ResponseEntity.ok(this.activityService.save(activity));
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     /**
@@ -190,7 +196,7 @@ public class ActivityController {
      * @return a List of Pair(Activity.ID, Position)
      */
     @PostMapping("/sendAvailableActivities/{userId}")
-    public ResponseEntity<List<Pair<Long, String>>> sendAvailableActivities(@RequestBody Set<TimeSlot> timeSlots,
+    public ResponseEntity<List<Pair<Long, String>>> sendAvailableActivities(@RequestBody List<TimeSlot> timeSlots,
                                                                             @PathVariable String userId) {
         List<Pair<Long, String>> list = new ArrayList<>();
 
@@ -233,7 +239,7 @@ public class ActivityController {
         if (activity.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        if (!authManager.getNetId().equals(activity.get().getOwnerId())) {
+        if (!authManager.getUserId().equals(activity.get().getOwnerId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         if (!matchingPublisher.deleteMatchingByActivityId(activityId)) {

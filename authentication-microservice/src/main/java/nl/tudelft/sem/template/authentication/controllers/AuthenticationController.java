@@ -2,9 +2,9 @@ package nl.tudelft.sem.template.authentication.controllers;
 
 import nl.tudelft.sem.template.authentication.authentication.JwtTokenGenerator;
 import nl.tudelft.sem.template.authentication.authentication.JwtUserDetailsService;
-import nl.tudelft.sem.template.authentication.domain.user.NetId;
 import nl.tudelft.sem.template.authentication.domain.user.Password;
 import nl.tudelft.sem.template.authentication.domain.user.RegistrationService;
+import nl.tudelft.sem.template.authentication.domain.user.UserId;
 import nl.tudelft.sem.template.authentication.models.AuthenticationRequestModel;
 import nl.tudelft.sem.template.authentication.models.AuthenticationResponseModel;
 import nl.tudelft.sem.template.authentication.models.RegistrationRequestModel;
@@ -16,10 +16,14 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 public class AuthenticationController {
@@ -65,7 +69,7 @@ public class AuthenticationController {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            request.getNetId(),
+                            request.getUserId(),
                             request.getPassword()));
         } catch (DisabledException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "USER_DISABLED", e);
@@ -73,7 +77,7 @@ public class AuthenticationController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", e);
         }
 
-        final UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(request.getNetId());
+        final UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(request.getUserId());
         final String jwtToken = jwtTokenGenerator.generateToken(userDetails);
         return ResponseEntity.ok(new AuthenticationResponseModel(jwtToken));
     }
@@ -83,19 +87,40 @@ public class AuthenticationController {
      *
      * @param request The registration model
      * @return 200 OK if the registration is successful
-     * @throws Exception if a user with this netid already exists
+     * @throws Exception if a user with this userid already exists
      */
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody RegistrationRequestModel request) throws Exception {
-
+    public ResponseEntity register(@Valid @RequestBody RegistrationRequestModel request) throws Exception {
         try {
-            NetId netId = new NetId(request.getNetId());
+            UserId userId = new UserId(request.getUserId());
             Password password = new Password(request.getPassword());
-            registrationService.registerUser(netId, password);
+            registrationService.registerUser(userId, password);
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The given userId is already in use!");
         }
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.OK).body("Thank you, " + request.getUserId()
+                + ". Registration successful!");
+    }
+
+    /**
+     * Handles BAD_REQUEST exceptions thrown by the Validator of User entities
+     * Acts as a parser of the BAD_REQUEST exception messages bodies.
+     * Triggered for all User entities that do not respect the @Valid annotation
+     *
+     * @param ex exception
+     * @return a Mapping fieldName -> errorMessage
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
     }
 }

@@ -8,12 +8,6 @@ import com.example.micro.services.MatchingServiceImpl;
 import com.example.micro.utils.FunctionUtils;
 import com.example.micro.utils.Pair;
 import com.example.micro.utils.TimeSlot;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +16,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 public class MatchingController {
@@ -59,7 +57,7 @@ public class MatchingController {
     public ResponseEntity<List<Pair<Long, String>>> getAvailableActivities(@PathVariable String userId,
                                                                            @RequestBody List<TimeSlot> timeSlots) {
 
-        if (!authManger.getNetId().equals(userId)) {
+        if (!authManger.getUserId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -83,7 +81,7 @@ public class MatchingController {
 
         String userId = matching.getUserId();
 
-        if (!authManger.getNetId().equals(userId)) {
+        if (!authManger.getUserId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -119,7 +117,7 @@ public class MatchingController {
                                                 @PathVariable String senderId,
                                                 @PathVariable String type) {
 
-        if (!authManger.getNetId().equals(senderId)) {
+        if (!authManger.getUserId().equals(senderId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         if (!senderId.equals(activityPublisher.getOwnerId(matching.getActivityId()))) {
@@ -136,7 +134,6 @@ public class MatchingController {
         }
         return ResponseEntity.badRequest().build();
     }
-
 
     /**
      * API Endpoint that performs a POST request in order for an owner of a specific activity
@@ -177,7 +174,7 @@ public class MatchingController {
      */
     @GetMapping("/getUserActivities/{userId}")
     public ResponseEntity<List<Long>> getUserActivities(@PathVariable String userId) {
-        if (!authManger.getNetId().equals(userId)) {
+        if (!authManger.getUserId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return ResponseEntity.ok(matchingServiceImpl.findActivitiesByUserId(userId));
@@ -193,7 +190,7 @@ public class MatchingController {
      */
     @PostMapping("/unenroll")
     public ResponseEntity<Pair<String, Long>> unenroll(@RequestBody Pair<String, Long> userIdActivityIdPair) {
-        if (!authManger.getNetId().equals(userIdActivityIdPair.getFirst())) {
+        if (!authManger.getUserId().equals(userIdActivityIdPair.getFirst())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         String userId = userIdActivityIdPair.getFirst();
@@ -217,7 +214,7 @@ public class MatchingController {
     @PostMapping("/deleteMatchingByActivityId/{activityId}")
     public ResponseEntity<Matching> deleteMatchingByActivityId(@PathVariable Long activityId) {
         String ownerId = activityPublisher.getOwnerId(activityId);
-        if (!authManger.getNetId().equals(ownerId)) {
+        if (!authManger.getUserId().equals(ownerId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         matchingServiceImpl.deleteByActivityId(activityId);

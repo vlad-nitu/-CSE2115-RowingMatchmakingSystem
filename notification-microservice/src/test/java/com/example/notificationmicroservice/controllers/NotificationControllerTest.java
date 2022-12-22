@@ -85,7 +85,7 @@ class NotificationControllerTest {
         List<String> expected = foundNotifications.stream().map(x -> x.buildMessage()).collect(Collectors.toList());
         when(notificationDatabaseService.findNotificationsByTargetId(notification.getTargetId()))
                 .thenReturn(foundNotifications);
-        when(authManager.getNetId()).thenReturn(notification.getTargetId());
+        when(authManager.getUserId()).thenReturn(notification.getTargetId());
         MvcResult mvcResult = mockMvc
                 .perform(get("/getNotifications/" + notification.getTargetId()))
                 .andExpect(status().isOk())
@@ -100,7 +100,7 @@ class NotificationControllerTest {
     @Test
     void getNotificationsIncorrectUser() throws Exception {
         Notification notification = new Notification("userId", "targetId", 1L, "notifyOwner", "cox");
-        when(authManager.getNetId()).thenReturn(notification.getUserId());
+        when(authManager.getUserId()).thenReturn(notification.getUserId());
         MvcResult mvcResult = mockMvc
                 .perform(get("/getNotifications/" + notification.getTargetId()))
                 .andExpect(status().isForbidden())
