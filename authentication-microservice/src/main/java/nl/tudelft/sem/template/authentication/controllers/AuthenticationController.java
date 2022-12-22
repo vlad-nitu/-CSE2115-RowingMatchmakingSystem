@@ -96,7 +96,7 @@ public class AuthenticationController {
             Password password = new Password(request.getPassword());
             registrationService.registerUser(netId, password);
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The given netId is already in use!");
         }
 
         return ResponseEntity.ok().build();
