@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.Mockito.mockConstructionWithAnswer;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -193,7 +194,7 @@ class ActivityControllerTest {
     void takeAvailableSpotSuccess() throws Exception {
         Activity activity = new Training();
         activity.setActivityId(1L);
-        activity.setPositions(Set.of("cox", "rower"));
+        activity.setPositions(List.of("cox", "rower"));
         Pair<Long, String> pair = new Pair<>(1L, "cox");
         when(activityService.takeSpot(pair)).thenReturn(true);
         MvcResult res = mockMvc
@@ -210,7 +211,7 @@ class ActivityControllerTest {
     void takeAvailableSpotFail() throws Exception {
         Activity activity = new Training();
         activity.setActivityId(1L);
-        activity.setPositions(Set.of("cox", "rower"));
+        activity.setPositions(List.of("cox", "rower"));
         Pair<Long, String> pair = new Pair<>(2L, "cox");
         when(activityService.takeSpot(pair)).thenThrow(new Exception());
         MvcResult res = mockMvc
@@ -220,5 +221,20 @@ class ActivityControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
         assertThat(res.getResponse().getContentAsString()).isEqualTo("");
+    }
+
+    @Test
+    void checkWrongPositions() throws Exception {
+        Activity activity = new Training();
+        activity.setActivityId(1L);
+        activity.setPositions(List.of("cox", "rower"));
+        when(activityService.findActivityOptional(1L)).thenReturn(Optional.of(activity));
+        MvcResult res = mockMvc
+                .perform(get("/check/Razvan/1/SideRower"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = res.getResponse().getContentAsString();
+        boolean obtained = objectMapper.readValue(contentAsString, boolean.class);
+        assertThat(obtained).isFalse();
     }
 }
