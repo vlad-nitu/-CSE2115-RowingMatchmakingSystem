@@ -3,13 +3,11 @@ package nl.tudelft.cse.sem.template.user.publishers;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import nl.tudelft.cse.sem.template.user.utils.UserUtils;
 import nl.tudelft.cse.sem.template.user.utils.TimeSlot;
 import nl.tudelft.cse.sem.template.user.utils.BaseActivity;
-
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 import javax.ws.rs.core.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +24,6 @@ public class ActivityPublisherTest {
     private ActivityPublisher activityPublisher;
 
     private BaseActivity activity;
-    //private List<TimeSlot> timeSlots;
 
     @BeforeEach
     void setUp() {
@@ -38,15 +35,16 @@ public class ActivityPublisherTest {
 
     @Test
     public void createActivityTestValid() throws Exception {
-        Response res = Response.ok().build();
-        when(userUtils.postRequest("/createActivity", activity)).thenReturn(res);
-        activityPublisher.createActivity(activity);
+        Response response = Response.status(200).entity(new BaseActivity()).build();
+        when(userUtils.postRequest("/createActivity", activity)).thenReturn(response);
+        assertThat(activityPublisher.createActivity(activity)).isNotEqualTo(null);
         verify(userUtils, times(1)).postRequest("/createActivity", activity);
     }
 
     @Test
     public void createActivityTestInvalid() throws Exception {
-        when(userUtils.postRequest("/createActivity", activity)).thenThrow(new Exception("Invalid"));
-        activityPublisher.createActivity(activity);
+        Response response = Response.status(400).build();
+        when(userUtils.postRequest("/createActivity", activity)).thenReturn(response);
+        assertThat(activityPublisher.createActivity(activity)).isEqualTo(null);
     }
 }

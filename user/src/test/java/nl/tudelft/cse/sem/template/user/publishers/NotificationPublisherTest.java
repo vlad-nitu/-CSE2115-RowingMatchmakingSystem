@@ -43,8 +43,9 @@ public class NotificationPublisherTest {
 
     @Test
     public void getNotificationsTestInvalid() throws Exception {
-        when(userUtils.getRequest("/getNotifications/LotteKremer")).thenThrow(new Exception("Invalid"));
-        assertThat(notificationPublisher.getNotifications("LotteKremer")).isEqualTo(new ArrayList<>());
+        Response response = Response.status(400).build();
+        when(userUtils.getRequest("/getNotifications/LotteKremer")).thenReturn(response);
+        assertThat(notificationPublisher.getNotifications("LotteKremer")).isEqualTo(null);
     }
 
 }

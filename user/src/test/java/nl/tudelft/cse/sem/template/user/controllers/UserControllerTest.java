@@ -477,7 +477,7 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
         String contentAsString = mvcResult.getResponse().getContentAsString();
-        assertThat(contentAsString).contains(expected.toString().replace(" ",""));
+        assertThat(contentAsString).contains(expected.toString().replace(" ", ""));
 
         expected = null;
         when(matchingPublisher.getUserActivities(null)).thenReturn(expected);
@@ -549,5 +549,61 @@ public class UserControllerTest {
                 .andReturn();
         contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("Something went wrong!");
+    }
+
+    @Test
+    void createActivity() throws Exception {
+        BaseActivity baseActivity = new BaseActivity();
+        baseActivity.setOwnerId("valid");
+        when(authManager.getNetId()).thenReturn("valid");
+        when(activityPublisher.createActivity(any())).thenReturn(baseActivity);
+        MvcResult mvcResult = mockMvc
+                .perform(post("/createActivity/training")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(baseActivity))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        BaseActivity obtained = objectMapper.readValue(contentAsString, BaseActivity.class);
+        assertThat(obtained).isEqualTo(baseActivity);
+
+        when(activityPublisher.createActivity(any())).thenReturn(null);
+        mvcResult = mockMvc
+                .perform(post("/createActivity/training")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(baseActivity))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Something went wrong!");
+
+        mvcResult = mockMvc
+                .perform(post("/createActivity/invalid")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(baseActivity))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Type can only be 'training' or 'competition'.");
+
+        when(authManager.getNetId()).thenReturn("valid");
+        baseActivity.setOwnerId("invalid");
+        mvcResult = mockMvc
+                .perform(post("/createActivity/training")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(baseActivity))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("The provided ownerId does not match your netId! Use valid as the ownerId.");
+
     }
 }

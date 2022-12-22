@@ -1,14 +1,10 @@
 package nl.tudelft.cse.sem.template.user.publishers;
 
+import nl.tudelft.cse.sem.template.user.utils.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import nl.tudelft.cse.sem.template.user.utils.*;
-
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 
 @ExtendWith(MockitoExtension.class)
 public class MatchingPublisherTest {
@@ -49,9 +46,10 @@ public class MatchingPublisherTest {
 
     @Test
     public void getAvailableActivitiesTestInvalid() throws Exception {
-        when(userUtils.postRequest("/getAvailableActivities/LotteKremer", timeSlots)).thenThrow(new Exception());
+        Response response = Response.status(400).build();
+        when(userUtils.postRequest("/getAvailableActivities/LotteKremer", timeSlots)).thenReturn(response);
         assertThat(matchingPublisher.getAvailableActivities("LotteKremer", timeSlots))
-                .isEqualTo(new ArrayList<Pair<Long, String>>());
+                .isEqualTo(null);
     }
 
     @Test
@@ -64,8 +62,9 @@ public class MatchingPublisherTest {
 
     @Test
     public void getUserActivitiesTestInvalid() throws Exception {
-        when(userUtils.getRequest("/getUserActivities/LotteKremer")).thenThrow(new Exception());
-        assertThat(matchingPublisher.getUserActivities("LotteKremer")).isEqualTo(new ArrayList<Long>());
+        Response response = Response.status(400).build();
+        when(userUtils.getRequest("/getUserActivities/LotteKremer")).thenReturn(response);
+        assertThat(matchingPublisher.getUserActivities("LotteKremer")).isEqualTo(null);
     }
 
     @Test
@@ -77,16 +76,18 @@ public class MatchingPublisherTest {
 
     @Test
     public void decideMatchTestInvalid() throws Exception {
+        Response response = Response.status(400).build();
         when(userUtils.postRequest("/decideMatch/LotteKremer/accept", matching))
-                .thenThrow(new Exception());
+                .thenReturn(response);
         assertThat(matchingPublisher.decideMatch("LotteKremer", "accept", matching))
-                .isEqualTo(new BaseMatching());
+                .isEqualTo(null);
     }
 
     @Test
     public void chooseActivityTestInvalid() throws Exception {
-        when(userUtils.postRequest("/chooseActivity", matching)).thenThrow(new Exception());
-        assertThat(matchingPublisher.chooseActivity(matching)).isEqualTo(new BaseMatching());
+        Response response = Response.status(400).build();
+        when(userUtils.postRequest("/chooseActivity", matching)).thenReturn(response);
+        assertThat(matchingPublisher.chooseActivity(matching)).isEqualTo(null);
     }
 
     @Test
@@ -106,8 +107,9 @@ public class MatchingPublisherTest {
 
     @Test
     public void unenrollTestInvalid() throws Exception {
+        Response response = Response.status(400).build();
         Pair<String, Long>  userActivityPair = new Pair<String, Long>("LotteKremer", 1L);
-        when(userUtils.postRequest("/unenroll", userActivityPair)).thenThrow(new Exception());
-        assertThat(matchingPublisher.unenroll(userActivityPair)).isEqualTo(new Pair<String, Long>());
+        when(userUtils.postRequest("/unenroll", userActivityPair)).thenReturn(response);
+        assertThat(matchingPublisher.unenroll(userActivityPair)).isEqualTo(null);
     }
 }

@@ -31,6 +31,8 @@ public class UserController {
 
     private static final String noSuchUserIdError = "There is no user with the given userId!";
 
+    private static final String genericPublisherError = "Something went wrong!";
+
     /**
      * All argument constructor, injects the main service component, authentication manager
      * and all publishers into the controller.
@@ -200,12 +202,15 @@ public class UserController {
     @PostMapping("/createActivity/{type}")
     public ResponseEntity createActivity(@Valid @RequestBody BaseActivity activity,
                                          @PathVariable String type) throws Exception {
+        if (!type.equals("training") && !type.equals("competition")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Type can only be 'training' or 'competition'.");
+        }
         if (!activity.getOwnerId().equals(authManager.getNetId())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided ownerId does not match your netId! Use "
                     + authManager.getNetId() + " as the ownerId.");
         }
         BaseActivity response = activityPublisher.createActivity(activity);
-        return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong!")
+        return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericPublisherError)
                 : ResponseEntity.status(HttpStatus.OK).body(response);
         /* try {
             return ResponseEntity.ok(activity);
@@ -228,7 +233,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(noSuchUserIdError);
         }
         List<Pair<Long, String>> response = matchingPublisher.getAvailableActivities(userId, timeslots);
-        return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong!")
+        return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericPublisherError)
                 : ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -241,7 +246,7 @@ public class UserController {
     public ResponseEntity getNotifications() throws Exception {
         String userId = authManager.getNetId();
         List<String> response = notificationPublisher.getNotifications(userId);
-        return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong!")
+        return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericPublisherError)
                 : ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -260,7 +265,7 @@ public class UserController {
         }
         String userId = authManager.getNetId();
         BaseMatching response = matchingPublisher.decideMatch(userId, type, matching);
-        return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong!")
+        return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericPublisherError)
                 : ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -273,7 +278,7 @@ public class UserController {
     public ResponseEntity getUserActivities() throws Exception {
         String userId = authManager.getNetId();
         List<Long> response = matchingPublisher.getUserActivities(userId);
-        return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong!")
+        return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericPublisherError)
                 : ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -281,14 +286,14 @@ public class UserController {
      * API Endpoint that performs a POST request in order to let the user choose to participate in an activity.
      *
      * @param matching the activity the user wants to participate in
-     * @return the matching in which the user has requested to participate
+     * @return the matching in which the user has requested to participate or the encountered problem description
      */
     @PostMapping("/chooseActivity")
     public ResponseEntity chooseActivity(@RequestBody BaseMatching matching) throws Exception {
         String userId = authManager.getNetId();
         matching.setUserId(userId);
         BaseMatching response = matchingPublisher.chooseActivity(matching);
-        return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong!")
+        return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericPublisherError)
                 : ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -297,6 +302,7 @@ public class UserController {
      *
      * @param activity the activity where the user wants to unenroll from.
      * @return the userId and activityId pair from the matching that is now cancelled
+     *      or the encountered problem description
      */
     @PostMapping("/unenroll")
     public ResponseEntity unenroll(@RequestBody BaseActivity activity) throws Exception {
@@ -304,7 +310,7 @@ public class UserController {
         Long activityId = activity.getActivityId();
         Pair<String, Long> userIdActivityIdPair = new Pair<String, Long>(userId, activityId);
         Pair<String, Long> response = matchingPublisher.unenroll(userIdActivityIdPair);
-        return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong!")
+        return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericPublisherError)
                 : ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
