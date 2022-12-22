@@ -307,13 +307,20 @@ public class UserController {
                 : ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    /**
+     * API Endpoint that performs a GET request in order to cancel an Activity.
+     *
+     * @param activityId the activityId Long attribute where the user wants to unenroll from.
+     * @return a String representing whether Activity deletion was succesful or not
+     */
     @GetMapping("/cancelActivity/{activityId}")
     public ResponseEntity<String> cancelActivity(@PathVariable Long activityId) {
         Integer statusCode = activityPublisher.cancelActivity(activityId);
-        if (statusCode == 204)
+        if (statusCode == HttpStatus.NO_CONTENT.value()) {
             return ResponseEntity.status(HttpStatus.OK).body("Activity was deleted successfully");
-        else
+        } else {
             return ResponseEntity.status(statusCode).body("Activity deletion was not successful");
+        }
     }
 
 
