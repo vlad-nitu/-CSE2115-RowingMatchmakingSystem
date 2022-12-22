@@ -21,7 +21,7 @@ public class RegistrationRequestModel {
     @NotBlank(message = "Password is mandatory and cannot be blank")
     @NotNull(message = "Password is mandatory and cannot be null")
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#\\$%\\^&\\*])[a-zA-Z\\d!@#\\$%\\^&\\*]{8,50}$",
-            message = "The password must be between 8 and 50 characters and include at least one lowercase letter," +
-                    " one uppercase letter, one number, and one special character")
+            message = "The password must be between 8 and 50 characters and include at least one lowercase letter,"
+                    + " one uppercase letter, one number, and one special character")
     private String password;
 }

@@ -58,7 +58,8 @@ public class UserController {
     @PostMapping("/createUser")
     public ResponseEntity createUser(@Valid @RequestBody User user) {
         if (!InputValidation.userIdValidation(user.getUserId())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("userId must not include special characters nor spaces!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("userId must not include special characters nor spaces!");
         }
         if (!InputValidation.userGenderValidation(user.getGender())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided gender is invalid!");
