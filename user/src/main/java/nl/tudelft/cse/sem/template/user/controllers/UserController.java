@@ -5,6 +5,7 @@ import nl.tudelft.cse.sem.template.user.domain.User;
 import nl.tudelft.cse.sem.template.user.publishers.ActivityPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.MatchingPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.NotificationPublisher;
+import nl.tudelft.cse.sem.template.user.services.UserService;
 import nl.tudelft.cse.sem.template.user.utils.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,7 +27,7 @@ public class UserController {
     private final transient MatchingPublisher matchingPublisher;
     private final transient NotificationPublisher notificationPublisher;
     private final transient AuthManager authManager;
-    
+
     private static final String noSuchUserIdError = "There is no user with the given userId!";
 
     private static final String genericPublisherError = "Something went wrong!";
@@ -57,7 +58,8 @@ public class UserController {
     @PostMapping("/createUser")
     public ResponseEntity createUser(@Valid @RequestBody User user) {
         if (!InputValidation.userIdValidation(user.getUserId())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided ID is invalid!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("userId must not include special characters nor spaces!");
         }
         if (!InputValidation.userGenderValidation(user.getGender())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided gender is invalid!");
@@ -66,9 +68,9 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("One of the positions that you provided is not valid!");
         }
-        if (!user.getUserId().equals(authManager.getNetId())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided userId does not match your netId! Use "
-                    + authManager.getNetId() + " as the userId.");
+        if (!user.getUserId().equals(authManager.getUserId())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided userId does not match your userId! Use "
+                    + authManager.getUserId() + " as the userId.");
         }
         Optional<User> foundUser = userService.findUserById(user.getUserId());
         if (foundUser.isPresent()) {
@@ -178,6 +180,7 @@ public class UserController {
                 noSuchUserIdError) : ResponseEntity.ok(responseBody);
     }
 
+
     /**
      * Find all users.
      *
@@ -203,9 +206,9 @@ public class UserController {
         if (!type.equals("training") && !type.equals("competition")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Type can only be 'training' or 'competition'.");
         }
-        if (!activity.getOwnerId().equals(authManager.getNetId())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided ownerId does not match your netId! Use "
-                    + authManager.getNetId() + " as the ownerId.");
+        if (!activity.getOwnerId().equals(authManager.getUserId())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided ownerId does not match your userId! Use "
+                    + authManager.getUserId() + " as the ownerId.");
         }
         activity.setType(type);
         BaseActivity response = activityPublisher.createActivity(activity);
@@ -221,7 +224,7 @@ public class UserController {
      */
     @GetMapping("/getAvailableActivities")
     public ResponseEntity getAvailableActivities() throws Exception {
-        String userId = authManager.getNetId();
+        String userId = authManager.getUserId();
         Set<TimeSlot> timeslots = userService.findTimeSlotsById(userId);
         if (timeslots == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(noSuchUserIdError);
@@ -238,7 +241,7 @@ public class UserController {
      */
     @GetMapping("/getNotifications")
     public ResponseEntity getNotifications() throws Exception {
-        String userId = authManager.getNetId();
+        String userId = authManager.getUserId();
         List<String> response = notificationPublisher.getNotifications(userId);
         return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericPublisherError)
                 : ResponseEntity.status(HttpStatus.OK).body(response);
@@ -257,7 +260,7 @@ public class UserController {
         if (!type.equals("accept") && !type.equals("decline")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Decision can only be 'accept' or 'decline'.");
         }
-        String userId = authManager.getNetId();
+        String userId = authManager.getUserId();
         BaseMatching response = matchingPublisher.decideMatch(userId, type, matching);
         return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericPublisherError)
                 : ResponseEntity.status(HttpStatus.OK).body(response);
@@ -270,7 +273,7 @@ public class UserController {
      */
     @GetMapping("/getUserActivities")
     public ResponseEntity getUserActivities() throws Exception {
-        String userId = authManager.getNetId();
+        String userId = authManager.getUserId();
         List<Long> response = matchingPublisher.getUserActivities(userId);
         return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericPublisherError)
                 : ResponseEntity.status(HttpStatus.OK).body(response);
@@ -284,7 +287,7 @@ public class UserController {
      */
     @PostMapping("/chooseActivity")
     public ResponseEntity chooseActivity(@RequestBody BaseMatching matching) throws Exception {
-        String userId = authManager.getNetId();
+        String userId = authManager.getUserId();
         matching.setUserId(userId);
         BaseMatching response = matchingPublisher.chooseActivity(matching);
         return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericPublisherError)
@@ -300,7 +303,7 @@ public class UserController {
      */
     @PostMapping("/unenroll")
     public ResponseEntity unenroll(@RequestBody Long activityId) throws Exception {
-        String userId = authManager.getNetId();
+        String userId = authManager.getUserId();
         Pair<String, Long> userIdActivityIdPair = new Pair<String, Long>(userId, activityId);
         Pair<String, Long> response = matchingPublisher.unenroll(userIdActivityIdPair);
         return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericPublisherError)

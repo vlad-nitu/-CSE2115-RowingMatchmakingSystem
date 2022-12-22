@@ -1,12 +1,13 @@
 package nl.tudelft.sem.template.example.authentication;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class AuthManagerTests {
     private transient AuthManager authManager;
@@ -17,7 +18,7 @@ public class AuthManagerTests {
     }
 
     @Test
-    public void getNetidTest() {
+    public void getUseridTest() {
         // Arrange
         String expected = "user123";
         var authenticationToken = new UsernamePasswordAuthenticationToken(
@@ -27,7 +28,7 @@ public class AuthManagerTests {
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
         // Act
-        String actual = authManager.getNetId();
+        String actual = authManager.getUserId();
 
         // Assert
         assertThat(actual).isEqualTo(expected);
