@@ -181,17 +181,6 @@ public class UserController {
     }
 
     /**
-     * API Endpoint that performs a GET request in order to obtain and send the timeslots of a User.
-     *
-     * @param userId - String object representing the unique identifier of a User
-     * @return - ResponseEntity object with a Set of Timeslot objects representing the timeslots
-     */
-    @GetMapping("/sendTimeSlots/{userId}")
-    public ResponseEntity<Set<TimeSlot>> sendTimeSlots(@PathVariable String userId) {
-        return ResponseEntity.ok(userService.findTimeSlotsById(userId));
-    }
-
-    /**
      * Find all users.
      *
      * @return - Response of a list of users

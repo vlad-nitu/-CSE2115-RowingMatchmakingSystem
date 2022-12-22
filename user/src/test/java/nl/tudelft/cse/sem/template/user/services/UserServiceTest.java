@@ -125,6 +125,6 @@ class UserServiceTest {
         when(userRepository.findById("id")).thenReturn(expected);
         assertThat(userService.findTimeSlotsById("id")).isEqualTo(timeSlots);
         when(userRepository.findById("")).thenReturn(Optional.empty());
-        assertThat(userService.findTimeSlotsById("")).isEqualTo(null);
+        assertThat(userService.findTimeSlotsById("")).isEqualTo(Set.of());
     }
 }
