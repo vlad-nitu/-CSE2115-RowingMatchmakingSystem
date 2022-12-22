@@ -3,10 +3,6 @@ package nl.tudelft.cse.sem.template.user.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import nl.tudelft.cse.sem.template.user.authentication.AuthManager;
-import nl.tudelft.cse.sem.template.user.publishers.ActivityPublisher;
-import nl.tudelft.cse.sem.template.user.publishers.MatchingPublisher;
-import nl.tudelft.cse.sem.template.user.publishers.NotificationPublisher;
 import nl.tudelft.cse.sem.template.user.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,10 +18,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.mockito.Mockito.when;
@@ -37,11 +35,6 @@ public class UserControllerTest {
     MockMvc mockMvc;
     @Mock
     private UserService userService;
-    @Mock
-    private AuthManager authManager;
-    private ActivityPublisher activityPublisher;
-    private MatchingPublisher matchingPublisher;
-    private NotificationPublisher notificationPublisher;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private UserController userController;
@@ -50,7 +43,6 @@ public class UserControllerTest {
     private Boolean competitive;
     private Character gender;
     private String certificate;
-    private  String email;
     private String organization;
     private Set<String> positions;
     private Set<TimeSlot> timeSlots;
@@ -64,17 +56,15 @@ public class UserControllerTest {
         organization = "Laga";
         competitive = true;
         gender = 'F';
-        email = "test@domain.com";
         positions = new HashSet<>();
         positions.add("cox");
         positions.add("coach");
         timeSlots = new HashSet<>();
         timeSlots.add(new TimeSlot(LocalDateTime.of(2022, 12, 14, 7, 00),
                 LocalDateTime.of(2022, 12, 14, 19, 15)));
-        user = new User(userId, competitive, gender, organization, certificate, email, positions, timeSlots);
+        user = new User(userId, competitive, gender, organization, certificate, positions, timeSlots);
 
-        this.userController = new UserController(userService, activityPublisher,
-                matchingPublisher, notificationPublisher, authManager);
+        this.userController = new UserController(userService);
 
         mockMvc = MockMvcBuilders
                 .standaloneSetup(userController)
@@ -98,23 +88,8 @@ public class UserControllerTest {
 
         lenient().when(userService.save(user))
                 .thenReturn(user);
-        when(authManager.getNetId()).thenReturn(user.getUserId());
 
-        user.setPositions(new HashSet<>(Set.of("invalid")));
         MvcResult mvcResult = mockMvc
-                .perform(post("/createUser")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(user))
-                )
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(status().is4xxClientError())
-                .andReturn();
-        String contentAsString = mvcResult.getResponse().getContentAsString();
-        boolean expected = contentAsString.contains("One of the positions that you provided is not valid!");
-        assertThat(expected);
-
-        user.setPositions(positions);
-        mvcResult = mockMvc
                 .perform(post("/createUser")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(user))
@@ -123,65 +98,9 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        contentAsString = mvcResult.getResponse().getContentAsString();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
         User obtained = objectMapper.readValue(contentAsString, User.class);
         assertThat(obtained).isEqualTo(user);
-
-        user.setUserId("Invalid!");
-        mvcResult = mockMvc
-                .perform(post("/createUser")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(user))
-                )
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(status().is4xxClientError())
-                .andReturn();
-        contentAsString = mvcResult.getResponse().getContentAsString();
-        expected = contentAsString.contains("The provided ID is invalid!");
-        assertThat(expected);
-
-        user.setUserId("Valid");
-        user.setGender('N');
-        mvcResult = mockMvc
-                .perform(post("/createUser")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(user))
-                )
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(status().is4xxClientError())
-                .andReturn();
-        contentAsString = mvcResult.getResponse().getContentAsString();
-        expected = contentAsString.contains("The provided gender is invalid!");
-        assertThat(expected);
-
-        user.setGender('M');
-        when(authManager.getNetId()).thenReturn("netId");
-        mvcResult = mockMvc
-                .perform(post("/createUser")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(user))
-                )
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(status().is4xxClientError())
-                .andReturn();
-        contentAsString = mvcResult.getResponse().getContentAsString();
-        expected = contentAsString.contains("The provided userId does not match your netId! Use netId as the userId");
-        assertThat(expected);
-
-        lenient().when(userService.findUserById(anyString()))
-                .thenReturn(Optional.of(new User()));
-        when(authManager.getNetId()).thenReturn(user.getUserId());
-        mvcResult = mockMvc
-                .perform(post("/createUser")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(user))
-                )
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(status().is4xxClientError())
-                .andReturn();
-        contentAsString = mvcResult.getResponse().getContentAsString();
-        expected = contentAsString.contains("User with the given ID already exists!");
-        assertThat(expected);
     }
 
     @Test
@@ -204,77 +123,43 @@ public class UserControllerTest {
 
     @Test
     public void sendCompetitivenessTest() throws Exception {
-        String expected = "true";
+        Boolean expected = true;
         when(userService.findCompetitivenessByUserId(userId)).thenReturn(expected);
         MvcResult mvcResult = mockMvc
                 .perform(get("/sendCompetitiveness/LotteKremer"))
                 .andExpect(status().isOk())
                 .andReturn();
+
         String contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("true");
-
-        expected = "false";
-        when(userService.findCompetitivenessByUserId(userId)).thenReturn(expected);
-        mvcResult = mockMvc
-                .perform(get("/sendCompetitiveness/LotteKremer"))
-                .andExpect(status().isOk())
-                .andReturn();
-        contentAsString = mvcResult.getResponse().getContentAsString();
-        assertThat(contentAsString).contains("false");
-
-        expected = "error";
-        userId = "noSuchUser";
-        when(userService.findCompetitivenessByUserId(userId)).thenReturn(expected);
-        mvcResult = mockMvc
-                .perform(get("/sendCompetitiveness/noSuchUser"))
-                .andExpect(status().is4xxClientError())
-                .andReturn();
-        contentAsString = mvcResult.getResponse().getContentAsString();
-        assertThat(contentAsString).contains("There is no user with the given userId!");
     }
 
     @Test
     public void sendGenderTest() throws Exception {
         Character expected = 'F';
         when(userService.findGenderById(userId)).thenReturn(expected);
+
         MvcResult mvcResult = mockMvc
                 .perform(get("/sendGender/LotteKremer"))
                 .andExpect(status().isOk())
                 .andReturn();
+
         String contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("F");
-
-        expected = ' ';
-        userId = "noSuchUser";
-        when(userService.findGenderById(userId)).thenReturn(expected);
-        mvcResult = mockMvc
-                .perform(get("/sendGender/noSuchUser"))
-                .andExpect(status().is4xxClientError())
-                .andReturn();
-        contentAsString = mvcResult.getResponse().getContentAsString();
-        assertThat(contentAsString).contains("There is no user with the given userId!");
     }
 
     @Test
     public void sendCertificateTest() throws Exception {
         String expected = "C4";
         when(userService.findCertificateById(userId)).thenReturn(expected);
+
         MvcResult mvcResult = mockMvc
                 .perform(get("/sendCertificate/LotteKremer"))
                 .andExpect(status().isOk())
                 .andReturn();
+
         String contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("C4");
-
-        expected = null;
-        userId = "noSuchUser";
-        when(userService.findCertificateById(userId)).thenReturn(expected);
-        mvcResult = mockMvc
-                .perform(get("/sendCertificate/noSuchUser"))
-                .andExpect(status().is4xxClientError())
-                .andReturn();
-        contentAsString = mvcResult.getResponse().getContentAsString();
-        assertThat(contentAsString).contains("There is no user with the given userId!");
     }
 
     @Test
@@ -285,62 +170,24 @@ public class UserControllerTest {
                 .perform(get("/sendOrganization/LotteKremer"))
                 .andExpect(status().isOk())
                 .andReturn();
+
         String contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("Laga");
-
-        expected = null;
-        userId = "noSuchUser";
-        when(userService.findOrganisationById(userId)).thenReturn(expected);
-        mvcResult = mockMvc
-                .perform(get("/sendOrganization/noSuchUser"))
-                .andExpect(status().is4xxClientError())
-                .andReturn();
-        contentAsString = mvcResult.getResponse().getContentAsString();
-        assertThat(contentAsString).contains("There is no user with the given userId!");
     }
 
     @Test
     public void sendPositionsTest() throws Exception {
         Set<String> expected = Set.of("Cox", "Coach");
         when(userService.findPositionsById(userId)).thenReturn(expected);
+
         MvcResult mvcResult = mockMvc
                 .perform(get("/sendPositions/LotteKremer"))
                 .andExpect(status().isOk())
                 .andReturn();
+
         String contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("Cox");
         assertThat(contentAsString).contains("Coach");
-
-        expected = null;
-        userId = "noSuchUser";
-        when(userService.findPositionsById(userId)).thenReturn(expected);
-        mvcResult = mockMvc
-                .perform(get("/sendPositions/noSuchUser"))
-                .andExpect(status().is4xxClientError())
-                .andReturn();
-        contentAsString = mvcResult.getResponse().getContentAsString();
-        assertThat(contentAsString).contains("There is no user with the given userId!");
     }
 
-    @Test
-    void sendEmail() throws Exception {
-        String expected = "test@domain.com";
-        when(userService.findEmailById(userId)).thenReturn(expected);
-        MvcResult mvcResult = mockMvc
-                .perform(get("/sendEmail/LotteKremer"))
-                .andExpect(status().isOk())
-                .andReturn();
-        String contentAsString = mvcResult.getResponse().getContentAsString();
-        assertThat(contentAsString).contains("test@domain.com");
-
-        expected = null;
-        userId = "noSuchUser";
-        when(userService.findEmailById(userId)).thenReturn(expected);
-        mvcResult = mockMvc
-                .perform(get("/sendEmail/noSuchUser"))
-                .andExpect(status().is4xxClientError())
-                .andReturn();
-        contentAsString = mvcResult.getResponse().getContentAsString();
-        assertThat(contentAsString).contains("There is no user with the given userId!");
-    }
 }

@@ -127,34 +127,4 @@ class NotificationControllerTest {
         assertThat(contentAsString).contains("type is mandatory and cannot be blank");
         assertThat(contentAsString).contains("userId is mandatory and cannot be blank");
     }
-
-    @Test
-    void invalidType() throws Exception {
-        Notification notification = new Notification("User", "Owner", 1L, "bad type", "cox");
-        MvcResult mvcResult = mockMvc
-                .perform(post("/notifyUser")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(notification))
-                )
-                .andExpect(status().isBadRequest())
-                .andReturn();
-
-        String contentAsString = mvcResult.getResponse().getContentAsString();
-        assertThat(contentAsString).contains("Invalid notification type");
-    }
-
-    @Test
-    void invalidPosition() throws Exception {
-        Notification notification = new Notification("User", "Owner", 1L, "notifyUser", "bad position");
-        MvcResult mvcResult = mockMvc
-                .perform(post("/notifyUser")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(notification))
-                )
-                .andExpect(status().isBadRequest())
-                .andReturn();
-
-        String contentAsString = mvcResult.getResponse().getContentAsString();
-        assertThat(contentAsString).contains("Invalid position");
-    }
 }

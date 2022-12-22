@@ -2,8 +2,9 @@ package com.example.activitymicroservice.utils;
 
 import lombok.AllArgsConstructor;
 
-import java.util.Collection;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @AllArgsConstructor
 public class InputValidation {
@@ -21,7 +22,7 @@ public class InputValidation {
      * @param positions - Set of Strings representing the positions
      * @return true, if all positions are valid, or false otherwise.
      */
-    public static boolean validatePositions(Collection<String> positions) {
+    public static boolean validatePositions(Set<String> positions) {
         for (String position : positions) {
             if (!validPositions.contains(position)) {
                 return false;
@@ -29,16 +30,6 @@ public class InputValidation {
         }
 
         return true;
-    }
-
-    /**
-     * Checks whether the all the elements of the set of positions provided as input are valid.
-     *
-     * @param position the positions
-     * @return true, if all positions are valid, or false otherwise.
-     */
-    public static boolean validatePosition(String position) {
-        return validPositions.contains(position);
     }
 
 

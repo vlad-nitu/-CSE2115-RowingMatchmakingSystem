@@ -96,71 +96,16 @@ public class ActivityService {
      *                 position occupied respectively
      * @throws Exception if the position does not exist in the Activity.
      */
-    public void takeSpot(Pair<Long, String> posTaken) throws Exception {
+    public boolean takeSpot(Pair<Long, String> posTaken) throws Exception {
         Optional<Activity> activity = this.findActivityOptional(posTaken.getFirst());
         if (activity.isEmpty()) {
-            throw new Exception("Activity was not found");
+            throw new Exception("The activity ID does not exist");
         }
-        //Probably will be needed for a test because it says that the list is immutable, so I create a new one
-        List<String> updatedPositions = new ArrayList<>(activity.get().getPositions());
-        if (updatedPositions.remove(posTaken.getSecond())) {
-            activity.get().setPositions(updatedPositions);
-            activityRepository.save(activity.get());
-        } else {
+        boolean isPosition = activity.get().getPositions().remove(posTaken.getSecond());
+        if (!isPosition) {
             throw new Exception("The wished position was not found");
         }
         return true;
     }
 
-    /**
-     * Occupies a certain position in an Activity.
-     *
-     * @param posTaken Pair of a Long and String object representing the ID of the activity and the
-     *                 position occupied respectively
-     * @throws Exception if the position does not exist in the Activity.
-     */
-    public List<String> unenrollPosition(Pair<Long, String> posTaken) throws Exception {
-        Optional<Activity> activity = this.findActivityOptional(posTaken.getFirst());
-        if (activity.isEmpty()) {
-            throw new Exception("Activity was not found");
-        }
-        //need to do this for a test because it says that the list is immutable, so I create a new one
-        List<String> updatedPositions = new ArrayList<>(activity.get().getPositions());
-        updatedPositions.add(posTaken.getSecond());
-        activity.get().setPositions(updatedPositions);
-        activityRepository.save(activity.get());
-        return activity.get().getPositions();
-    }
-
-    /**
-     * Checks if an Activity can be approached by a User with a certain set of features.
-     *
-     * @param activity the given Activity
-     * @param gender the gender of the User
-     * @param certificate the certificate of the User
-     * @param organisation the organisation of the User
-     * @param competitiveness the competitiveness of the User
-     * @param listPositions the list of positions the User can occupy
-     * @param position the position the User wants to occupy
-     * @return a boolean representing weather the User is eligible for the Activity or not
-     */
-    public boolean checkUser(Activity activity, Character gender,
-                             String certificate, String organisation,
-                             boolean competitiveness, List<String> listPositions, String position) {
-        if (activity instanceof Competition) {
-            if (((Competition) activity).isCompetitive() != competitiveness) {
-                return false;
-            }
-            if (((Competition) activity).getGender() != gender) {
-                return false;
-            }
-            if (!Objects.equals(((Competition) activity).getOrganisation(), organisation)) {
-                return false;
-            }
-        }
-        if (!Objects.equals(activity.getCertificate(), certificate)) {
-            return false;
-        }
-        return listPositions.contains(position);
-    }
 }

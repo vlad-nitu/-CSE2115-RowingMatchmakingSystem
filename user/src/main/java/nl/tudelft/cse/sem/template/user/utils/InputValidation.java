@@ -16,7 +16,6 @@ public class InputValidation {
             "starboard side rower",
             "sculling rower");
 
-    private static final Set<Character> possibleGenders = Set.of('M', 'm', 'F', 'f');
 
     /**
      * Validates the userId by checking if it contains special characters.
@@ -30,16 +29,6 @@ public class InputValidation {
 
         return !matcher.find();
 
-    }
-
-    /**
-     * Validates the user's gender by checking if it follows the required format.
-     *
-     * @param gender - the character defining the user's indicated gender
-     * @return boolean defining whether the input passed the validation
-     */
-    public static boolean userGenderValidation(Character gender) {
-        return possibleGenders.contains(gender);
     }
 
     /**

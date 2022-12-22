@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+//TODO handle the case of Optional not being present
 @AllArgsConstructor
 @Service
-@SuppressWarnings("PMD.ReturnEmptyCollectionRatherThanNull")
 public class UserService {
 
     private final transient UserRepository userRepository;
@@ -35,8 +35,7 @@ public class UserService {
      * @return User object if a match is found, null otherwise
      */
     public Optional<User> findUserById(String userId) {
-        Optional<User> user = userRepository.findById(userId);
-        return user;
+        return userRepository.findById(userId);
     }
 
     /**
@@ -53,28 +52,22 @@ public class UserService {
      * Finds competitiveness corresponding to the given userId.
      *
      * @param userId - the ID of the user
-     * @return String defining whether the user is competitive or an indication that an error was encountered
+     * @return boolean defining whether the user is competetive
      */
-    public String findCompetitivenessByUserId(String userId) {
+    public boolean findCompetitivenessByUserId(String userId) {
         Optional<User> user = userRepository.findById(userId);
-        if (user.isPresent()) {
-            return user.get().getIsCompetitive() ? "true" : "false";
-        }
-        return "error";
+        return user.get().isCompetitive();
     }
 
     /**
      * Finds the gender corresponding to the given userId.
      *
      * @param userId - the ID of the user
-     * @return character defining the user's gender or an indication that an error was encountered
+     * @return character defining the user's gender
      */
     public Character findGenderById(String userId) {
         Optional<User> user = userRepository.findById(userId);
-        if (user.isPresent()) {
-            return user.get().getGender();
-        }
-        return ' ';
+        return user.get().getGender();
     }
 
 
@@ -82,7 +75,7 @@ public class UserService {
      * Finds the certificate possessed by the user with the given ID.
      *
      * @param userId - the ID of the user
-     * @return String containing the user's certificate or an indication that an error was encountered
+     * @return String containing the user's certificate
      */
     public String findCertificateById(String userId) {
         Optional<User> user = userRepository.findById(userId);
@@ -97,28 +90,11 @@ public class UserService {
      * Finds the organisation corresponding to the given userId.
      *
      * @param userId - the ID of the user
-     * @return String containing the organisation the user is a part of or an indication that an error was encountered
+     * @return String containing the organisation the user is a part of
      */
     public String findOrganisationById(String userId) {
         Optional<User> user = userRepository.findById(userId);
-        if (user.isPresent()) {
-            return user.get().getOrganisation();
-        }
-        return null;
-    }
-
-    /**
-     * Finds the e-mail address corresponding to the given userId.
-     *
-     * @param userId - the ID of the user
-     * @return String containing the user's e-mail address or an indication that an error was encountered
-     */
-    public String findEmailById(String userId) {
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isPresent()) {
-            return user.get().getEmail();
-        }
-        return null;
+        return user.get().getOrganisation();
     }
 
 
@@ -127,14 +103,10 @@ public class UserService {
      *
      * @param userId - the ID of the user
      * @return Set {@literal <}String{@literal >} containing the positions the user is able to fulfill
-     *      or an indication that an error was encountered
      */
     public Set<String> findPositionsById(String userId) {
         Optional<User> user = userRepository.findById(userId);
-        if (user.isPresent()) {
-            return user.get().getPositions();
-        }
-        return null;
+        return user.get().getPositions();
     }
 
     /**
