@@ -65,7 +65,9 @@ public class MatchingController {
 
         List<Long> selectedActivities = matchingServiceImpl.findActivitiesByUserId(userId);
         List<TimeSlot> occTimeSlots = activityPublisher.getTimeSlots(selectedActivities);
+        System.out.println(occTimeSlots.size());
         List<TimeSlot> newTimeSlots = FunctionUtils.filterTimeSlots(timeSlots, occTimeSlots);
+        System.out.println(newTimeSlots.size());
         List<Pair<Long, String>> possibleActivities = activityPublisher.getAvailableActivities(userId, newTimeSlots);
         return ResponseEntity.ok(possibleActivities);
     }

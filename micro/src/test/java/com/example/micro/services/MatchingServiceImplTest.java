@@ -46,10 +46,10 @@ public class MatchingServiceImplTest {
     @Test
     public void findActivitiesByUserIdTest() {
         Optional<List<Matching>> result = Optional.of(new ArrayList<>(List.of(
-                new Matching("a", 1L, "a", true),
+                new Matching("a", 1L, "a", false),
                 new Matching("a", 2L, "a", true))));
         when(matchingRepository.findMatchingsByUserId("a")).thenReturn(result);
-        List<Long> sol = List.of(1L, 2L);
+        List<Long> sol = List.of(1L);
         assertThat(matchingServiceImpl.findActivitiesByUserId("a")).isEqualTo(sol);
     }
 

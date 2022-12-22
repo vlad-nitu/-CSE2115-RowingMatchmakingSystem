@@ -35,6 +35,7 @@ public class MatchingServiceImpl {
         return matchingRepository.findMatchingsByUserId(userId)
                 .orElse(new ArrayList<Matching>())
                 .stream()
+                .filter(x -> !x.getPending())
                 .map(Matching::getActivityId)
                 .collect(Collectors.toList());
     }
