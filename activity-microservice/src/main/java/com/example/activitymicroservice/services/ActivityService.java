@@ -14,6 +14,7 @@ import java.util.*;
 
 @AllArgsConstructor
 @Service
+@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 public class ActivityService {
 
     private static LocalDateTime checkTime;
