@@ -14,6 +14,7 @@ import com.example.activitymicroservice.utils.Pair;
 import com.example.activitymicroservice.utils.TimeSlot;
 import com.example.activitymicroservice.validators.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -71,14 +72,34 @@ public class ActivityController {
 
     }
 
+    /**
+     * API Endpoint that performs a Get Request to obtain the Owner ID of a given activity.
+     *
+     * @param activityId Long object that represents an Activity's ID
+     * @return a String object representing the Owner ID
+     */
     @GetMapping("/sendOwnerId/{activityId}")
     public ResponseEntity<String> sendOwnerId(@PathVariable Long activityId) {
-        return ResponseEntity.ok(this.activityService.findActivity(activityId).getOwnerId());
+        if (!activityService.findActivityOptional(activityId).isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(activityService.findActivityOptional(activityId).get().getOwnerId());
     }
 
+    /**
+     * API Endpoint that performs a Post Request to return a List of
+     * TimeSlots representing the TimeSlots of a list of Activities.
+     *
+     * @param activityIds List Object representing the list of Activities
+     * @return a List containing the TimeSlots of those Activities.
+     */
     @PostMapping("/sendTimeSlots")
     public ResponseEntity<List<TimeSlot>> sendTimeSlots(@RequestBody List<Long> activityIds) {
-        return ResponseEntity.ok(this.activityService.getTimeSlotsByActivityIds(activityIds));
+        try {
+            return ResponseEntity.ok(this.activityService.getTimeSlotsByActivityIds(activityIds));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     /**
@@ -90,13 +111,13 @@ public class ActivityController {
      * @return ResponseEntity object that specifies if the request could be done
      */
     @PostMapping("/takeAvailableSpot")
-    public ResponseEntity takeAvailableSpot(@RequestBody @Valid Pair<Long, String> posTaken) {
+    public ResponseEntity<String> takeAvailableSpot(@RequestBody @Valid Pair<Long, String> posTaken) {
         try {
             if (!InputValidation.validatePosition(posTaken.getSecond())) {
                 return ResponseEntity.badRequest().body("Invalid Position");
             }
             activityService.takeSpot(posTaken);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(posTaken.getSecond());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().build();
@@ -115,14 +136,19 @@ public class ActivityController {
     @GetMapping("/check/{userId}/{activityId}/{position}")
     public ResponseEntity<Boolean> check(@PathVariable String userId,
                                          @PathVariable Long activityId, @PathVariable String position) {
-        Activity activity = this.activityService.findActivity(activityId);
+
+        if (!this.activityService.findActivityOptional(activityId).isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Activity activity = this.activityService.findActivityOptional(activityId).get();
 
         if (!activity.getPositions().contains(position)) {
             return ResponseEntity.ok(false);
         }
 
         List<Activity> activities = activityService.getActivitiesByTimeSlot(List.of(activity),
-                new ArrayList<>(userPublisher.getTimeslots(userId)), LocalDateTime.now());
+                userPublisher.getTimeslots(userId));
         if (activities.isEmpty()) {
             return ResponseEntity.ok(false);
         }
@@ -176,7 +202,7 @@ public class ActivityController {
 
 
         List<Activity> activityList =
-                activityService.getActivitiesByTimeSlot(activityService.findAll(), timeSlots, LocalDateTime.now());
+                activityService.getActivitiesByTimeSlot(activityService.findAll(), timeSlots);
         for (Activity activity : activityList) {
             for (String position : activity.getPositions()) {
                 Validator validator;
@@ -245,6 +271,16 @@ public class ActivityController {
             e.printStackTrace();
             return ResponseEntity.status(500).build();
         }
+    }
+
+    /**
+     * Find all activities.
+     *
+     * @return - Response of a list of users
+     */
+    @GetMapping(value = "/findAll", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Activity>> findAllUsers() {
+        return ResponseEntity.ok(activityService.findAll());
     }
 
     /**

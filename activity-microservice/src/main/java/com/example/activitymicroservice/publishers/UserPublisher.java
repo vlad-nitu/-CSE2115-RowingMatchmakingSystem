@@ -103,15 +103,15 @@ public class UserPublisher {
      * @param userId the id of the user
      * @return the certificate of the user
      */
-    public Set<TimeSlot> getTimeslots(String userId) {
+    public List<TimeSlot> getTimeslots(String userId) {
         try {
             @Cleanup
             Response res = activityUtils.getRequest("/sendTimeSlots/" + userId);
-            Set<TimeSlot> timeSlots = res.readEntity(new GenericType<>() {});
+            List<TimeSlot> timeSlots = res.readEntity(new GenericType<>() {});
             return  timeSlots;
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return new HashSet<>();
+            return new ArrayList<>();
         }
     }
 

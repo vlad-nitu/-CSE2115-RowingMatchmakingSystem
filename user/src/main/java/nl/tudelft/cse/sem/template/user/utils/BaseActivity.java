@@ -2,6 +2,7 @@ package nl.tudelft.cse.sem.template.user.utils;
 
 import lombok.*;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -15,7 +16,7 @@ public class BaseActivity {
     private Long activityId;
     private String ownerId;
     private TimeSlot timeSlot;
-    private Set<String> positions;
+    private List<String> positions;
     private String certificate;
     private boolean isCompetitive;
     private char gender;
@@ -36,7 +37,7 @@ public class BaseActivity {
      */
     public BaseActivity(Long activityId, String ownerId,
                         TimeSlot timeSlot,
-                        Set<String> positions,
+                        List<String> positions,
                         String certificate,
                         boolean isCompetitive,
                         char gender,

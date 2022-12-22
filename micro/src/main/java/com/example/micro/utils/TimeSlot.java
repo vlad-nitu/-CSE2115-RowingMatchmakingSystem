@@ -11,16 +11,20 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
+
 @NoArgsConstructor
 @EqualsAndHashCode
 public class TimeSlot {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @Column(name = "starttime", nullable = false)
     private LocalDateTime start;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @Column(name = "endtime", nullable = false)
     private LocalDateTime end;
 
     public TimeSlot(LocalDateTime start, LocalDateTime end) {

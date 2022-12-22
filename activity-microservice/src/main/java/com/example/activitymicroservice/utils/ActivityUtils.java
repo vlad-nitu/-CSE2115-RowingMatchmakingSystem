@@ -1,5 +1,7 @@
 package com.example.activitymicroservice.utils;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,6 +13,8 @@ import java.util.SplittableRandom;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
+@AllArgsConstructor
+@Getter
 public class ActivityUtils {
 
     private final transient String server;
