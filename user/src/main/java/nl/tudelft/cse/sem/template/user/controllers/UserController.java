@@ -307,6 +307,12 @@ public class UserController {
                 : ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @GetMapping("/cancelActivity/{activityId}")
+    public ResponseEntity<BaseActivity> cancelActivity(@PathVariable Long activityId) {
+        return ResponseEntity.ok(activityPublisher.cancelActivity(activityId));
+    }
+
+
     /**
      * Handles BAD_REQUEST exceptions thrown by the Validator of User entities
      * Acts as a parser of the BAD_REQUEST exception messages bodies.

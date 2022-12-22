@@ -31,7 +31,27 @@ public class ActivityPublisher {
     public BaseActivity createActivity(BaseActivity activity) throws Exception {
         @Cleanup
         Response res = userUtils.postRequest("/createActivity", activity);
-        return res.getStatus() == 200 ? res.readEntity(new GenericType<BaseActivity>(){}) : null;
+        return res.getStatus() == 200 ? res.readEntity(new GenericType<BaseActivity>() {
+        }) : null;
     }
 
+    /**
+     * Cancel an activity.
+     *
+     * @param activityId the id of the activity
+     * @return the canceled activity
+     */
+    public BaseActivity cancelActivity(Long activityId) {
+
+        try {
+            @Cleanup
+            Response res = userUtils.postRequest("/cancelActivity/" + activityId, null);
+            BaseActivity activity = res.readEntity(new GenericType<>() {
+            });
+            return activity;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
 }
