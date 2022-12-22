@@ -74,14 +74,34 @@ public class ActivityController {
 
     }
 
+    /**
+     * API Endpoint that performs a Get Request to obtain the Owner ID of a given activity.
+     *
+     * @param activityId Long object that represents an Activity's ID
+     * @return a String object representing the Owner ID
+     */
     @GetMapping("/sendOwnerId/{activityId}")
     public ResponseEntity<String> sendOwnerId(@PathVariable Long activityId) {
-        return ResponseEntity.ok(this.activityService.findActivity(activityId).getOwnerId());
+        if (!activityService.findActivityOptional(activityId).isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(activityService.findActivityOptional(activityId).get().getOwnerId());
     }
 
+    /**
+     * API Endpoint that performs a Post Request to return a List of
+     * TimeSlots representing the TimeSlots of a list of Activities.
+     *
+     * @param activityIds List Object representing the list of Activities
+     * @return a List containing the TimeSlots of those Activities.
+     */
     @PostMapping("/sendTimeSlots")
     public ResponseEntity<List<TimeSlot>> sendTimeSlots(@RequestBody List<Long> activityIds) {
-        return ResponseEntity.ok(this.activityService.getTimeSlotsByActivityIds(activityIds));
+        try {
+            return ResponseEntity.ok(this.activityService.getTimeSlotsByActivityIds(activityIds));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     /**
@@ -93,13 +113,13 @@ public class ActivityController {
      * @return ResponseEntity object that specifies if the request could be done
      */
     @PostMapping("/takeAvailableSpot")
-    public ResponseEntity.BodyBuilder takeAvailableSpot(@RequestBody Pair<Long, String> posTaken) {
+    public ResponseEntity<String> takeAvailableSpot(@RequestBody Pair<Long, String> posTaken) {
         try {
             this.activityService.takeSpot(posTaken);
-            return ResponseEntity.ok();
+            return ResponseEntity.ok(posTaken.getSecond());
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 

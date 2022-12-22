@@ -6,20 +6,29 @@ import com.example.activitymicroservice.domain.Training;
 import com.example.activitymicroservice.publishers.MatchingPublisher;
 import com.example.activitymicroservice.publishers.UserPublisher;
 import com.example.activitymicroservice.services.ActivityService;
+import com.example.activitymicroservice.utils.Pair;
+import com.example.activitymicroservice.utils.TimeSlot;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -102,5 +111,114 @@ class ActivityControllerTest {
 
         Activity returned = objectMapper.readValue(res.getResponse().getContentAsString(), Activity.class);
         assertThat(returned).isEqualTo(act);
+    }
+
+    @Test
+    void getOwnerIdSuccess() throws Exception {
+        Activity activity = new Training();
+        activity.setOwnerId("Razvan");
+        activity.setActivityId(1L);
+        when(activityService.findActivityOptional(activity.getActivityId())).thenReturn(Optional.of(activity));
+        MvcResult res = mockMvc
+                .perform(get("/sendOwnerId/1"))
+                .andExpect(status().isOk())
+                .andReturn();
+        assertThat(res.getResponse().getContentAsString()).isEqualTo("Razvan");
+    }
+
+    @Test
+    void getOwnerIdFail() throws Exception {
+        Activity activity = new Training();
+        activity.setOwnerId("Razvan");
+        activity.setActivityId(1L);
+        when(activityService.findActivityOptional(2L)).thenReturn(Optional.empty());
+        MvcResult res = mockMvc
+                .perform(get("/sendOwnerId/2"))
+                .andExpect(status().isNotFound())
+                .andReturn();
+        assertThat(res.getResponse().getContentAsString()).isEmpty();
+    }
+
+    @Test
+    void getTimeSlotsSuccess() throws Exception {
+        TimeSlot timeSlot1 = new TimeSlot(
+                LocalDateTime.of(2003, 12, 1, 23, 15),
+                LocalDateTime.of(2002, 11, 2, 15, 0));
+        Activity activity1 = new Training();
+        activity1.setActivityId(1L);
+        activity1.setTimeSlot(timeSlot1);
+
+        TimeSlot timeSlot2 = new TimeSlot(
+                LocalDateTime.of(2004, 12, 1, 23, 15),
+                LocalDateTime.of(2002, 11, 2, 15, 0));
+        Activity activity2 = new Training();
+        activity2.setActivityId(2L);
+        activity2.setTimeSlot(timeSlot2);
+
+        when(activityService.getTimeSlotsByActivityIds(List.of(1L, 2L))).thenReturn(List.of(timeSlot1, timeSlot2));
+        MvcResult res = mockMvc
+                .perform(post("/sendTimeSlots")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(List.of(1L, 2L))))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = res.getResponse().getContentAsString();
+        List<TimeSlot> obtained = objectMapper.readValue(contentAsString, new TypeReference<List<TimeSlot>>() {});
+        assertThat(obtained.size()).isEqualTo(2);
+        assertThat(obtained.get(0)).isEqualTo(timeSlot1);
+        assertThat(obtained.get(1)).isEqualTo(timeSlot2);
+    }
+
+    @Test
+    void getTimeSlotsFail() throws Exception {
+        TimeSlot timeSlot1 = new TimeSlot(
+                LocalDateTime.of(2003, 12, 1, 23, 15),
+                LocalDateTime.of(2002, 11, 2, 15, 0));
+        Activity activity1 = new Training();
+        activity1.setActivityId(1L);
+        activity1.setTimeSlot(timeSlot1);
+
+
+        when(activityService.getTimeSlotsByActivityIds(List.of(1L, 2L))).thenThrow(new Exception());
+        MvcResult res = mockMvc
+                .perform(post("/sendTimeSlots")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(List.of(1L, 2L))))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        assertThat(res.getResponse().getContentAsString()).isEmpty();
+    }
+
+    @Test
+    void takeAvailableSpotSuccess() throws Exception {
+        Activity activity = new Training();
+        activity.setActivityId(1L);
+        activity.setPositions(Set.of("cox", "rower"));
+        Pair<Long, String> pair = new Pair<>(1L, "cox");
+        when(activityService.takeSpot(pair)).thenReturn(true);
+        MvcResult res = mockMvc
+                .perform(post("/takeAvailableSpot")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(pair)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        assertThat(res.getResponse().getContentAsString()).isEqualTo("cox");
+    }
+
+    @Test
+    void takeAvailableSpotFail() throws Exception {
+        Activity activity = new Training();
+        activity.setActivityId(1L);
+        activity.setPositions(Set.of("cox", "rower"));
+        Pair<Long, String> pair = new Pair<>(2L, "cox");
+        when(activityService.takeSpot(pair)).thenThrow(new Exception());
+        MvcResult res = mockMvc
+                .perform(post("/takeAvailableSpot")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(pair)))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        assertThat(res.getResponse().getContentAsString()).isEqualTo("");
     }
 }

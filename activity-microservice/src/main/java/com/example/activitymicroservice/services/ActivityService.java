@@ -74,10 +74,14 @@ public class ActivityService {
      * @param activityIds a list of activity ids
      * @return a list of timeslots
      */
-    public List<TimeSlot> getTimeSlotsByActivityIds(List<Long> activityIds) {
+    public List<TimeSlot> getTimeSlotsByActivityIds(List<Long> activityIds) throws Exception {
         List<TimeSlot> timeSlots = new ArrayList<>();
         for (Long activityId : activityIds) {
-            timeSlots.add(findActivity(activityId).getTimeSlot());
+            if (findActivityOptional(activityId).isPresent()) {
+                timeSlots.add(findActivityOptional(activityId).get().getTimeSlot());
+            } else {
+                throw new Exception("The activity IDs are wrong");
+            }
         }
         return timeSlots;
     }
@@ -89,12 +93,16 @@ public class ActivityService {
      *                 position occupied respectively
      * @throws Exception if the position does not exist in the Activity.
      */
-    public void takeSpot(Pair<Long, String> posTaken) throws Exception {
-        Activity activity = this.findActivity(posTaken.getFirst());
-        boolean isPosition = activity.getPositions().remove(posTaken.getSecond());
+    public boolean takeSpot(Pair<Long, String> posTaken) throws Exception {
+        Optional<Activity> activity = this.findActivityOptional(posTaken.getFirst());
+        if (activity.isEmpty()) {
+            throw new Exception("The activity ID does not exist");
+        }
+        boolean isPosition = activity.get().getPositions().remove(posTaken.getSecond());
         if (!isPosition) {
             throw new Exception("The wished position was not found");
         }
+        return true;
     }
 
     /**
