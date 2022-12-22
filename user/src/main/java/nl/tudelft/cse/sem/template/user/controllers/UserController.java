@@ -1,10 +1,11 @@
 package nl.tudelft.cse.sem.template.user.controllers;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
 import nl.tudelft.cse.sem.template.user.authentication.AuthManager;
+import nl.tudelft.cse.sem.template.user.domain.User;
 import nl.tudelft.cse.sem.template.user.publishers.ActivityPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.MatchingPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.NotificationPublisher;
+import nl.tudelft.cse.sem.template.user.services.UserService;
 import nl.tudelft.cse.sem.template.user.utils.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,11 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import nl.tudelft.cse.sem.template.user.domain.User;
-import nl.tudelft.cse.sem.template.user.services.UserService;
 
 import javax.validation.Valid;
-import javax.ws.rs.core.Response;
 import java.util.*;
 
 @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
@@ -190,7 +188,7 @@ public class UserController {
         return ResponseEntity.ok(userService.findAll());
     }
 
-    // TODO: debug, write tests
+    //TODO: manually test and possibly debug all the APIs below
     /**
      * API Endpoint that performs a POST request in order to create an activity.
      *
@@ -212,11 +210,6 @@ public class UserController {
         BaseActivity response = activityPublisher.createActivity(activity);
         return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericPublisherError)
                 : ResponseEntity.status(HttpStatus.OK).body(response);
-        /* try {
-            return ResponseEntity.ok(activity);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong.");
-        }*/
     }
 
     /**
