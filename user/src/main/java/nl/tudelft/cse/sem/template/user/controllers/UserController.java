@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import nl.tudelft.cse.sem.template.user.services.UserService;
 
 import javax.validation.Valid;
 import java.util.*;
@@ -47,7 +48,6 @@ public class UserController {
         this.authManager = authManager;
     }
 
-    //TODO: decide whether userId should be automatically injected as the userId
     /**
      * API Endpoint that performs a POST request in order to save a new User to the database.
      *
@@ -180,6 +180,7 @@ public class UserController {
                 noSuchUserIdError) : ResponseEntity.ok(responseBody);
     }
 
+
     /**
      * Find all users.
      *
@@ -209,6 +210,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided ownerId does not match your userId! Use "
                     + authManager.getUserId() + " as the ownerId.");
         }
+        activity.setType(type);
         BaseActivity response = activityPublisher.createActivity(activity);
         return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericPublisherError)
                 : ResponseEntity.status(HttpStatus.OK).body(response);
@@ -295,19 +297,35 @@ public class UserController {
     /**
      * API Endpoint that performs a POST request in order to unenroll from an activity.
      *
-     * @param activity the activity where the user wants to unenroll from.
+     * @param activityId the activityId Long attribute where the user wants to unenroll from.
      * @return the userId and activityId pair from the matching that is now cancelled
      *      or the encountered problem description
      */
     @PostMapping("/unenroll")
-    public ResponseEntity unenroll(@RequestBody BaseActivity activity) throws Exception {
+    public ResponseEntity unenroll(@RequestBody Long activityId) throws Exception {
         String userId = authManager.getUserId();
-        Long activityId = activity.getActivityId();
         Pair<String, Long> userIdActivityIdPair = new Pair<String, Long>(userId, activityId);
         Pair<String, Long> response = matchingPublisher.unenroll(userIdActivityIdPair);
         return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericPublisherError)
                 : ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    /**
+     * API Endpoint that performs a GET request in order to cancel an Activity.
+     *
+     * @param activityId the activityId Long attribute where the user wants to unenroll from.
+     * @return a String representing whether Activity deletion was succesful or not
+     */
+    @GetMapping("/cancelActivity/{activityId}")
+    public ResponseEntity<String> cancelActivity(@PathVariable Long activityId) {
+        Integer statusCode = activityPublisher.cancelActivity(activityId);
+        if (statusCode == HttpStatus.NO_CONTENT.value()) {
+            return ResponseEntity.status(HttpStatus.OK).body("Activity was deleted successfully");
+        } else {
+            return ResponseEntity.status(statusCode).body("Activity deletion was not successful");
+        }
+    }
+
 
     /**
      * Handles BAD_REQUEST exceptions thrown by the Validator of User entities

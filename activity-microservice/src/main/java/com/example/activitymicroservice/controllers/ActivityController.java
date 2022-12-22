@@ -152,7 +152,7 @@ public class ActivityController {
      * @return - 200_OK, if activity was created, or 400_BAD_REQUEST if the Activity object failed input validation stage
      */
     @PostMapping("/createActivity")
-    public ResponseEntity<Activity> createActivity(@RequestBody Activity activity) {
+    public ResponseEntity<Activity> createActivity(@Valid @RequestBody Activity activity) {
 
         if (InputValidation.validatePositions(activity.getPositions())) {
             return ResponseEntity.ok(this.activityService.save(activity));

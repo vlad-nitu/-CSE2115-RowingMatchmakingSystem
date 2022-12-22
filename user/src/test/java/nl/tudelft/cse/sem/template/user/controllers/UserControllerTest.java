@@ -18,7 +18,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -532,7 +534,7 @@ public class UserControllerTest {
         MvcResult mvcResult = mockMvc
                 .perform(post("/unenroll")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(baseActivity))
+                        .content(objectMapper.writeValueAsString(1L))
                 )
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
@@ -545,7 +547,7 @@ public class UserControllerTest {
         mvcResult = mockMvc
                 .perform(post("/unenroll")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(baseActivity))
+                        .content(objectMapper.writeValueAsString(1L))
                 )
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is4xxClientError())
@@ -608,5 +610,29 @@ public class UserControllerTest {
         contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("The provided ownerId does not match your userId! Use valid as the ownerId.");
 
+    }
+
+    @Test
+    void cancelActivityValid() throws Exception {
+        when(activityPublisher.cancelActivity(1L)).thenReturn(204);
+        MvcResult mvcResult = mockMvc
+                .perform(get("/cancelActivity/1"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Activity was deleted successfully");
+    }
+
+    @Test
+    void cancelActivityError() throws Exception {
+        when(activityPublisher.cancelActivity(1L)).thenReturn(404);
+        MvcResult mvcResult = mockMvc
+                .perform(get("/cancelActivity/1"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("Activity deletion was not successful");
     }
 }

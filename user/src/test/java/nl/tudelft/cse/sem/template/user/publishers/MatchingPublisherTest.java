@@ -5,6 +5,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,14 +41,15 @@ public class MatchingPublisherTest {
     public void getAvailableActivitiesTestValid() throws Exception {
         List<Pair<Long, String>> activities = List.of(new Pair<Long, String>(1L, "message"));
         Response res = Response.ok(activities).build();
-        when(userUtils.postRequest("/getAvailableActivities/LotteKremer", timeSlots)).thenReturn(res);
+        when(userUtils.postRequest("/getAvailableActivities/LotteKremer", new ArrayList<>(timeSlots))).thenReturn(res);
         assertThat(matchingPublisher.getAvailableActivities("LotteKremer", timeSlots)).isEqualTo(activities);
     }
 
     @Test
     public void getAvailableActivitiesTestInvalid() throws Exception {
         Response response = Response.status(400).build();
-        when(userUtils.postRequest("/getAvailableActivities/LotteKremer", timeSlots)).thenReturn(response);
+        when(userUtils.postRequest("/getAvailableActivities/LotteKremer", new ArrayList<>(timeSlots)))
+                .thenReturn(response);
         assertThat(matchingPublisher.getAvailableActivities("LotteKremer", timeSlots))
                 .isEqualTo(null);
     }
