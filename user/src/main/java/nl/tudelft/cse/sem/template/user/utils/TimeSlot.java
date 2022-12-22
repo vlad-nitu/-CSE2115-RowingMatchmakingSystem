@@ -19,13 +19,13 @@ public class TimeSlot {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @Column(name = "starttime")
+    @Column(name = "starttime", nullable = false)
     private LocalDateTime start;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @Column(name = "endtime")
+    @Column(name = "endtime", nullable = false)
     private LocalDateTime end;
 
     public TimeSlot(LocalDateTime start, LocalDateTime end) {
