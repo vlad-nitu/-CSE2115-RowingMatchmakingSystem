@@ -1,13 +1,16 @@
 package com.example.activitymicroservice.publishers;
 
 import com.example.activitymicroservice.utils.ActivityUtils;
+import com.example.activitymicroservice.utils.TimeSlot;
 import lombok.Cleanup;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserPublisher {
@@ -91,6 +94,24 @@ public class UserPublisher {
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return "";
+        }
+    }
+
+    /**
+     * Request the time slots of the user.
+     *
+     * @param userId the id of the user
+     * @return the certificate of the user
+     */
+    public Set<TimeSlot> getTimeslots(String userId) {
+        try {
+            @Cleanup
+            Response res = activityUtils.getRequest("/sendTimeSlots/" + userId);
+            Set<TimeSlot> timeSlots = res.readEntity(new GenericType<>() {});
+            return  timeSlots;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new HashSet<>();
         }
     }
 

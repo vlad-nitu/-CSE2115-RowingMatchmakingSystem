@@ -4,6 +4,8 @@ package com.example.activitymicroservice.controllers;
 
 import com.example.activitymicroservice.authentication.AuthManager;
 import com.example.activitymicroservice.domain.Activity;
+import com.example.activitymicroservice.domain.Competition;
+import com.example.activitymicroservice.domain.Training;
 import com.example.activitymicroservice.publishers.MatchingPublisher;
 import com.example.activitymicroservice.publishers.UserPublisher;
 import com.example.activitymicroservice.services.ActivityService;
@@ -18,15 +20,22 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.io.InvalidObjectException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
 public class ActivityController {
+    private final transient String coxCertificate = "cox";
     private final transient ActivityService activityService;
     private final transient UserPublisher userPublisher;
     private final transient MatchingPublisher matchingPublisher;
     private final transient AuthManager authManager;
+    private final transient Validator training;
+    private final transient Validator trainingCox;
+    private final transient Validator competition;
+    private final transient Validator competitionCox;
 
     /**
      * Constructor for injection.
@@ -42,6 +51,24 @@ public class ActivityController {
         this.userPublisher = userPublisher;
         this.matchingPublisher = matchingPublisher;
         this.authManager = authManager;
+
+        training = new PositionValidator();
+
+        trainingCox = new CertificateValidator();
+        trainingCox.setNext(training);
+
+        Validator organizationValidator = new OrganisationValidator();
+        organizationValidator.setNext(training);
+
+        Validator competitivenessValidator = new CompetitivenessValidator();
+        competitivenessValidator.setNext(organizationValidator);
+
+        competition = new GenderValidator();
+        competition.setNext(competitivenessValidator);
+
+        competitionCox = new CertificateValidator();
+        competitionCox.setNext(competition);
+
     }
 
     @GetMapping("/sendOwnerId/{activityId}")
@@ -63,13 +90,16 @@ public class ActivityController {
      * @return ResponseEntity object that specifies if the request could be done
      */
     @PostMapping("/takeAvailableSpot")
-    public ResponseEntity.BodyBuilder takeAvailableSpot(@RequestBody Pair<Long, String> posTaken) {
+    public ResponseEntity takeAvailableSpot(@RequestBody @Valid Pair<Long, String> posTaken) {
         try {
-            this.activityService.takeSpot(posTaken);
-            return ResponseEntity.ok();
+            if (!InputValidation.validatePosition(posTaken.getSecond())) {
+                return ResponseEntity.badRequest().body("Invalid Position");
+            }
+            activityService.takeSpot(posTaken);
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -86,13 +116,33 @@ public class ActivityController {
     public ResponseEntity<Boolean> check(@PathVariable String userId,
                                          @PathVariable Long activityId, @PathVariable String position) {
         Activity activity = this.activityService.findActivity(activityId);
-        Character gender = this.userPublisher.getGender(userId);
-        boolean competitiveness = this.userPublisher.getCompetitiveness(userId);
-        String organisation = this.userPublisher.getOrganisation(userId);
-        String certificate = this.userPublisher.getCertificate(userId);
-        List<String> listPositions = this.userPublisher.getPositions(userId);
-        return ResponseEntity.ok(this.activityService.checkUser(activity, gender,
-                certificate, organisation, competitiveness, listPositions, position));
+
+        if (!activity.getPositions().contains(position)) {
+            return ResponseEntity.ok(false);
+        }
+
+        List<Activity> activities = activityService.getActivitiesByTimeSlot(List.of(activity),
+                new ArrayList<>(userPublisher.getTimeslots(userId)), LocalDateTime.now());
+        if (activities.isEmpty()) {
+            return ResponseEntity.ok(false);
+        }
+        Validator validator;
+        if (activity instanceof Competition && position.equals(coxCertificate)) {
+            validator = competitionCox;
+        } else if (activity instanceof Competition) {
+            validator = competition;
+        } else if (activity instanceof Training && position.equals(coxCertificate)) {
+            validator = trainingCox;
+        } else {
+            validator = training;
+        }
+        try {
+            boolean isValid = validator.handle(activity, userPublisher, position, userId);
+            return ResponseEntity.ok(isValid);
+        } catch (InvalidObjectException e) {
+            return ResponseEntity.ok(false);
+        }
+
     }
 
     /**
@@ -121,29 +171,29 @@ public class ActivityController {
      */
     @PostMapping("/sendAvailableActivities/{userId}")
     public ResponseEntity<List<Pair<Long, String>>> sendAvailableActivities(@RequestBody List<TimeSlot> timeSlots,
-                                                                            @PathVariable String userId)
-            throws InvalidObjectException {
+                                                                            @PathVariable String userId) {
         List<Pair<Long, String>> list = new ArrayList<>();
-        Validator positionValidator = new PositionValidator();
 
-        Validator certificateValidator = new CertificateValidator();
-        certificateValidator.setNext(positionValidator);
 
-        Validator genderValidator = new GenderValidator();
-        genderValidator.setNext(certificateValidator);
-
-        Validator organizationValidator = new OrganisationValidator();
-        organizationValidator.setNext(genderValidator);
-
-        Validator competitivenessValidator = new CompetitivenessValidator();
-        competitivenessValidator.setNext(organizationValidator);
-
-        List<Activity> activityList = activityService.getActivitiesByTimeSlot(timeSlots);
+        List<Activity> activityList =
+                activityService.getActivitiesByTimeSlot(activityService.findAll(), timeSlots, LocalDateTime.now());
         for (Activity activity : activityList) {
             for (String position : activity.getPositions()) {
-                boolean isValid = competitivenessValidator.handle(activity, userPublisher, position, userId);
-                if (isValid) {
+                Validator validator;
+                if (activity instanceof Competition && position.equals(coxCertificate)) {
+                    validator = competitionCox;
+                } else if (activity instanceof Competition) {
+                    validator = competition;
+                } else if (activity instanceof Training && position.equals(coxCertificate)) {
+                    validator = trainingCox;
+                } else {
+                    validator = training;
+                }
+                try {
+                    validator.handle(activity, userPublisher, position, userId);
                     list.add(new Pair<>(activity.getActivityId(), position));
+                } catch (InvalidObjectException e) {
+                    continue;
                 }
             }
         }
@@ -171,6 +221,30 @@ public class ActivityController {
         }
         activityService.deleteById(activityId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(activity.get());
+    }
+
+
+
+    /**
+     * API Endpoint that receives a POST request and opens up a position
+     * that was taken before.
+     *
+     * @param posTaken Pair of a Long and String object representing the ID of the activity and the
+     *                 position occupied respectively
+     * @return ResponseEntity object that specifies if the request could be done
+     */
+    @PostMapping("/unenrollPosition")
+    public ResponseEntity unenrollPosition(@RequestBody @Valid Pair<Long, String> posTaken) {
+        if (!InputValidation.validatePosition(posTaken.getSecond())) {
+            return ResponseEntity.badRequest().body("Invalid position");
+        }
+        try {
+            activityService.unenrollPosition(posTaken);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
+        }
     }
 
     /**
