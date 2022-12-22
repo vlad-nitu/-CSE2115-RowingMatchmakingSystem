@@ -80,10 +80,14 @@ public class ActivityService {
             if (findActivityOptional(activityId).isPresent()) {
                 timeSlots.add(findActivityOptional(activityId).get().getTimeSlot());
             } else {
-                throw new Exception("The activity IDs are wrong");
+                break;
             }
         }
-        return timeSlots;
+        if (timeSlots.size() == activityIds.size()) { // check whether all activityIds were valid
+            return timeSlots;
+        } else {
+            throw new Exception("The activity IDs are wrong");
+        }
     }
 
     /**
