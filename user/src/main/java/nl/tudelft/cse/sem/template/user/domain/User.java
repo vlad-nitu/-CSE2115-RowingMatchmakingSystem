@@ -4,10 +4,7 @@ import lombok.*;
 import nl.tudelft.cse.sem.template.user.utils.TimeSlot;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.util.Set;
 
 @Entity
@@ -28,11 +25,8 @@ public class User {
 
     @NotNull(message = "Competitiveness level is mandatory and cannot be null")
     @Column(name = "iscompetitive")
-    private boolean isCompetitive;
+    private Boolean isCompetitive;
 
-    //TODO change to String or validate with use of InputValidation.java
-    //@NotNull(message = "Gender is mandatory and cannot be null")
-    //@Pattern(regexp = "\\b[MF]{1}\\b", message = "Gender must be specified by M or F")
     @Column(name = "gender")
     private char gender;
 
@@ -42,11 +36,17 @@ public class User {
     @Column(name = "organisation")
     private String organisation;
 
-    //TODO possibly add regex matching for the known certificates pattern
+
     @NotNull(message = "Certificate cannot be null")
     @Size(max = 30, message = "Certificate name must be shorter than 30 characters")
     @Column(name = "certificate")
     private String certificate;
+
+    @Email
+    @NotNull(message = "E-mail cannot be null")
+    @NotBlank(message = "E-mail cannot be blank")
+    @Column(name = "email")
+    private String email;
 
     @ElementCollection
     @NotNull(message = "Positions list cannot be null")

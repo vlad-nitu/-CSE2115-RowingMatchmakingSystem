@@ -9,6 +9,7 @@ import com.example.activitymicroservice.domain.Training;
 import com.example.activitymicroservice.publishers.MatchingPublisher;
 import com.example.activitymicroservice.publishers.UserPublisher;
 import com.example.activitymicroservice.services.ActivityService;
+import com.example.activitymicroservice.utils.InputValidation;
 import com.example.activitymicroservice.utils.Pair;
 import com.example.activitymicroservice.utils.TimeSlot;
 import com.example.activitymicroservice.validators.Validator;
@@ -24,6 +25,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.io.InvalidObjectException;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -93,13 +95,16 @@ public class ActivityController {
      * @return ResponseEntity object that specifies if the request could be done
      */
     @PostMapping("/takeAvailableSpot")
-    public ResponseEntity.BodyBuilder takeAvailableSpot(@RequestBody Pair<Long, String> posTaken) {
+    public ResponseEntity takeAvailableSpot(@RequestBody @Valid Pair<Long, String> posTaken) {
         try {
-            this.activityService.takeSpot(posTaken);
-            return ResponseEntity.ok();
+            if (!InputValidation.validatePosition(posTaken.getSecond())) {
+                return ResponseEntity.badRequest().body("Invalid Position");
+            }
+            activityService.takeSpot(posTaken);
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -145,9 +150,20 @@ public class ActivityController {
 
     }
 
+    /**
+     * API enpoint that allows for creating an Activity object and persisting it to the DB.
+     *
+     * @param activity - Activity object that you will create
+     * @return - 200_OK, if activity was created, or 400_BAD_REQUEST if the Activity object failed input validation stage
+     */
     @PostMapping("/createActivity")
     public ResponseEntity<Activity> createActivity(@RequestBody Activity activity) {
-        return ResponseEntity.ok(this.activityService.save(activity));
+
+        if (InputValidation.validatePositions(activity.getPositions())) {
+            return ResponseEntity.ok(this.activityService.save(activity));
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     /**
@@ -210,6 +226,30 @@ public class ActivityController {
         }
         activityService.deleteById(activityId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(activity.get());
+    }
+
+
+
+    /**
+     * API Endpoint that receives a POST request and opens up a position
+     * that was taken before.
+     *
+     * @param posTaken Pair of a Long and String object representing the ID of the activity and the
+     *                 position occupied respectively
+     * @return ResponseEntity object that specifies if the request could be done
+     */
+    @PostMapping("/unenrollPosition")
+    public ResponseEntity unenrollPosition(@RequestBody @Valid Pair<Long, String> posTaken) {
+        if (!InputValidation.validatePosition(posTaken.getSecond())) {
+            return ResponseEntity.badRequest().body("Invalid position");
+        }
+        try {
+            activityService.unenrollPosition(posTaken);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
+        }
     }
 
     /**
