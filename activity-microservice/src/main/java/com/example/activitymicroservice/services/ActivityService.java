@@ -10,10 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @AllArgsConstructor
 @Service
@@ -37,7 +34,8 @@ public class ActivityService {
      * @return List of Activities
      */
     public List<Activity> getActivitiesByTimeSlot(List<Activity> activities,
-                                                  List<TimeSlot> timeSlots, LocalDateTime currentTime) {
+                                                  Set<TimeSlot> timeSlots) {
+        LocalDateTime currentTime = LocalDateTime.now();
         List<Activity> activityList = new ArrayList<>();
         for (Activity activity : activities) {
             if (activity instanceof Competition) {
@@ -109,35 +107,4 @@ public class ActivityService {
         return true;
     }
 
-    /**
-     * Checks if an Activity can be approached by a User with a certain set of features.
-     *
-     * @param activity        the given Activity
-     * @param gender          the gender of the User
-     * @param certificate     the certificate of the User
-     * @param organisation    the organisation of the User
-     * @param competitiveness the competitiveness of the User
-     * @param listPositions   the list of positions the User can occupy
-     * @param position        the position the User wants to occupy
-     * @return a boolean representing weather the User is eligible for the Activity or not
-     */
-    public boolean checkUser(Activity activity, Character gender,
-                             String certificate, String organisation,
-                             boolean competitiveness, List<String> listPositions, String position) {
-        if (activity instanceof Competition) {
-            if (((Competition) activity).isCompetitive() != competitiveness) {
-                return false;
-            }
-            if (((Competition) activity).getGender() != gender) {
-                return false;
-            }
-            if (!Objects.equals(((Competition) activity).getOrganisation(), organisation)) {
-                return false;
-            }
-        }
-        if (!Objects.equals(activity.getCertificate(), certificate)) {
-            return false;
-        }
-        return listPositions.contains(position);
-    }
 }

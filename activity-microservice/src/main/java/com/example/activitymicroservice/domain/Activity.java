@@ -45,7 +45,6 @@ public abstract class Activity {
     @NotNull(message = "Positions list cannot be null")
     @Column(name = "positions")
     private List<@NotBlank(message = "Position cannot be blank")
-                @NotNull(message = "Position cannot be null")
                     @Size(min = 3, max = 20, message = "Position name must be between 3 and 20 characters")
             String> positions;
 

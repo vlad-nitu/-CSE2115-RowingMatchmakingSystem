@@ -135,14 +135,19 @@ public class ActivityController {
     @GetMapping("/check/{userId}/{activityId}/{position}")
     public ResponseEntity<Boolean> check(@PathVariable String userId,
                                          @PathVariable Long activityId, @PathVariable String position) {
-        Activity activity = this.activityService.findActivity(activityId);
+
+        if (!this.activityService.findActivityOptional(activityId).isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Activity activity = this.activityService.findActivityOptional(activityId).get();
 
         if (!activity.getPositions().contains(position)) {
             return ResponseEntity.ok(false);
         }
 
         List<Activity> activities = activityService.getActivitiesByTimeSlot(List.of(activity),
-                new ArrayList<>(userPublisher.getTimeslots(userId)), LocalDateTime.now());
+                userPublisher.getTimeslots(userId));
         if (activities.isEmpty()) {
             return ResponseEntity.ok(false);
         }
@@ -179,13 +184,13 @@ public class ActivityController {
      * @return a List of Pair(Activity.ID, Position)
      */
     @PostMapping("/sendAvailableActivities/{userId}")
-    public ResponseEntity<List<Pair<Long, String>>> sendAvailableActivities(@RequestBody List<TimeSlot> timeSlots,
+    public ResponseEntity<List<Pair<Long, String>>> sendAvailableActivities(@RequestBody Set<TimeSlot> timeSlots,
                                                                             @PathVariable String userId) {
         List<Pair<Long, String>> list = new ArrayList<>();
 
 
         List<Activity> activityList =
-                activityService.getActivitiesByTimeSlot(activityService.findAll(), timeSlots, LocalDateTime.now());
+                activityService.getActivitiesByTimeSlot(activityService.findAll(), timeSlots);
         for (Activity activity : activityList) {
             for (String position : activity.getPositions()) {
                 Validator validator;
