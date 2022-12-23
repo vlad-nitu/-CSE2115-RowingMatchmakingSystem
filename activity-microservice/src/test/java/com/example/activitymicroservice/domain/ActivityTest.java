@@ -52,43 +52,16 @@ class ActivityTest {
         assertThat(training).isEqualTo(training2);
     }
 
+
     @Test
-    void testEqualsLargeFalse() {
+    void testEqualsLargePasses() {
         assertThat(training).isEqualTo(training2);
     }
 
     @Test
-    void testEqualsLargePasses() {
-        Activity training = new Training();
-        training.setActivityId(1L);
-        training.setOwnerId("Vlad");
-        training.setTimeSlot(new TimeSlot(LocalDateTime.now(), LocalDateTime.now().plusMinutes(30)));
-        training.setPositions(List.of("cox", "coach"));
-        training.setCertificate("C4");
-        Activity training2 = new Training();
-        training2.setActivityId(1L);
-        training2.setOwnerId("Vlad");
-        training2.setTimeSlot(new TimeSlot(LocalDateTime.now(), LocalDateTime.now().plusMinutes(30)));
-        training2.setPositions(List.of("cox", "coach"));
-        training2.setCertificate("C4");
-        assertThat(training).isNotEqualTo(training2);
-    }
-
-    @Test
     void testEqualsLargeCombinations() {
-        Activity training = new Training();
-        training.setActivityId(1L);
-        training.setOwnerId("Vlad");
-        training.setTimeSlot(new TimeSlot(LocalDateTime.now(), LocalDateTime.now().plusMinutes(30)));
-        training.setPositions(List.of("cox", "coach"));
-        training.setCertificate("C4");
-        Activity training2 = new Training();
-        training2.setActivityId(1L);
-        training2.setOwnerId("Vlad");
-        training2.setTimeSlot(new TimeSlot(LocalDateTime.now(), LocalDateTime.now().plusMinutes(30)));
-        training2.setPositions(List.of("cox", "coach"));
-        training2.setCertificate("C4");
-        assertThat(training).isNotEqualTo(training2);
+
+        assertThat(training).isEqualTo(training2);
         training2.setActivityId(2L);
         assertThat(training).isNotEqualTo(training2);
         training2.setActivityId(training.getActivityId());

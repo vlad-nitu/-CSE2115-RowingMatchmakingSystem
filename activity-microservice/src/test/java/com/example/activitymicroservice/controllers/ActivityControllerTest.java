@@ -301,7 +301,7 @@ class ActivityControllerTest {
         lenient().when(userPublisher.getGender("Razvan")).thenReturn('M');
         lenient().when(userPublisher.getCompetitiveness("Razvan")).thenReturn(true);
         lenient().when(userPublisher.getOrganisation("Razvan")).thenReturn("33a");
-        lenient().when(userPublisher.getPositions("Razvan")).thenReturn(List.of("cox", "rower"));
+        lenient().when(userPublisher.getPositions("Razvan")).thenReturn(Set.of("cox", "rower"));
         MvcResult res = mockMvc
                 .perform(get("/check/Razvan/1/cox"))
                 .andExpect(status().isOk())
@@ -334,7 +334,7 @@ class ActivityControllerTest {
         lenient().when(userPublisher.getGender("Razvan")).thenReturn('M');
         lenient().when(userPublisher.getCompetitiveness("Razvan")).thenReturn(true);
         lenient().when(userPublisher.getOrganisation("Razvan")).thenReturn("33a");
-        lenient().when(userPublisher.getPositions("Razvan")).thenReturn(List.of("cox", "rower"));
+        lenient().when(userPublisher.getPositions("Razvan")).thenReturn(Set.of("cox", "rower"));
         MvcResult res = mockMvc
                 .perform(get("/check/Razvan/1/rower"))
                 .andExpect(status().isOk())
@@ -370,7 +370,7 @@ class ActivityControllerTest {
         lenient().when(userPublisher.getGender("Razvan")).thenReturn('M');
         lenient().when(userPublisher.getCompetitiveness("Razvan")).thenReturn(true);
         lenient().when(userPublisher.getOrganisation("Razvan")).thenReturn("33a");
-        lenient().when(userPublisher.getPositions("Razvan")).thenReturn(List.of("cox", "rower"));
+        lenient().when(userPublisher.getPositions("Razvan")).thenReturn(Set.of("cox", "rower"));
         MvcResult res = mockMvc
                 .perform(get("/check/Razvan/1/rower"))
                 .andExpect(status().isOk())
@@ -408,7 +408,7 @@ class ActivityControllerTest {
         lenient().when(userPublisher.getGender("Razvan")).thenReturn('M');
         lenient().when(userPublisher.getCompetitiveness("Razvan")).thenReturn(true);
         lenient().when(userPublisher.getOrganisation("Razvan")).thenReturn("33a");
-        lenient().when(userPublisher.getPositions("Razvan")).thenReturn(List.of("cox", "rower"));
+        lenient().when(userPublisher.getPositions("Razvan")).thenReturn(Set.of("cox", "rower"));
         MvcResult res = mockMvc
                 .perform(get("/check/Razvan/1/cox"))
                 .andExpect(status().isOk())

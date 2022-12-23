@@ -96,7 +96,7 @@ public class UserPublisherTest {
 
     @Test
     void getPositionsGood() throws Exception {
-        List<String> list = List.of("cox", "rower");
+        Set<String> list = Set.of("cox", "rower");
         Response res = Response.ok(list).build();
         when(activityUtils.getRequest("/sendPositions/" + userId)).thenReturn(res);
         assertThat(userPublisher.getPositions(userId)).isEqualTo(list);

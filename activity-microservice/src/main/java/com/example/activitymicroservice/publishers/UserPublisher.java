@@ -123,15 +123,15 @@ public class UserPublisher {
      * @param userId the id of the user
      * @return a set with the positions the user can fill in
      */
-    public List<String> getPositions(String userId) {
+    public Set<String> getPositions(String userId) {
         try {
             @Cleanup
             Response res = activityUtils.getRequest("/sendPositions/" + userId);
-            List<String> positions = res.readEntity(new GenericType<>() {});
+            Set<String> positions = res.readEntity(new GenericType<>() {});
             return  positions;
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            List<String> emptyList = new ArrayList<>();
+            Set<String> emptyList = new HashSet<>();
             return emptyList;
         }
     }

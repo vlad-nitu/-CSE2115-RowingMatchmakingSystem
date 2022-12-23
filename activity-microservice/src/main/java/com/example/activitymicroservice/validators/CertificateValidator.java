@@ -10,7 +10,7 @@ import java.util.Objects;
 
 public class CertificateValidator extends BaseValidator {
     //The latter in the list the more priority it has
-    private static List<String> certificates = List.of("C4", "4+", "8+");
+    private static List<String> certificates = new ArrayList<>(List.of("C4", "4+", "8+"));
 
     @Override
     public boolean handle(Activity activity, UserPublisher userPublisher,
@@ -30,7 +30,7 @@ public class CertificateValidator extends BaseValidator {
         certificates = new ArrayList<>(list);
     }
 
-    public static void addCertificateList(String certificate) {
+    public static void addCertificate(String certificate) {
         certificates.add(certificate);
     }
 }
