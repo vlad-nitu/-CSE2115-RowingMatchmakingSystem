@@ -1,0 +1,127 @@
+{
+	"info": {
+		"_postman_id": "27f8b309-fba4-4b27-9c46-3ff2cd4f4049",
+		"name": "Notification",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19926803"
+	},
+	"item": [
+		{
+			"name": "notifyUser",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\": \"\",\r\n    \"targetId\": \"\",\r\n    \"activityId\": \"\",\r\n    \"type\": \"\",\r\n    \"position\": \"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8086/notifyUser",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8086",
+					"path": [
+						"notifyUser"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "example body",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userId\": \"user\",\r\n    \"targetId\": \"target\",\r\n    \"activityId\": \"20\",\r\n    \"type\": \"notifyUser\",\r\n    \"position\": \"cox\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8086/notifyUser",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"notifyUser"
+							]
+						}
+					},
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": null
+				}
+			]
+		},
+		{
+			"name": "getNotifications",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8086//getNotifications/{{targetId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8086",
+					"path": [
+						"",
+						"getNotifications",
+						"{{targetId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJub3RpZmljYXRpb25Vc2VyIiwiZXhwIjoxNjcxODg2ODE1LCJpYXQiOjE2NzE4MDA0MTV9.o2LBIyaNCL1jnHaxawj5AtQlRRtoy48RxlG8f7VbgpA1Vy5QE-ud5eXcN7SBeKAO8sSOhb2pSijO4o-25Qjh5g",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "targetId",
+			"value": "inputHere"
+		}
+	]
+}
