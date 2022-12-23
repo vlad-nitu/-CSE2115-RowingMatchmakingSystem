@@ -32,11 +32,11 @@ Thus, we are expected to  develop an application that will match available peopl
 
 - Run `gradle <microservice_package_name> :bootRun` in order to start a specific microservice.
 - We provide 5 subsystems, which are placed in the following packages
-    - `authentication-microservice` - Authentication
-    - `activity-microservice` - Activity
-    - `micro` - Matching
-    - `notification-microservice` - Notification
-    - `user` - User
+    - `authentication-microservice` - Authentication,hosted on `localhost:8081`
+    - `activity-microservice` - Activity, hosted on `localhost:8084`
+    - `micro` - Matching, hosted on `localhost:8083`
+    - `notification-microservice` - Notification, hosted on `localhost:8086`
+    - `user` - User, hosted on `localhost:8085`
 
 ## How to use the system
 
