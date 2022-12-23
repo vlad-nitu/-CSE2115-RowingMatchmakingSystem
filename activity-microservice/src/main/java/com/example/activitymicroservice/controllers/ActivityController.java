@@ -218,7 +218,7 @@ public class ActivityController {
                 try {
                     validator.handle(activity, userPublisher, position, userId);
                     list.add(new Pair<>(activity.getActivityId(), position));
-                } catch (InvalidObjectException e) {
+                } catch (Exception e) {
                     continue;
                 }
             }

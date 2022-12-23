@@ -11,6 +11,7 @@ import com.example.activitymicroservice.utils.InputValidation;
 import com.example.activitymicroservice.utils.Pair;
 import com.example.activitymicroservice.utils.TimeSlot;
 import com.example.activitymicroservice.validators.CertificateValidator;
+import com.example.activitymicroservice.validators.Validator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -54,6 +55,7 @@ class ActivityControllerTest {
     void setUp() {
         ActivityController activityController = new ActivityController(activityService, userPublisher,
                 matchingPublisher, authManager);
+
         mockMvc = MockMvcBuilders
                 .standaloneSetup(activityController)
                 .build();
@@ -166,7 +168,8 @@ class ActivityControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
         String contentAsString = res.getResponse().getContentAsString();
-        List<TimeSlot> obtained = objectMapper.readValue(contentAsString, new TypeReference<List<TimeSlot>>() {});
+        List<TimeSlot> obtained = objectMapper.readValue(contentAsString, new TypeReference<List<TimeSlot>>() {
+        });
         assertThat(obtained.size()).isEqualTo(2);
         assertThat(obtained.get(0)).isEqualTo(timeSlot1);
         assertThat(obtained.get(1)).isEqualTo(timeSlot2);
@@ -483,7 +486,8 @@ class ActivityControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
         String contentAsString = res.getResponse().getContentAsString();
-        List<Activity> obtained = objectMapper.readValue(contentAsString, new TypeReference<List<Activity>>() {});
+        List<Activity> obtained = objectMapper.readValue(contentAsString, new TypeReference<List<Activity>>() {
+        });
         assertThat(obtained).isEqualTo(activityList);
     }
 
@@ -585,5 +589,76 @@ class ActivityControllerTest {
                         .content(objectMapper.writeValueAsString(activity)))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void sendAvailableActivitiesEmptyTest() throws Exception {
+        when(activityService.getActivitiesByTimeSlot(any(), any())).thenReturn(List.of());
+        List<TimeSlot> timeSlots = new ArrayList<>();
+
+        MvcResult res = mockMvc
+                .perform(post("/sendAvailableActivities/Razvan")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(timeSlots)))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = res.getResponse().getContentAsString();
+        List<Pair<Long, String>> obtained = objectMapper.readValue(contentAsString, List.class);
+        assertThat(obtained).isEqualTo(List.of());
+    }
+
+    @Test
+    void sendAvailableActivitiesLargeTest() throws Exception {
+
+        Activity training = new Training();
+        training.setActivityId(1L);
+        training.setOwnerId("Vlad");
+        training.setTimeSlot(new TimeSlot(LocalDateTime.of(2022, 10, 10, 10, 10),
+                LocalDateTime.of(2023, 10, 10, 10, 10)));
+        training.setCertificate("C4");
+        training.setPositions(List.of("cox"));
+        Activity competition = new Competition();
+        competition.setActivityId(1L);
+        competition.setOwnerId("Vlad");
+        competition.setTimeSlot(new TimeSlot(LocalDateTime.of(2022, 10, 10, 10, 10),
+                LocalDateTime.of(2023, 10, 10, 10, 10)));
+        competition.setCertificate("C4");
+        competition.setPositions(List.of("cox"));
+
+        Activity competition1 = new Competition();
+        competition1.setActivityId(1L);
+        competition1.setOwnerId("Vlad");
+        competition1.setTimeSlot(new TimeSlot(LocalDateTime.of(2022, 10, 10, 10, 10),
+                LocalDateTime.of(2023, 10, 10, 10, 10)));
+        competition1.setCertificate("C4");
+        competition1.setPositions(List.of("coach"));
+
+        Activity training1 = new Training();
+        training1.setActivityId(1L);
+        training1.setOwnerId("Vlad");
+        training1.setTimeSlot(new TimeSlot(LocalDateTime.of(2022, 10, 10, 10, 10),
+                LocalDateTime.of(2023, 10, 10, 10, 10)));
+        training1.setCertificate("C4");
+        training1.setPositions(List.of("coach"));
+
+        List<Activity> acitvityList = new ArrayList<>();
+        acitvityList.add(training);
+        acitvityList.add(competition);
+        acitvityList.add(training1);
+        acitvityList.add(competition1);
+
+        when(activityService.getActivitiesByTimeSlot(any(), any())).thenReturn(acitvityList);
+
+        List<TimeSlot> timeSlots = new ArrayList<>();
+        MvcResult res = mockMvc
+                .perform(post("/sendAvailableActivities/Razvan")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(timeSlots)))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = res.getResponse().getContentAsString();
+        List<Pair<Long, String>> obtained = objectMapper.readValue(contentAsString, List.class);
+        assertThat(obtained.size()).isEqualTo(0);
+    }
+
 
 }
