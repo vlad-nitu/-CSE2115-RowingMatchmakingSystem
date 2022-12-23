@@ -1,0 +1,485 @@
+{
+	"info": {
+		"_postman_id": "4b2baa96-61b6-44bb-8d36-2c8aeb8f826f",
+		"name": "Activity",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19926803"
+	},
+	"item": [
+		{
+			"name": "createActivity",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"type\": \"\",\r\n    \"ownerId\": \"\",\r\n    \"timeSlot\": {},\r\n    \"positions\": [],\r\n    \"certificate\": \"\",\r\n    \"competitive\": false,\r\n    \"gender\": \"\",\r\n    \"organisation\": \"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8084/createActivity",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8084",
+					"path": [
+						"createActivity"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "exmple creation",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"training\",\r\n    \"ownerId\": \"ownerId\",\r\n    \"timeSlot\": {\r\n        \"start\": \"2003-12-12 10:05\",\r\n        \"end\": \"2004-12-12 10:05\"\r\n    },\r\n    \"positions\": [\r\n        \"cox\",\r\n        \"coach\"\r\n    ],\r\n    \"certificate\": \"C4\",\r\n    \"competitive\": true,\r\n    \"gender\": \"F\",\r\n    \"organisation\": \"SEM33A\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8084/createActivity",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8084",
+							"path": [
+								"createActivity"
+							]
+						}
+					},
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": null
+				}
+			]
+		},
+		{
+			"name": "sendOwnerId",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8084/sendOwnerId/{{activityId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8084",
+					"path": [
+						"sendOwnerId",
+						"{{activityId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "sendTimeSlots",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8084/sendTimeSlots",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8084",
+					"path": [
+						"sendTimeSlots"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "example body",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    38,\r\n    39,\r\n    40\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8084/sendTimeSlots",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8084",
+							"path": [
+								"sendTimeSlots"
+							]
+						}
+					},
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": null
+				}
+			]
+		},
+		{
+			"name": "check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8084/check/{{userId}}/{{activityId}}/{{position}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8084",
+					"path": [
+						"check",
+						"{{userId}}",
+						"{{activityId}}",
+						"{{position}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "sendAvailableActivities",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8084/sendAvailableActivities/{{userId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8084",
+					"path": [
+						"sendAvailableActivities",
+						"{{userId}}"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "example timeslots",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n        \"start\": \"2022-12-22 20:00\",\r\n        \"end\": \"2022-12-22 21:00\"\r\n    }, \r\n    {\r\n        \"start\": \"2022-12-24 20:00\",\r\n        \"end\": \"2022-12-24 21:00\"\r\n    }, \r\n    {\r\n        \"start\": \"2022-12-22 20:00\",\r\n        \"end\": \"2023-01-01 21:00\"\r\n    } \r\n\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8084/sendAvailableActivities/{{userId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8084",
+							"path": [
+								"sendAvailableActivities",
+								"{{userId}}"
+							]
+						}
+					},
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": null
+				}
+			]
+		},
+		{
+			"name": "cancelActivity",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8084/cancelActivity/{{activityId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8084",
+					"path": [
+						"cancelActivity",
+						"{{activityId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "unenrollPosition",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first\": \"\",\r\n    \"second\": \"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8084/unenrollPosition",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8084",
+					"path": [
+						"unenrollPosition"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "example pair",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"first\": \"20\",\r\n    \"second\": \"cox\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8084/unenrollPosition",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8084",
+							"path": [
+								"unenrollPosition"
+							]
+						}
+					},
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": null
+				}
+			]
+		},
+		{
+			"name": "takeAvailableSpot",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first\": \"20\",\r\n    \"second\": \"cox\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8084/takeAvailableSpot",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8084",
+					"path": [
+						"takeAvailableSpot"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "example pair",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"first\": \"20\",\r\n    \"second\": \"cox\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8084/takeAvailableSpot",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8084",
+							"path": [
+								"takeAvailableSpot"
+							]
+						}
+					},
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": null
+				}
+			]
+		},
+		{
+			"name": "http://localhost:8084/editActivity/30",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n        \"type\": \"\",\r\n        \"ownerId\": \"\",\r\n        \"timeSlot\": {},\r\n        \"positions\": [],\r\n        \"certificate\": \"\",\r\n        \"gender\": \"\",\r\n        \"organisation\": \"\",\r\n        \"competitive\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8084/editActivity/{{activityId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8084",
+					"path": [
+						"editActivity",
+						"{{activityId}}"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "example edit",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"type\": \"competition\",\r\n        \"ownerId\": \"Razvan1\",\r\n        \"timeSlot\": {\r\n            \"start\": \"2022-12-25 15:00\",\r\n            \"end\": \"2045-12-25 17:00\"\r\n        },\r\n        \"positions\": [\r\n            \"coach\",\r\n            \"razvan\",\r\n            \"vlad\"\r\n        ],\r\n        \"certificate\": \"C4\",\r\n        \"gender\": \"F\",\r\n        \"organisation\": \"SEM##\",\r\n        \"competitive\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8084/editActivity/{{activityId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8084",
+							"path": [
+								"editActivity",
+								"{{activityId}}"
+							]
+						}
+					},
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": null
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJub3RpZmljYXRpb25Vc2VyIiwiZXhwIjoxNjcxODg2ODE1LCJpYXQiOjE2NzE4MDA0MTV9.o2LBIyaNCL1jnHaxawj5AtQlRRtoy48RxlG8f7VbgpA1Vy5QE-ud5eXcN7SBeKAO8sSOhb2pSijO4o-25Qjh5g",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "ownerId\n",
+			"value": "InputHere\n",
+			"type": "string"
+		},
+		{
+			"key": "activityId",
+			"value": "inputHere"
+		},
+		{
+			"key": "userId",
+			"value": "inputHere"
+		},
+		{
+			"key": "position",
+			"value": "inputHere"
+		}
+	]
+}
