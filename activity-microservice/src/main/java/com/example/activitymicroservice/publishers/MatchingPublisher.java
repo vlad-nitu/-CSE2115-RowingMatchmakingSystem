@@ -2,6 +2,8 @@ package com.example.activitymicroservice.publishers;
 
 import com.example.activitymicroservice.utils.ActivityUtils;
 import lombok.Cleanup;
+import lombok.Generated;
+import lombok.Getter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Generated
 public class MatchingPublisher {
 
     private final transient ActivityUtils activityUtils;
