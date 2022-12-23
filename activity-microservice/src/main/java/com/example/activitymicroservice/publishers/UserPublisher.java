@@ -3,6 +3,7 @@ package com.example.activitymicroservice.publishers;
 import com.example.activitymicroservice.utils.ActivityUtils;
 import com.example.activitymicroservice.utils.TimeSlot;
 import lombok.Cleanup;
+import lombok.Generated;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.GenericType;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service
+@Generated
 public class UserPublisher {
 
     private final transient ActivityUtils activityUtils;
@@ -121,15 +123,15 @@ public class UserPublisher {
      * @param userId the id of the user
      * @return a set with the positions the user can fill in
      */
-    public List<String> getPositions(String userId) {
+    public Set<String> getPositions(String userId) {
         try {
             @Cleanup
             Response res = activityUtils.getRequest("/sendPositions/" + userId);
-            List<String> positions = res.readEntity(new GenericType<>() {});
+            Set<String> positions = res.readEntity(new GenericType<>() {});
             return  positions;
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            List<String> emptyList = new ArrayList<>();
+            Set<String> emptyList = new HashSet<>();
             return emptyList;
         }
     }
