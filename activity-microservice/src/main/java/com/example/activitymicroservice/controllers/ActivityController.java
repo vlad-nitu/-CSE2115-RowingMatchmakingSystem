@@ -276,11 +276,37 @@ public class ActivityController {
     /**
      * Find all activities.
      *
-     * @return - Response of a list of users
+     * @return - Response of a list of activities
      */
     @GetMapping(value = "/findAll", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Activity>> findAllUsers() {
         return ResponseEntity.ok(activityService.findAll());
+    }
+
+    /**
+     * API Endpoint that lets an owner edit an Activity.
+     *
+     * @param activityId the ID of the Activity
+     * @param newActivity the new format of the edited Activity
+     * @return a Response Entity containing the newly edited Activity
+     */
+    @PostMapping("/editActivity/{activityId}")
+    public ResponseEntity<Activity> editActivity(@PathVariable Long activityId,
+                                                 @Valid @RequestBody Activity newActivity) {
+        Optional<Activity> activity = activityService.findActivityOptional(activityId);
+        if (activity.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        if (!authManager.getUserId().equals(activity.get().getOwnerId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        if (!matchingPublisher.deleteMatchingByActivityId(activityId)) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+        if (!activityService.editActivityService(activity.get(), newActivity)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        return ResponseEntity.ok(activityService.findActivityOptional(activityId).get());
     }
 
     /**

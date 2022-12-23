@@ -2,10 +2,12 @@ package com.example.activitymicroservice.services;
 
 import com.example.activitymicroservice.domain.Activity;
 import com.example.activitymicroservice.domain.Competition;
+import com.example.activitymicroservice.domain.Training;
 import com.example.activitymicroservice.repositories.ActivityRepository;
 import com.example.activitymicroservice.utils.Pair;
 import com.example.activitymicroservice.utils.TimeSlot;
 import lombok.AllArgsConstructor;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -126,5 +128,32 @@ public class ActivityService {
         activity.get().setPositions(updatedPositions);
         activityRepository.save(activity.get());
         return activity.get().getPositions();
+    }
+
+    /**
+     * Takes the input of a new activity and edits the original activity with that.
+     * It saves the edited activity in the repo after that.
+     *
+     * @param oldActivity Activity object, the one we want to edit
+     * @param newActivity Activity object, the way we want the old activity to look like.
+     * @return true if the activity was successfully edited, false otherwise
+     */
+    public boolean editActivityService(Activity oldActivity, Activity newActivity) {
+        // If the old and new activity are different types return false
+        if ((oldActivity instanceof Competition && newActivity instanceof Training)
+                || (oldActivity instanceof Training && newActivity instanceof Competition)) {
+            return false;
+        }
+
+        if (oldActivity instanceof Competition) {
+            ((Competition) oldActivity).setGender(((Competition) newActivity).getGender());
+            ((Competition) oldActivity).setOrganisation(((Competition) newActivity).getOrganisation());
+            ((Competition) oldActivity).setCompetitive(((Competition) newActivity).isCompetitive());
+        }
+        oldActivity.setTimeSlot(newActivity.getTimeSlot());
+        oldActivity.setPositions(newActivity.getPositions());
+        oldActivity.setCertificate(newActivity.getCertificate());
+        activityRepository.save(oldActivity);
+        return true;
     }
 }
