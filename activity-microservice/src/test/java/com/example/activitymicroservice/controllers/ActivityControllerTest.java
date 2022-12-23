@@ -7,11 +7,14 @@ import com.example.activitymicroservice.domain.Training;
 import com.example.activitymicroservice.publishers.MatchingPublisher;
 import com.example.activitymicroservice.publishers.UserPublisher;
 import com.example.activitymicroservice.services.ActivityService;
+import com.example.activitymicroservice.utils.InputValidation;
 import com.example.activitymicroservice.utils.Pair;
 import com.example.activitymicroservice.utils.TimeSlot;
 import com.example.activitymicroservice.validators.CertificateValidator;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -416,6 +419,79 @@ class ActivityControllerTest {
         String contentAsString = res.getResponse().getContentAsString();
         boolean obtained = objectMapper.readValue(contentAsString, boolean.class);
         assertThat(obtained).isTrue();
+    }
+
+    @Test
+    void createActivityGood() throws Exception {
+        Activity activity = new Training();
+        activity.setPositions(List.of("cox"));
+        when(activityService.save(activity)).thenReturn(activity);
+        MvcResult res = mockMvc
+                .perform(post("/createActivity")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(activity)))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = res.getResponse().getContentAsString();
+        Activity obtained = objectMapper.readValue(contentAsString, Activity.class);
+        assertThat(obtained).isEqualTo(activity);
+        assertThat(InputValidation.validatePositions(activity.getPositions())).isTrue();
+    }
+
+    @Test
+    void createActivityFail() throws Exception {
+        Activity activity = new Training();
+        activity.setPositions(List.of("Rower"));
+        lenient().when(activityService.save(activity)).thenReturn(activity);
+        MvcResult res = mockMvc
+                .perform(post("/createActivity")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(activity)))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        assertThat(res.getResponse().getContentAsString()).isEmpty();
+        assertThat(InputValidation.validatePositions(activity.getPositions())).isFalse();
+    }
+
+    @Test
+    void InputValidationTestGood() {
+        List<String> positions = List.of("cox", "coach");
+        assertThat(InputValidation.validatePositions(positions)).isTrue();
+    }
+
+    @Test
+    void findAllTest() throws Exception {
+        Activity activity1 = new Training();
+        Activity activity2 = new Competition();
+        List<Activity> activityList = List.of(activity1, activity2);
+        lenient().when(activityService.save(activity1)).thenReturn(activity1);
+        lenient().when(activityService.save(activity2)).thenReturn(activity2);
+        when(activityService.findAll()).thenReturn(activityList);
+        MvcResult res = mockMvc
+                .perform(get("/findAll"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = res.getResponse().getContentAsString();
+        List<Activity> obtained = objectMapper.readValue(contentAsString, new TypeReference<List<Activity>>() {});
+        assertThat(obtained).isEqualTo(activityList);
+    }
+
+    @Test
+    void editActivitySuccessfully() throws Exception {
+        Activity activity = new Training();
+        activity.setActivityId(1L);
+        activity.setOwnerId("Razvan");
+        Activity activity1 = new Training();
+        activity1.setCertificate("B4");
+        when(activityService.findActivityOptional(1L)).thenReturn(Optional.of(activity));
+        when(authManager.getUserId()).thenReturn("Razvan");
+        when(matchingPublisher.deleteMatchingByActivityId(1L)).thenReturn(true);
+        when(activityService.editActivityService(activity, activity1)).thenReturn(true);
+        mockMvc.perform(post("/editActivity/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(activity1)))
+                .andExpect(status().isOk());
+
     }
 
 }
