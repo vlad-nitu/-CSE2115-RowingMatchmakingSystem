@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -165,6 +166,23 @@ class ActivityServiceTest {
         assertThat(activityService.takeSpot(new Pair<>(1L, "cox"))).isTrue();
         assertThat(activity.getPositions().size()).isEqualTo(1);
         assertThat(activity.getPositions().get(0)).isEqualTo("rower");
+    }
+
+    @Test
+    public void editActivityServiceTestFalse() {
+        Activity activity = new Training();
+        Activity activity1 = new Competition();
+        assertThat(activityService.editActivityService(activity, activity1)).isFalse();
+    }
+
+    @Test
+    public void editActivityServiceTestTrue() {
+        Activity activity = new Training();
+        Activity activity1 = new Training();
+        activity1.setCertificate("B4");
+        when(activityRepository.save(activity)).thenReturn(activity);
+        assertThat(activityService.editActivityService(activity, activity1)).isTrue();
+        assertThat(activity.getCertificate()).isEqualTo("B4");
     }
 
 }

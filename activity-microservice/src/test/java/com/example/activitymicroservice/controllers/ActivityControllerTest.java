@@ -424,7 +424,12 @@ class ActivityControllerTest {
     @Test
     void createActivityGood() throws Exception {
         Activity activity = new Training();
+        activity.setOwnerId("Razvan");
+        activity.setTimeSlot(new TimeSlot(LocalDateTime.of(2001, 12, 1, 23, 15),
+                LocalDateTime.of(2002, 11, 2, 15, 00)));
         activity.setPositions(List.of("cox"));
+        activity.setCertificate("C4");
+
         when(activityService.save(activity)).thenReturn(activity);
         MvcResult res = mockMvc
                 .perform(post("/createActivity")
@@ -454,9 +459,15 @@ class ActivityControllerTest {
     }
 
     @Test
-    void InputValidationTestGood() {
+    void inputValidationTestGood() {
         List<String> positions = List.of("cox", "coach");
         assertThat(InputValidation.validatePositions(positions)).isTrue();
+    }
+
+    @Test
+    void inputValidationTestBad() {
+        List<String> positions = List.of("cox", "oach");
+        assertThat(InputValidation.validatePositions(positions)).isFalse();
     }
 
     @Test
@@ -482,7 +493,11 @@ class ActivityControllerTest {
         activity.setActivityId(1L);
         activity.setOwnerId("Razvan");
         Activity activity1 = new Training();
-        activity1.setCertificate("B4");
+        activity1.setOwnerId("Razvan");
+        activity1.setTimeSlot(new TimeSlot(LocalDateTime.of(2001, 12, 1, 23, 15),
+                LocalDateTime.of(2002, 11, 2, 15, 00)));
+        activity1.setPositions(List.of("cox"));
+        activity1.setCertificate("C4");
         when(activityService.findActivityOptional(1L)).thenReturn(Optional.of(activity));
         when(authManager.getUserId()).thenReturn("Razvan");
         when(matchingPublisher.deleteMatchingByActivityId(1L)).thenReturn(true);
@@ -491,7 +506,84 @@ class ActivityControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(activity1)))
                 .andExpect(status().isOk());
+    }
 
+    @Test
+    void editActivityFailNoActivity() throws Exception {
+        Activity activity = new Training();
+        activity.setOwnerId("Razvan");
+        activity.setTimeSlot(new TimeSlot(LocalDateTime.of(2001, 12, 1, 23, 15),
+                LocalDateTime.of(2002, 11, 2, 15, 00)));
+        activity.setPositions(List.of("cox"));
+        activity.setCertificate("C4");
+        when(activityService.findActivityOptional(1L)).thenReturn(Optional.empty());
+        mockMvc.perform(post("/editActivity/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(activity)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void editActivityFailWrongUser() throws Exception {
+        Activity activity = new Training();
+        activity.setOwnerId("Razvan");
+        activity.setTimeSlot(new TimeSlot(LocalDateTime.of(2001, 12, 1, 23, 15),
+                LocalDateTime.of(2002, 11, 2, 15, 00)));
+        activity.setPositions(List.of("cox"));
+        activity.setCertificate("C4");
+
+        Activity activity1 = new Training();
+        activity1.setActivityId(1L);
+        activity1.setOwnerId("Razvan");
+        when(activityService.findActivityOptional(1L)).thenReturn(Optional.of(activity1));
+        when(authManager.getUserId()).thenReturn("NotRazvan");
+        mockMvc.perform(post("/editActivity/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(activity)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void editActivityFailMatchingPublisherError() throws Exception {
+        Activity activity = new Training();
+        activity.setOwnerId("Razvan");
+        activity.setTimeSlot(new TimeSlot(LocalDateTime.of(2001, 12, 1, 23, 15),
+                LocalDateTime.of(2002, 11, 2, 15, 00)));
+        activity.setPositions(List.of("cox"));
+        activity.setCertificate("C4");
+
+        Activity activity1 = new Training();
+        activity1.setActivityId(1L);
+        activity1.setOwnerId("Razvan");
+        when(activityService.findActivityOptional(1L)).thenReturn(Optional.of(activity1));
+        when(authManager.getUserId()).thenReturn("Razvan");
+        when(matchingPublisher.deleteMatchingByActivityId(1L)).thenReturn(false);
+        mockMvc.perform(post("/editActivity/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(activity)))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    void editActivityFailActivityServiceError() throws Exception {
+        Activity activity = new Training();
+        activity.setOwnerId("Razvan");
+        activity.setTimeSlot(new TimeSlot(LocalDateTime.of(2001, 12, 1, 23, 15),
+                LocalDateTime.of(2002, 11, 2, 15, 00)));
+        activity.setPositions(List.of("cox"));
+        activity.setCertificate("C4");
+
+        Activity activity1 = new Training();
+        activity1.setActivityId(1L);
+        activity1.setOwnerId("Razvan");
+        when(activityService.findActivityOptional(1L)).thenReturn(Optional.of(activity1));
+        when(authManager.getUserId()).thenReturn("Razvan");
+        when(matchingPublisher.deleteMatchingByActivityId(1L)).thenReturn(true);
+        when(activityService.editActivityService(activity1, activity)).thenReturn(false);
+        mockMvc.perform(post("/editActivity/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(activity)))
+                .andExpect(status().isBadRequest());
     }
 
 }
