@@ -13,6 +13,7 @@ import nl.tudelft.cse.sem.template.user.utils.BaseActivity;
 import nl.tudelft.cse.sem.template.user.utils.BaseMatching;
 import nl.tudelft.cse.sem.template.user.utils.Pair;
 import nl.tudelft.cse.sem.template.user.utils.TimeSlot;
+import org.apache.tomcat.jni.Local;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,8 +35,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -634,5 +634,61 @@ public class UserControllerTest {
                 .andReturn();
         String contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("Activity deletion was not successful");
+    }
+
+    @Test
+    void changeTimeSlotBadId() throws Exception {
+        when(authManager.getUserId()).thenReturn("userId");
+        Set<TimeSlot> times = Set.of(new TimeSlot(LocalDateTime.now(), LocalDateTime.now().plusHours(2)));
+        MvcResult mvcResult = mockMvc
+                .perform(post("/changeTimeSlot/badUserId")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(times))
+                )
+                .andExpect(status().isForbidden())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("The provided userId does not match your userId");
+    }
+
+    @Test
+    void changeTimeSlotNoUser() throws Exception {
+        when(authManager.getUserId()).thenReturn("userId");
+        when(userService.findUserById("userId")).thenReturn(Optional.empty());
+        Set<TimeSlot> times = Set.of(new TimeSlot(LocalDateTime.now(), LocalDateTime.now().plusHours(2)));
+        MvcResult mvcResult = mockMvc
+                .perform(post("/changeTimeSlot/userId")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(times))
+                )
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("The user does not exist");
+    }
+
+    @Test
+    void changeTimeSlotValidation() throws Exception {
+        mockMvc
+                .perform(post("/changeTimeSlot/userId")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(null))
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void changeTimeSlotSuccess() throws Exception {
+        when(authManager.getUserId()).thenReturn("userId");
+        Set<TimeSlot> times = Set.of(new TimeSlot(LocalDateTime.now(), LocalDateTime.now().plusHours(2)));
+        when(userService.findUserById("userId")).thenReturn(Optional.of(user));
+        when(userService.save(user)).thenReturn(user);
+        mockMvc
+                .perform(post("/changeTimeSlot/userId")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(times))
+                )
+                .andExpect(status().isOk());
+        verify(userService).save(any());
     }
 }

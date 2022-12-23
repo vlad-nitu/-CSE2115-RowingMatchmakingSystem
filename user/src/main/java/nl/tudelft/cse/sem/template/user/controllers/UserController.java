@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import nl.tudelft.cse.sem.template.user.services.UserService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.*;
 
 @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
@@ -328,6 +329,27 @@ public class UserController {
         } else {
             return ResponseEntity.status(statusCode).body("Activity deletion was not successful");
         }
+    }
+
+    /** Updates a user's timeslots.
+     *
+     *
+     * @param userId the id of the user of who to change the time slots
+     * @param timeslots the new timeslots to replace the old ones
+     * @return and updated user
+     */
+    @PostMapping("/changeTimeSlot/{userId}")
+    public ResponseEntity changeTimeSlots(@PathVariable String userId,
+                                          @RequestBody @NotNull Set<TimeSlot> timeslots) {
+        if (!userId.equals(authManager.getUserId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("The provided userId does not match your userId");
+        }
+        Optional<User> foundUser = userService.findUserById(userId);
+        if (foundUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The user does not exist");
+        }
+        foundUser.get().setTimeSlots(timeslots);
+        return ResponseEntity.ok(userService.save(foundUser.get()));
     }
 
 
