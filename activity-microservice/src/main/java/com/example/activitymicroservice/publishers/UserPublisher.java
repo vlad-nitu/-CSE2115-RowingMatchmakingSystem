@@ -3,6 +3,7 @@ package com.example.activitymicroservice.publishers;
 import com.example.activitymicroservice.utils.ActivityUtils;
 import com.example.activitymicroservice.utils.TimeSlot;
 import lombok.Cleanup;
+import lombok.Generated;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.GenericType;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service
+@Generated
 public class UserPublisher {
 
     private final transient ActivityUtils activityUtils;
