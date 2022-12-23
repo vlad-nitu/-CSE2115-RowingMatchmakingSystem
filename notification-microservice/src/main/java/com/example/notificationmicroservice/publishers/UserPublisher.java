@@ -2,12 +2,14 @@ package com.example.notificationmicroservice.publishers;
 
 import com.example.notificationmicroservice.utils.NotificationUtils;
 import lombok.Cleanup;
+import lombok.Generated;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
 @Service
+@Generated
 public class UserPublisher {
 
     private final transient NotificationUtils notificationUtils;

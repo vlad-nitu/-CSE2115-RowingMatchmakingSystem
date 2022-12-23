@@ -40,4 +40,10 @@ class UserPublisherTest {
         when(notificationUtils.getRequest(anyString())).thenReturn(Response.ok(expected).build());
         assertEquals(expected, userPublisher.getEmail("userId"));
     }
+
+    @Test
+    void constructorServerTest() throws Exception {
+        UserPublisher userPublisher1 = new UserPublisher();
+        assertNotNull(userPublisher1);
+    }
 }
