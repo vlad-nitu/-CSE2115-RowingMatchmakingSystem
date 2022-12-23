@@ -96,7 +96,7 @@ Thus, we are expected to  develop an application that will match available peopl
 ## How to contribute to it
 As there is always room for improvement, future users can contribute as following:
 1. If you spot any bugs, please let us know in order to fix the product as soon as possible. Our emails can be found in the "Group members" section.
-2. If you have any idea that is relevant in improving our game, we are looking forward to hearing your proposals.
+2. If you have any idea that is relevant in improving our application, we are looking forward to hearing your proposals.
 
 ## Copyright / License (opt.)
 
