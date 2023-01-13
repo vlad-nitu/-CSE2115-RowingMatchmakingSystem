@@ -10,18 +10,16 @@ import java.util.Set;
  */
 @NoArgsConstructor
 @EqualsAndHashCode
-@Getter
-@Setter
 public class BaseActivity {
     private Long activityId;
-    private String ownerId;
+    @Setter private String ownerId;
     private TimeSlot timeSlot;
     private List<String> positions;
     private String certificate;
     private boolean isCompetitive;
     private char gender;
     private String organisation;
-    private String type; // "activity" or "competition"
+    @Setter  private String type; // "activity" or "competition"
 
     /**
      * All args constructor.
