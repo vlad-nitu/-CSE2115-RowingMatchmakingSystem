@@ -9,9 +9,9 @@ import java.util.Set;
  * The type Base activity.
  */
 @NoArgsConstructor
-@EqualsAndHashCode
 public class BaseActivity {
     private Long activityId;
+    @Getter
     @Setter private String ownerId;
     private TimeSlot timeSlot;
     private List<String> positions;
