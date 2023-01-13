@@ -2,6 +2,7 @@ package nl.tudelft.cse.sem.template.user.utils;
 
 import lombok.*;
 
+import javax.persistence.Column;
 import java.util.List;
 import java.util.Set;
 
@@ -9,17 +10,17 @@ import java.util.Set;
  * The type Base activity.
  */
 @NoArgsConstructor
+@Getter
 public class BaseActivity {
     private Long activityId;
-    @Getter
     @Setter private String ownerId;
     private TimeSlot timeSlot;
     private List<String> positions;
     private String certificate;
-    private boolean isCompetitive;
+    @Setter private boolean isCompetitive;
     private char gender;
     private String organisation;
-    @Setter  private String type; // "activity" or "competition"
+    @Setter private String type; // "training" or "competition"
 
     /**
      * All args constructor.
