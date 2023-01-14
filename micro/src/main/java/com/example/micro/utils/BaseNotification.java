@@ -4,12 +4,14 @@ import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
 public class BaseNotification {
+    @Getter
     private String userId;
+    @Getter
     private String targetId;
+    @Getter
     private Long activityId;
+    @Getter
     private String position;
     private String type;
-
 }
