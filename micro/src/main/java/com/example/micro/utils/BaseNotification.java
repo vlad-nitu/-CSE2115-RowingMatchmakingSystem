@@ -4,7 +4,6 @@ import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
 @Getter
 public class BaseNotification {
     private String userId;
@@ -12,7 +11,5 @@ public class BaseNotification {
     private Long activityId;
     private String position;
     private String type;
-
-
 
 }
