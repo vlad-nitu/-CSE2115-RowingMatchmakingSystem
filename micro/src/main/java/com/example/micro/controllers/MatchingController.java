@@ -5,6 +5,7 @@ import com.example.micro.domain.Matching;
 import com.example.micro.publishers.ActivityPublisher;
 import com.example.micro.publishers.NotificationPublisher;
 import com.example.micro.services.MatchingServiceImpl;
+import com.example.micro.utils.BaseNotification;
 import com.example.micro.utils.FunctionUtils;
 import com.example.micro.utils.Pair;
 import com.example.micro.utils.TimeSlot;
@@ -96,10 +97,10 @@ public class MatchingController {
         matching.setPending(true);
         Matching savedMatching = matchingServiceImpl.save(matching);
         String targetId = activityPublisher.getOwnerId(matching.getActivityId());
-        notificationPublisher.notifyUser(matching.getUserId(),
-                        targetId, matching.getActivityId(),
-                        matching.getPosition(),
-                        "notifyOwner");
+        notificationPublisher.notifyUser(new BaseNotification(matching.getUserId(),
+                targetId, matching.getActivityId(),
+                matching.getPosition(),
+                "notifyOwner"));
         return ResponseEntity.ok(savedMatching);
     }
 
@@ -116,7 +117,20 @@ public class MatchingController {
     public ResponseEntity<Matching> chooseMatch(@Valid @RequestBody Matching matching,
                                                 @PathVariable String senderId,
                                                 @PathVariable String type) {
+        ResponseEntity<Matching> res = securityCheck(matching, senderId);
+        if (res != null) {
+            return res;
+        }
+        if (type.equals("accept")) {
+            return chooseMatchAccept(matching);
+        }
+        if (type.equals("decline")) {
+            return chooseMatchDecline(matching);
+        }
+        return ResponseEntity.badRequest().build();
+    }
 
+    ResponseEntity<Matching> securityCheck(Matching matching, String senderId) {
         if (!authManger.getUserId().equals(senderId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -126,13 +140,7 @@ public class MatchingController {
         if (!matchingServiceImpl.checkId(matching.getUserId(), matching.getActivityId(), matching.getPosition())) {
             return ResponseEntity.badRequest().build();
         }
-        if (type.equals("accept")) {
-            return chooseMatchAccept(matching);
-        }
-        if (type.equals("decline")) {
-            return chooseMatchDecline(matching);
-        }
-        return ResponseEntity.badRequest().build();
+        return null;
     }
 
     /**
@@ -149,7 +157,8 @@ public class MatchingController {
         activityPublisher.takeAvailableSpot(matching.getActivityId(), matching.getPosition());
         // User is also the target
         String userId = matching.getUserId();
-        notificationPublisher.notifyUser(userId, userId, matching.getActivityId(), matching.getPosition(), "notifyUser");
+        notificationPublisher.notifyUser(new BaseNotification(userId, userId,
+                matching.getActivityId(), matching.getPosition(), "notifyUser"));
         return ResponseEntity.ok(savedMatching);
     }
 

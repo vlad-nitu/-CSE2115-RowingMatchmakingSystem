@@ -5,6 +5,7 @@ import com.example.micro.domain.Matching;
 import com.example.micro.publishers.ActivityPublisher;
 import com.example.micro.publishers.NotificationPublisher;
 import com.example.micro.services.MatchingServiceImpl;
+import com.example.micro.utils.BaseNotification;
 import com.example.micro.utils.Pair;
 import com.example.micro.utils.TimeSlot;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -178,7 +179,7 @@ public class MatchingControllerTest {
         when(matchingServiceImpl.findMatchingWithPendingFalse(anyString(), anyLong())).thenReturn(Optional.empty());
         lenient().when(matchingServiceImpl.save(any(Matching.class))).thenReturn(savedMatching);
         when(activityPublisher.getOwnerId(anyLong())).thenReturn("dummyString");
-        doNothing().when(notificationPublisher).notifyUser(anyString(), anyString(), anyLong(), anyString(), anyString());
+        doNothing().when(notificationPublisher).notifyUser(any(BaseNotification.class));
 
 
         MvcResult mvcResult = mockMvc
@@ -435,7 +436,7 @@ public class MatchingControllerTest {
 
         doNothing().when(matchingServiceImpl).deleteById(anyString(), anyLong(), anyString());
         doNothing().when(activityPublisher).takeAvailableSpot(anyLong(), anyString());
-        doNothing().when(notificationPublisher).notifyUser(anyString(), anyString(), anyLong(), anyString(), anyString());
+        doNothing().when(notificationPublisher).notifyUser(any(BaseNotification.class));
 
 
         MvcResult mvcResult = mockMvc

@@ -6,7 +6,6 @@ import lombok.*;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Getter
-@Setter
 public class BaseNotification {
     private String userId;
     private String targetId;
