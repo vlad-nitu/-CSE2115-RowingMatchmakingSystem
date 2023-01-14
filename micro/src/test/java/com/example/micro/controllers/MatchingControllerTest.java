@@ -3,6 +3,7 @@ package com.example.micro.controllers;
 import com.example.micro.authentication.AuthManager;
 import com.example.micro.domain.Matching;
 import com.example.micro.publishers.ActivityPublisher;
+import com.example.micro.publishers.CollectionPublisher;
 import com.example.micro.publishers.NotificationPublisher;
 import com.example.micro.services.MatchingServiceImpl;
 import com.example.micro.utils.BaseNotification;
@@ -64,8 +65,7 @@ public class MatchingControllerTest {
         ));
         matching = new Matching("Vlad", 1L, "rower", false);
         this.matchingController = new MatchingController(matchingServiceImpl,
-                activityPublisher,
-                notificationPublisher,
+                new CollectionPublisher(activityPublisher, notificationPublisher),
                 authManager);
         mockMvc = MockMvcBuilders
                 .standaloneSetup(matchingController)
