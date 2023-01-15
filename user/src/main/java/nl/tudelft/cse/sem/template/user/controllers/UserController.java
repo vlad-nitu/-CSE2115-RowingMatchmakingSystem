@@ -2,7 +2,6 @@ package nl.tudelft.cse.sem.template.user.controllers;
 
 import nl.tudelft.cse.sem.template.user.authentication.AuthManager;
 import nl.tudelft.cse.sem.template.user.domain.User;
-import nl.tudelft.cse.sem.template.user.publishers.ActivityPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.MatchingPublisher;
 import nl.tudelft.cse.sem.template.user.publishers.NotificationPublisher;
 import nl.tudelft.cse.sem.template.user.services.UserService;
@@ -13,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import nl.tudelft.cse.sem.template.user.services.UserService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -24,7 +22,6 @@ import java.util.*;
 public class UserController {
 
     private final transient UserService userService;
-    private final transient ActivityPublisher activityPublisher;
     private final transient MatchingPublisher matchingPublisher;
     private final transient NotificationPublisher notificationPublisher;
     private final transient AuthManager authManager;
@@ -40,10 +37,9 @@ public class UserController {
      * @param userService - user service implementation
      * @param authManager - authentication manager implementation
      */
-    public UserController(UserService userService, ActivityPublisher activityPublisher, MatchingPublisher matchingPublisher,
+    public UserController(UserService userService, MatchingPublisher matchingPublisher,
                           NotificationPublisher notificationPublisher, AuthManager authManager) {
         this.userService = userService;
-        this.activityPublisher = activityPublisher;
         this.matchingPublisher = matchingPublisher;
         this.notificationPublisher = notificationPublisher;
         this.authManager = authManager;
@@ -198,30 +194,6 @@ public class UserController {
     }
 
     /**
-     * API Endpoint that performs a POST request in order to create an activity.
-     *
-     * @param activity - BaseActivity representing the activity
-     * @return ResponseEntity object with status OK or INTERNAL_SERVER_ERROR
-     *      and descriptive body
-     * @throws Exception - caught exception
-     */
-    @PostMapping("/createActivity/{type}")
-    public ResponseEntity createActivity(@Valid @RequestBody BaseActivity activity,
-                                         @PathVariable String type) throws Exception {
-        if (!type.equals("training") && !type.equals("competition")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Type can only be 'training' or 'competition'.");
-        }
-        if (!activity.getOwnerId().equals(authManager.getUserId())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided ownerId does not match your userId! Use "
-                    + authManager.getUserId() + " as the ownerId.");
-        }
-        activity.setType(type);
-        BaseActivity response = activityPublisher.createActivity(activity);
-        return response == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericPublisherError)
-                : ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    /**
      * API Endpoint that performs a GET request in order to get all the activities that the user can enroll to.
      *
      * @return A list of pairs that contain the activity id and the timeslot in String representation
@@ -315,22 +287,6 @@ public class UserController {
                 : ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    /**
-     * API Endpoint that performs a GET request in order to cancel an Activity.
-     *
-     * @param activityId the activityId Long attribute where the user wants to unenroll from.
-     * @return a String representing whether Activity deletion was succesful or not
-     */
-    @GetMapping("/cancelActivity/{activityId}")
-    public ResponseEntity<String> cancelActivity(@PathVariable Long activityId) {
-        Integer statusCode = activityPublisher.cancelActivity(activityId);
-        if (statusCode == HttpStatus.NO_CONTENT.value()) {
-            return ResponseEntity.status(HttpStatus.OK).body("Activity was deleted successfully");
-        } else {
-            return ResponseEntity.status(statusCode).body("Activity deletion was not successful");
-        }
-    }
-
     /** Updates a user's timeslots.
      *
      *
@@ -351,7 +307,6 @@ public class UserController {
         foundUser.get().setTimeSlots(timeslots);
         return ResponseEntity.ok(userService.save(foundUser.get()));
     }
-
 
     /**
      * Handles BAD_REQUEST exceptions thrown by the Validator of User entities
