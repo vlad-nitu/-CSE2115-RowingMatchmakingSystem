@@ -55,7 +55,7 @@ public class UserActivityController {
     @PostMapping("/createActivity/{type}")
     public ResponseEntity createActivity(@Valid @RequestBody BaseActivity activity,
                                          @PathVariable String type) throws Exception {
-        if (validateType(type)) {
+        if (!validateType(type)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Type can only be 'training' or 'competition'.");
         }
         if (!activity.getOwnerId().equals(authManager.getUserId())) {
@@ -69,7 +69,7 @@ public class UserActivityController {
     }
 
     /**
-     * A check to validate whether the type of activity is possible
+     * A check to validate whether the type of activity is possible.
      *
      * @param type - the string which represent the type
      * @return true iff the type equals training or competition
