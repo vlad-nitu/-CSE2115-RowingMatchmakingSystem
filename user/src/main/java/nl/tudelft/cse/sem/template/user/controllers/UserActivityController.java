@@ -17,8 +17,8 @@ public class UserActivityController {
     private static final String genericPublisherError = "Something went wrong!";
 
     /**
-     * All argument constructor, injects the main service component, authentication manager
-     * and all publishers into the controller.
+     * All argument constructor, injects the authentication manager
+     * and the necessary publisher into the controller.
      *
      * @param activityPublisher - a class responsible for sending requests to the activity microservice
      * @param authManager - authentication manager implementation
