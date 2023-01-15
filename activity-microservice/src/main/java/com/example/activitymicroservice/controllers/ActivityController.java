@@ -175,7 +175,6 @@ public class ActivityController {
         if (position.equals("cox")) {
             key += position;
         }
-        System.out.println(key);
         return validators.getOrDefault(key, training);
     }
 
