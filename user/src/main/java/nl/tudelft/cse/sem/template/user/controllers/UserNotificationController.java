@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+
 @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 @RestController
 public class UserNotificationController {
@@ -24,7 +25,7 @@ public class UserNotificationController {
      * @param notificationPublisher - a class responsible for sending requests to the notification microservice
      * @param authManager - authentication manager implementation
      */
-    public UserNotificationController(NotificationPublisher notificationPublisher, AuthManager authManager){
+    public UserNotificationController(NotificationPublisher notificationPublisher, AuthManager authManager) {
         this.notificationPublisher = notificationPublisher;
         this.authManager = authManager;
     }
