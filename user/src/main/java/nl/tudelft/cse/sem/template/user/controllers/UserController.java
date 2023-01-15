@@ -175,7 +175,6 @@ public class UserController {
                 noSuchUserIdError) : ResponseEntity.ok(responseBody);
     }
 
-
     /**
      * Find all users.
      *
