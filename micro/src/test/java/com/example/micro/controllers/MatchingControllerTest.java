@@ -178,7 +178,7 @@ public class MatchingControllerTest {
         when(matchingServiceImpl.findMatchingWithPendingFalse(anyString(), anyLong())).thenReturn(Optional.empty());
         lenient().when(matchingServiceImpl.save(any(Matching.class))).thenReturn(savedMatching);
         when(activityPublisher.getOwnerId(anyLong())).thenReturn("dummyString");
-        doNothing().when(notificationPublisher).notifyUser(anyString(), anyString(), anyLong(), anyString(), anyString());
+        doNothing().when(notificationPublisher).notifyUser(anyString(), anyLong(), anyString(), anyString());
 
 
         MvcResult mvcResult = mockMvc
@@ -435,7 +435,7 @@ public class MatchingControllerTest {
 
         doNothing().when(matchingServiceImpl).deleteById(anyString(), anyLong(), anyString());
         doNothing().when(activityPublisher).takeAvailableSpot(anyLong(), anyString());
-        doNothing().when(notificationPublisher).notifyUser(anyString(), anyString(), anyLong(), anyString(), anyString());
+        doNothing().when(notificationPublisher).notifyUser(anyString(), anyLong(), anyString(), anyString());
 
 
         MvcResult mvcResult = mockMvc

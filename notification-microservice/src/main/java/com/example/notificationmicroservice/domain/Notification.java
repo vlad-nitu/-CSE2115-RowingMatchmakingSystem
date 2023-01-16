@@ -16,8 +16,6 @@ import javax.validation.constraints.NotNull;
 
 @NoArgsConstructor
 @EqualsAndHashCode
-@Getter
-@Setter
 @Entity
 @Table(name = "notification")
 public class Notification {
@@ -26,10 +24,6 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
-
-    @Column(name = "userId", nullable = false)
-    @NotBlank(message = "userId is mandatory and cannot be blank")
-    private String userId;
 
     @Column(name = "targetId", nullable = false)
     @NotBlank(message = "targetId is mandatory and cannot be blank")
@@ -50,14 +44,12 @@ public class Notification {
     /** This Notification constructor is needed because I can't use.
      * All args constructor since id is assigned by the db.
      *
-     * @param userId from user
      * @param targetId to user
      * @param activityId regarding activity
      * @param type of type
      * @param position for position if applicable
      */
-    public Notification(String userId, String targetId, Long activityId, String type, String position) {
-        this.userId = userId;
+    public Notification(String targetId, Long activityId, String type, String position) {
         this.targetId = targetId;
         this.activityId = activityId;
         this.type = type;
@@ -76,5 +68,38 @@ public class Notification {
             return "A new user has applied as a " + position
                     + " for activity with Id: " + activityId;
         }
+    }
+
+    /** Position getter.
+     *
+     * @return position
+     */
+    public String getPosition() {
+        return position;
+    }
+
+    /** Type getter.
+     *
+     * @return type
+     */
+    public String getType() {
+        return type;
+    }
+
+    /** ActivityId getter. Even though it says it is unused
+     * the @Valid annotation needs it to work properly
+     *
+     * @return activityId
+     */
+    public Long getActivityId() {
+        return activityId;
+    }
+
+    /** TargetId getter.
+     *
+     * @return targetId
+     */
+    public String getTargetId() {
+        return targetId;
     }
 }

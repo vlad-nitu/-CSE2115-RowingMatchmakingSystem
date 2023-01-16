@@ -48,7 +48,7 @@ class NotificationControllerTest {
     @Test
     void notifyUserSuccess() throws Exception {
         String expectedSuccessMessage = "Successfully notified";
-        Notification notification = new Notification("userId", "targetId", 1L, "notifyOwner", "cox");
+        Notification notification = new Notification("targetId", 1L, "notifyOwner", "cox");
         when(strategy.handleNotification(notification)).thenReturn(true);
         MvcResult mvcResult = mockMvc
                 .perform(post("/notifyUser")
@@ -64,7 +64,7 @@ class NotificationControllerTest {
     @Test
     void notifyUserFailure() throws Exception {
         String expectedFailureMessage = "message";
-        Notification notification = new Notification("userId", "targetId", 1L, "notifyOwner", "cox");
+        Notification notification = new Notification("targetId", 1L, "notifyOwner", "cox");
         when(strategy.handleNotification(notification)).thenReturn(false);
         when(strategy.getFailureMessage()).thenReturn(expectedFailureMessage);
         MvcResult mvcResult = mockMvc
@@ -80,7 +80,7 @@ class NotificationControllerTest {
 
     @Test
     void getNotificationsCorrectUser() throws Exception {
-        Notification notification = new Notification("userId", "targetId", 1L, "notifyOwner", "cox");
+        Notification notification = new Notification("targetId", 1L, "notifyOwner", "cox");
         List<Notification> foundNotifications = List.of(notification);
         List<String> expected = foundNotifications.stream().map(x -> x.buildMessage()).collect(Collectors.toList());
         when(notificationDatabaseService.findNotificationsByTargetId(notification.getTargetId()))
@@ -99,8 +99,8 @@ class NotificationControllerTest {
 
     @Test
     void getNotificationsIncorrectUser() throws Exception {
-        Notification notification = new Notification("userId", "targetId", 1L, "notifyOwner", "cox");
-        when(authManager.getUserId()).thenReturn(notification.getUserId());
+        Notification notification = new Notification("targetId", 1L, "notifyOwner", "cox");
+        when(authManager.getUserId()).thenReturn("userId");
         MvcResult mvcResult = mockMvc
                 .perform(get("/getNotifications/" + notification.getTargetId()))
                 .andExpect(status().isForbidden())
@@ -111,7 +111,7 @@ class NotificationControllerTest {
 
     @Test
     void validationTest() throws Exception {
-        Notification notification = new Notification("", "", null, "", "");
+        Notification notification = new Notification("", null, "", "");
         MvcResult mvcResult = mockMvc
                 .perform(post("/notifyUser")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -123,14 +123,13 @@ class NotificationControllerTest {
         String contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("activityId is mandatory and cannot be null");
         assertThat(contentAsString).contains("targetId is mandatory and cannot be blank");
-        assertThat(contentAsString).contains("userId is mandatory and cannot be blank");
         assertThat(contentAsString).contains("type is mandatory and cannot be blank");
         assertThat(contentAsString).contains("userId is mandatory and cannot be blank");
     }
 
     @Test
     void invalidType() throws Exception {
-        Notification notification = new Notification("User", "Owner", 1L, "bad type", "cox");
+        Notification notification = new Notification("Owner", 1L, "bad type", "cox");
         MvcResult mvcResult = mockMvc
                 .perform(post("/notifyUser")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -145,7 +144,7 @@ class NotificationControllerTest {
 
     @Test
     void invalidPosition() throws Exception {
-        Notification notification = new Notification("User", "Owner", 1L, "notifyUser", "bad position");
+        Notification notification = new Notification("Owner", 1L, "notifyUser", "bad position");
         MvcResult mvcResult = mockMvc
                 .perform(post("/notifyUser")
                         .contentType(MediaType.APPLICATION_JSON)

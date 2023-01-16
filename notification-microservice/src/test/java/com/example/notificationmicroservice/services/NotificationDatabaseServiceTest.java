@@ -32,14 +32,14 @@ class NotificationDatabaseServiceTest {
 
     @Test
     public void findAllTest() {
-        List<Notification> result = List.of(new Notification("some", "other", 1L, "request", "cox"));
+        List<Notification> result = List.of(new Notification("other", 1L, "request", "cox"));
         when(notificationDatabaseService.findAll()).thenReturn(result);
         assertThat(notificationDatabaseService.findAll()).isEqualTo(result);
     }
 
     @Test
     void findNotificationsByTargetId() {
-        Notification notification = new Notification("some", "other", 1L, "request", "cox");
+        Notification notification = new Notification("other", 1L, "request", "cox");
         notificationDatabaseService.findNotificationsByTargetId(notification.getTargetId());
         verify(notificationRepository, times(1)).findNotificationsByTargetId(notification.getTargetId());
         verify(notificationRepository, never()).findNotificationsByTargetId("some");
@@ -47,7 +47,7 @@ class NotificationDatabaseServiceTest {
 
     @Test
     void removeNotificationsByTargetId() {
-        Notification notification = new Notification("some", "other", 1L, "request", "cox");
+        Notification notification = new Notification("other", 1L, "request", "cox");
         notificationDatabaseService.removeNotificationsByTargetId(notification.getTargetId());
         verify(notificationRepository, times(1)).removeNotificationsByTargetId(notification.getTargetId());
         verify(notificationRepository, never()).removeNotificationsByTargetId("some");
@@ -55,7 +55,7 @@ class NotificationDatabaseServiceTest {
 
     @Test
     void save() {
-        Notification notification = new Notification("some", "other", 1L, "request", "cox");
+        Notification notification = new Notification("other", 1L, "request", "cox");
         notificationDatabaseService.save(notification);
         verify(notificationRepository, times(1)).save(notification);
     }

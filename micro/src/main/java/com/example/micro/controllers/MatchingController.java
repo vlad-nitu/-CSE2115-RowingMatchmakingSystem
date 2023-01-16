@@ -96,8 +96,7 @@ public class MatchingController {
         matching.setPending(true);
         Matching savedMatching = matchingServiceImpl.save(matching);
         String targetId = activityPublisher.getOwnerId(matching.getActivityId());
-        notificationPublisher.notifyUser(matching.getUserId(),
-                        targetId, matching.getActivityId(),
+        notificationPublisher.notifyUser(targetId, matching.getActivityId(),
                         matching.getPosition(),
                         "notifyOwner");
         return ResponseEntity.ok(savedMatching);
@@ -149,7 +148,7 @@ public class MatchingController {
         activityPublisher.takeAvailableSpot(matching.getActivityId(), matching.getPosition());
         // User is also the target
         String userId = matching.getUserId();
-        notificationPublisher.notifyUser(userId, userId, matching.getActivityId(), matching.getPosition(), "notifyUser");
+        notificationPublisher.notifyUser(userId, matching.getActivityId(), matching.getPosition(), "notifyUser");
         return ResponseEntity.ok(savedMatching);
     }
 
