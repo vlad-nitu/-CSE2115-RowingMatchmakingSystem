@@ -5,6 +5,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 import com.example.activitymicroservice.domain.Competition;
 import com.example.activitymicroservice.publishers.UserPublisher;
+import com.example.activitymicroservice.utils.ActivityContext;
 import com.example.activitymicroservice.utils.ActivityUtils;
 import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +38,8 @@ public class CertificateValidatorTest {
 
     String userId;
 
+    ActivityContext context;
+
     @BeforeEach
     void setUp() {
         userId = "TataVlad";
@@ -44,6 +47,7 @@ public class CertificateValidatorTest {
         competition = new Competition();
         competition.setCertificate("4+");
         certificateValidator = new CertificateValidator();
+        context = new ActivityContext(competition, userPublisher, position, userId);
     }
 
     @Test
@@ -52,7 +56,7 @@ public class CertificateValidatorTest {
         CertificateValidator.updateCertificateList(list);
         when(userPublisher.getCertificate(userId)).thenReturn("c");
         competition.setCertificate("b");
-        assertThat(certificateValidator.handle(competition, userPublisher, position, userId)).isTrue();
+        assertThat(certificateValidator.handle(context)).isTrue();
         CertificateValidator.updateCertificateList(List.of("C4", "4+", "8+"));
     }
 
@@ -61,7 +65,7 @@ public class CertificateValidatorTest {
         CertificateValidator.addCertificate("a");
         when(userPublisher.getCertificate(userId)).thenReturn("8+");
         competition.setCertificate("a");
-        assertThatThrownBy(() -> certificateValidator.handle(competition, userPublisher, position, userId))
+        assertThatThrownBy(() -> certificateValidator.handle(context))
                 .isInstanceOf(InvalidObjectException.class);
         CertificateValidator.updateCertificateList(List.of("C4", "4+", "8+"));
     }
@@ -69,20 +73,20 @@ public class CertificateValidatorTest {
     @Test
     void handleCorrect() throws Exception {
         when(userPublisher.getCertificate(userId)).thenReturn("8+");
-        assertThat(certificateValidator.handle(competition, userPublisher, position, userId)).isTrue();
+        assertThat(certificateValidator.handle(context)).isTrue();
     }
 
     @Test
     void handleIncorrect() {
         when(userPublisher.getCertificate(userId)).thenReturn("C4");
-        assertThatThrownBy(() -> certificateValidator.handle(competition, userPublisher, position, userId))
+        assertThatThrownBy(() -> certificateValidator.handle(context))
                 .isInstanceOf(InvalidObjectException.class);
     }
 
     @Test
     void handleInValid1() {
         when(userPublisher.getCertificate(userId)).thenReturn("ADA");
-        assertThatThrownBy(() -> certificateValidator.handle(competition, userPublisher, position, userId))
+        assertThatThrownBy(() -> certificateValidator.handle(context))
                 .isInstanceOf(InvalidObjectException.class);
     }
 
@@ -90,7 +94,7 @@ public class CertificateValidatorTest {
     void handleInValid2() {
         when(userPublisher.getCertificate(userId)).thenReturn("C4");
         competition.setCertificate("abra");
-        assertThatThrownBy(() -> certificateValidator.handle(competition, userPublisher, position, userId))
+        assertThatThrownBy(() -> certificateValidator.handle(context))
                 .isInstanceOf(InvalidObjectException.class);
     }
 }

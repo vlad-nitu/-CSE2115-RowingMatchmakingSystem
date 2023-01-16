@@ -5,6 +5,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 import com.example.activitymicroservice.domain.Competition;
 import com.example.activitymicroservice.publishers.UserPublisher;
+import com.example.activitymicroservice.utils.ActivityContext;
 import com.example.activitymicroservice.utils.ActivityUtils;
 import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +38,8 @@ public class GenderValidatorTest {
 
     String userId;
 
+    ActivityContext context;
+
     @BeforeEach
     void setUp() {
         userId = "TataVlad";
@@ -44,18 +47,19 @@ public class GenderValidatorTest {
         competition = new Competition();
         competition.setGender('M');
         genderValidator = new GenderValidator();
+        context = new ActivityContext(competition, userPublisher, position, userId);
     }
 
     @Test
     void handleCorrect() throws Exception {
         when(userPublisher.getGender(userId)).thenReturn('M');
-        assertThat(genderValidator.handle(competition, userPublisher, position, userId)).isTrue();
+        assertThat(genderValidator.handle(context)).isTrue();
     }
 
     @Test
     void handleIncorrect() {
         when(userPublisher.getGender(userId)).thenReturn('F');
-        assertThatThrownBy(() -> genderValidator.handle(competition, userPublisher, position, userId))
+        assertThatThrownBy(() -> genderValidator.handle(context))
                 .isInstanceOf(InvalidObjectException.class);
     }
 }
