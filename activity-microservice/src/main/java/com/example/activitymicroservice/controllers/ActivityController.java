@@ -1,5 +1,3 @@
-
-
 package com.example.activitymicroservice.controllers;
 
 import com.example.activitymicroservice.authentication.AuthManager;
@@ -9,6 +7,7 @@ import com.example.activitymicroservice.domain.Training;
 import com.example.activitymicroservice.publishers.MatchingPublisher;
 import com.example.activitymicroservice.publishers.UserPublisher;
 import com.example.activitymicroservice.services.ActivityService;
+import com.example.activitymicroservice.utils.ActivityContext;
 import com.example.activitymicroservice.utils.InputValidation;
 import com.example.activitymicroservice.utils.Pair;
 import com.example.activitymicroservice.utils.TimeSlot;
@@ -28,7 +27,6 @@ import java.util.*;
 
 @RestController
 public class ActivityController {
-    private final transient String coxCertificate = "cox";
     private final transient ActivityService activityService;
     private final transient UserPublisher userPublisher;
     private final transient MatchingPublisher matchingPublisher;
@@ -137,39 +135,50 @@ public class ActivityController {
     public ResponseEntity<Boolean> check(@PathVariable String userId,
                                          @PathVariable Long activityId, @PathVariable String position) {
 
-        if (!this.activityService.findActivityOptional(activityId).isPresent()) {
+        Optional<Activity> activityOptional = this.activityService.findActivityOptional(activityId);
+        if (!activityOptional.isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        Activity activity = this.activityService.findActivityOptional(activityId).get();
-
+        Activity activity = activityOptional.get();
         if (!activity.getPositions().contains(position)) {
             return ResponseEntity.ok(false);
         }
-
         List<Activity> activities = activityService.getActivitiesByTimeSlot(List.of(activity),
                 userPublisher.getTimeslots(userId));
         if (activities.isEmpty()) {
             return ResponseEntity.ok(false);
         }
-        Validator validator;
-        if (activity instanceof Competition && position.equals(coxCertificate)) {
-            validator = competitionCox;
-        } else if (activity instanceof Competition) {
-            validator = competition;
-        } else if (activity instanceof Training && position.equals(coxCertificate)) {
-            validator = trainingCox;
-        } else {
-            validator = training;
-        }
+
+        // here we use a helper method "getValidator" to lower the cyclomatic complexitiy of this method
+        Validator validator = getValidator(activity, position);
         try {
-            boolean isValid = validator.handle(activity, userPublisher, position, userId);
+            ActivityContext context = new ActivityContext(activity, userPublisher, position, userId);
+            boolean isValid = validator.handle(context);
             return ResponseEntity.ok(isValid);
         } catch (InvalidObjectException e) {
             return ResponseEntity.ok(false);
         }
-
     }
+
+    private Validator getValidator(Activity activity, String position) {
+        // This refactor uses a Map to store the validators for different activity types and positions,
+        // with keys that are constructed from the activity type and position.
+        Map<String, Validator> validators = new HashMap<>();
+        validators.put("competitioncox", competitionCox);
+        validators.put("competition", competition);
+        validators.put("trainingcox", trainingCox);
+        validators.put("training", training);
+        // The getValidator method creates the key by getting the simple name of the activity class in lowercase
+        // and concatenating it with the position.
+        String key = activity.getClass().getSimpleName().toLowerCase(Locale.US);
+        if (position.equals("cox")) {
+            key += position;
+        }
+        return validators.getOrDefault(key, training);
+    }
+
+
 
     /**
      * API enpoint that allows for creating an Activity object and persisting it to the DB.
@@ -206,17 +215,18 @@ public class ActivityController {
         for (Activity activity : activityList) {
             for (String position : activity.getPositions()) {
                 Validator validator;
-                if (activity instanceof Competition && position.equals(coxCertificate)) {
+                if (activity instanceof Competition && position.equals("cox")) {
                     validator = competitionCox;
                 } else if (activity instanceof Competition) {
                     validator = competition;
-                } else if (activity instanceof Training && position.equals(coxCertificate)) {
+                } else if (activity instanceof Training && position.equals("cox")) {
                     validator = trainingCox;
                 } else {
                     validator = training;
                 }
                 try {
-                    validator.handle(activity, userPublisher, position, userId);
+                    ActivityContext context = new ActivityContext(activity, userPublisher, position, userId);
+                    validator.handle(context);
                     list.add(new Pair<>(activity.getActivityId(), position));
                 } catch (Exception e) {
                     continue;
@@ -330,7 +340,3 @@ public class ActivityController {
 
 
 }
-
-
-
-

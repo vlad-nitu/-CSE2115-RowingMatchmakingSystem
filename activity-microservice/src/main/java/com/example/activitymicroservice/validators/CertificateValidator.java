@@ -2,6 +2,7 @@ package com.example.activitymicroservice.validators;
 
 import com.example.activitymicroservice.domain.Activity;
 import com.example.activitymicroservice.publishers.UserPublisher;
+import com.example.activitymicroservice.utils.ActivityContext;
 
 import java.io.InvalidObjectException;
 import java.util.ArrayList;
@@ -13,17 +14,16 @@ public class CertificateValidator extends BaseValidator {
     private static List<String> certificates = new ArrayList<>(List.of("C4", "4+", "8+"));
 
     @Override
-    public boolean handle(Activity activity, UserPublisher userPublisher,
-                          String position, String userId) throws InvalidObjectException {
-        String userCertificate = userPublisher.getCertificate(userId);
-        if (!certificates.contains(activity.getCertificate()) || !certificates.contains(userCertificate)) {
+    public boolean handle(ActivityContext context) throws InvalidObjectException {
+        String userCertificate = context.getUserPublisher().getCertificate(context.getUserId());
+        if (!certificates.contains(context.getActivity().getCertificate()) || !certificates.contains(userCertificate)) {
             throw new InvalidObjectException("Certificate is not suitable");
         }
-        if (certificates.indexOf(activity.getCertificate()) > certificates.indexOf(userCertificate)) {
+        if (certificates.indexOf(context.getActivity().getCertificate()) > certificates.indexOf(userCertificate)) {
             throw new InvalidObjectException("You are not entitled to steer this type of boat");
         }
 
-        return super.checkNext(activity, userPublisher, position, userId);
+        return super.checkNext(context);
     }
 
     public static void updateCertificateList(List<String> list) {
