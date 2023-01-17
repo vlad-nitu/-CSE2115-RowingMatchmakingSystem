@@ -4,33 +4,23 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class InputValidationTest {
 
     @Test
-    void userIdValidationTest() {
-        String userIdSpecialCharacter = "abc^%";
-        assertFalse(InputValidation.userIdValidation(userIdSpecialCharacter));
-        String userIdValid = "arobben";
-        assertTrue(InputValidation.userIdValidation(userIdValid));
-    }
-
-    @Test
-    void userGenderValidation() {
+    void userValidation() {
         char genderValidM = 'M';
-        assertTrue(InputValidation.userGenderValidation(genderValidM));
+        Set<String> validPositions = Set.of("coach");
+        assertNull(InputValidation.validate(validPositions, genderValidM));
         char genderValidf = 'f';
-        assertTrue(InputValidation.userGenderValidation(genderValidf));
+        assertNull(InputValidation.validate(validPositions, genderValidf));
         char genderInvalid = 'N';
-        assertFalse(InputValidation.userGenderValidation(genderInvalid));
+        assertEquals(InputValidation.validate(validPositions, genderInvalid).getSecond(), "The provided gender is invalid!");
+        Set<String> invalidPositions = Set.of("invalid");
+        assertEquals(InputValidation.validate(invalidPositions, genderValidM).getSecond(),
+                "One of the positions that you provided is not valid!");
     }
 
-    @Test
-    void userPositionsValidation() {
-        Set<String> validPositions = Set.of("coach");
-        assertTrue(InputValidation.validatePositions(validPositions));
-        Set<String> invalidPositions = Set.of("invalid");
-        assertFalse(InputValidation.validatePositions(invalidPositions));
-    }
 }

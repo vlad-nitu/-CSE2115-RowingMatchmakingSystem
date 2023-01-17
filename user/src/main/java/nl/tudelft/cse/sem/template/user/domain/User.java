@@ -21,6 +21,7 @@ public class User {
     @NotBlank(message = "User ID is mandatory and cannot be blank")
     @NotNull(message = "User ID is mandatory and cannot be null")
     @Size(min = 3, max = 20, message = "User ID must be between 3 and 20 characters")
+    @Pattern(regexp = "^[a-zA-Z\\d]+$", message = "userId must not contain special characters nor spaces")
     private String userId;
 
     @NotNull(message = "Competitiveness level is mandatory and cannot be null")
