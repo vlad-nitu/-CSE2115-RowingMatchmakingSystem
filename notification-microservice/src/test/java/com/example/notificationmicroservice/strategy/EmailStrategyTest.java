@@ -32,7 +32,7 @@ class EmailStrategyTest {
 
     @Test
     void handleNotificationOwnerBadEmail() {
-        notification = new Notification("userId", "targetId", 1L, "notifyOwner", "cox");
+        notification = new Notification("targetId", 1L, "notifyOwner", "cox");
         doThrow(new MailSendException(""))
                 .when(mailSender)
                 .send(any(SimpleMailMessage.class));
@@ -41,7 +41,7 @@ class EmailStrategyTest {
 
     @Test
     void handleNotificationUserGoodEmail() {
-        notification = new Notification("userId", "targetId", 1L, "notifyUser", "cox");
+        notification = new Notification("targetId", 1L, "notifyUser", "cox");
         assertTrue(emailStrategy.handleNotification(notification));
     }
 }

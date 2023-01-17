@@ -6,8 +6,6 @@ import lombok.*;
 @NoArgsConstructor
 public class BaseNotification {
     @Getter
-    private String userId;
-    @Getter
     private String targetId;
     @Getter
     private Long activityId;

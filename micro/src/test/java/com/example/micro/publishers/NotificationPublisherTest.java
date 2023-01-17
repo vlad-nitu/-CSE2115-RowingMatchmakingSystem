@@ -27,7 +27,7 @@ public class NotificationPublisherTest {
 
     @Test
     public void notifyUserValid() throws Exception {
-        BaseNotification notification = new BaseNotification("tataVlad", "Nicu", 1L, "iron", "notifyOwner");
+        BaseNotification notification = new BaseNotification("Nicu", 1L, "iron", "notifyOwner");
         Response res = Response.ok().build();
         when(matchingUtils.postRequest("/notifyUser", notification)).thenReturn(res);
         notificationPublisher.notifyUser(notification);
@@ -36,7 +36,7 @@ public class NotificationPublisherTest {
 
     @Test
     public void notifyUserInvalid() throws Exception {
-        BaseNotification notification = new BaseNotification("tataVlad", "Nicu", 1L, "iron", "notifyOwner");
+        BaseNotification notification = new BaseNotification("Nicu", 1L, "iron", "notifyOwner");
         when(matchingUtils.postRequest("/notifyUser", notification)).thenThrow(new Exception("lol"));
         notificationPublisher.notifyUser(notification);
     }

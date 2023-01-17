@@ -15,9 +15,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @NoArgsConstructor
-@EqualsAndHashCode
-@Getter
-@Setter
 @Entity
 @Table(name = "notification")
 public class Notification {
@@ -27,22 +24,22 @@ public class Notification {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "userId", nullable = false)
-    @NotBlank(message = "userId is mandatory and cannot be blank")
-    private String userId;
-
+    @Getter
     @Column(name = "targetId", nullable = false)
     @NotBlank(message = "targetId is mandatory and cannot be blank")
     private String targetId;
 
+    @Getter
     @Column(name = "activityId", nullable = false)
     @NotNull(message = "activityId is mandatory and cannot be null")
     private Long activityId;
 
+    @Getter
     @Column(name = "type", nullable = false)
     @NotBlank(message = "type is mandatory and cannot be blank")
     private String type;
 
+    @Getter
     @Column(name = "position")
     @NotBlank(message = "position is mandatory and cannot be blank")
     private String position;
@@ -50,14 +47,12 @@ public class Notification {
     /** This Notification constructor is needed because I can't use.
      * All args constructor since id is assigned by the db.
      *
-     * @param userId from user
      * @param targetId to user
      * @param activityId regarding activity
      * @param type of type
      * @param position for position if applicable
      */
-    public Notification(String userId, String targetId, Long activityId, String type, String position) {
-        this.userId = userId;
+    public Notification(String targetId, Long activityId, String type, String position) {
         this.targetId = targetId;
         this.activityId = activityId;
         this.type = type;
