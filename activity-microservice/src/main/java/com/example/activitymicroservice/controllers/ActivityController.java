@@ -214,16 +214,9 @@ public class ActivityController {
                 activityService.getActivitiesByTimeSlot(activityService.findAll(), timeSlots);
         for (Activity activity : activityList) {
             for (String position : activity.getPositions()) {
-                Validator validator;
-                if (activity instanceof Competition && position.equals("cox")) {
-                    validator = competitionCox;
-                } else if (activity instanceof Competition) {
-                    validator = competition;
-                } else if (activity instanceof Training && position.equals("cox")) {
-                    validator = trainingCox;
-                } else {
-                    validator = training;
-                }
+
+                // here we use a helper method "getValidator" to lower the cyclomatic complexitiy of this method
+                Validator validator = getValidator(activity, position);
                 try {
                     ActivityContext context = new ActivityContext(activity, userPublisher, position, userId);
                     validator.handle(context);
