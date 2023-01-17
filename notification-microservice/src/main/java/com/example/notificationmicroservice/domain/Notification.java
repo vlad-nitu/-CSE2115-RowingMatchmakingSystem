@@ -15,7 +15,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @NoArgsConstructor
-@EqualsAndHashCode
 @Entity
 @Table(name = "notification")
 public class Notification {
