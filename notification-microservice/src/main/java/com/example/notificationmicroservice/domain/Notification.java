@@ -24,18 +24,22 @@ public class Notification {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @Getter
     @Column(name = "targetId", nullable = false)
     @NotBlank(message = "targetId is mandatory and cannot be blank")
     private String targetId;
 
+    @Getter
     @Column(name = "activityId", nullable = false)
     @NotNull(message = "activityId is mandatory and cannot be null")
     private Long activityId;
 
+    @Getter
     @Column(name = "type", nullable = false)
     @NotBlank(message = "type is mandatory and cannot be blank")
     private String type;
 
+    @Getter
     @Column(name = "position")
     @NotBlank(message = "position is mandatory and cannot be blank")
     private String position;
@@ -67,38 +71,5 @@ public class Notification {
             return "A new user has applied as a " + position
                     + " for activity with Id: " + activityId;
         }
-    }
-
-    /** Position getter.
-     *
-     * @return position
-     */
-    public String getPosition() {
-        return position;
-    }
-
-    /** Type getter.
-     *
-     * @return type
-     */
-    public String getType() {
-        return type;
-    }
-
-    /** ActivityId getter. Even though it says it is unused
-     * the @Valid annotation needs it to work properly
-     *
-     * @return activityId
-     */
-    public Long getActivityId() {
-        return activityId;
-    }
-
-    /** TargetId getter.
-     *
-     * @return targetId
-     */
-    public String getTargetId() {
-        return targetId;
     }
 }
