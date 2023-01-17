@@ -49,7 +49,7 @@ class NotificationControllerTest {
     void notifyUserSuccess() throws Exception {
         String expectedSuccessMessage = "Successfully notified";
         Notification notification = new Notification("targetId", 1L, "notifyOwner", "cox");
-        when(strategy.handleNotification(notification)).thenReturn(true);
+        when(strategy.handleNotification(any())).thenReturn(true);
         MvcResult mvcResult = mockMvc
                 .perform(post("/notifyUser")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -65,7 +65,7 @@ class NotificationControllerTest {
     void notifyUserFailure() throws Exception {
         String expectedFailureMessage = "message";
         Notification notification = new Notification("targetId", 1L, "notifyOwner", "cox");
-        when(strategy.handleNotification(notification)).thenReturn(false);
+        when(strategy.handleNotification(any())).thenReturn(false);
         when(strategy.getFailureMessage()).thenReturn(expectedFailureMessage);
         MvcResult mvcResult = mockMvc
                 .perform(post("/notifyUser")
@@ -124,7 +124,7 @@ class NotificationControllerTest {
         assertThat(contentAsString).contains("activityId is mandatory and cannot be null");
         assertThat(contentAsString).contains("targetId is mandatory and cannot be blank");
         assertThat(contentAsString).contains("type is mandatory and cannot be blank");
-        assertThat(contentAsString).contains("userId is mandatory and cannot be blank");
+        assertThat(contentAsString).contains("position is mandatory and cannot be blank");
     }
 
     @Test
