@@ -13,5 +13,6 @@ public class BaseNotification {
     private Long activityId;
     @Getter
     private String position;
+    @Getter
     private String type;
 }
