@@ -27,17 +27,17 @@ public class NotificationPublisherTest {
 
     @Test
     public void notifyUserValid() throws Exception {
-        BaseNotification notification = new BaseNotification("tataVlad", "Nicu", 1L, "iron", "notifyOwner");
+        BaseNotification notification = new BaseNotification("Nicu", 1L, "iron", "notifyOwner");
         Response res = Response.ok().build();
         when(matchingUtils.postRequest("/notifyUser", notification)).thenReturn(res);
-        notificationPublisher.notifyUser("tataVlad", "Nicu", 1L, "iron", "notifyOwner");
+        notificationPublisher.notifyUser(notification);
         verify(matchingUtils, times(1)).postRequest("/notifyUser", notification);
     }
 
     @Test
     public void notifyUserInvalid() throws Exception {
-        BaseNotification notification = new BaseNotification("tataVlad", "Nicu", 1L, "iron", "notifyOwner");
+        BaseNotification notification = new BaseNotification("Nicu", 1L, "iron", "notifyOwner");
         when(matchingUtils.postRequest("/notifyUser", notification)).thenThrow(new Exception("lol"));
-        notificationPublisher.notifyUser("tataVlad", "Nicu", 1L, "iron", "notifyOwner");
+        notificationPublisher.notifyUser(notification);
     }
 }

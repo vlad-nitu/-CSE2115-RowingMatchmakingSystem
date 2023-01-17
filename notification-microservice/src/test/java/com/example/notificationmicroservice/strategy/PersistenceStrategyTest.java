@@ -25,14 +25,14 @@ class PersistenceStrategyTest {
 
     @Test
     void handleNotificationSaveNull() {
-        Notification notification = new Notification("userId", "targetId", 1L, "notifyOwner", "cox");
+        Notification notification = new Notification("targetId", 1L, "notifyOwner", "cox");
         when(notificationDatabaseService.save(notification)).thenReturn(null);
         assertFalse(persistenceStrategy.handleNotification(notification));
     }
 
     @Test
     void handleNotificationSuccess() {
-        Notification notification = new Notification("userId", "targetId", 1L, "notifyOwner", "cox");
+        Notification notification = new Notification("targetId", 1L, "notifyOwner", "cox");
         when(notificationDatabaseService.save(notification)).thenReturn(notification);
         assertTrue(persistenceStrategy.handleNotification(notification));
     }

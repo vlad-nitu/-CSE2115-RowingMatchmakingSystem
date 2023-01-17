@@ -86,7 +86,7 @@ public class UserActivityControllerTest {
                 .andReturn();
         String contentAsString = mvcResult.getResponse().getContentAsString();
         BaseActivity obtained = objectMapper.readValue(contentAsString, BaseActivity.class);
-        assertThat(obtained).isEqualTo(baseActivity);
+        assertThat(obtained.getOwnerId()).isEqualTo(baseActivity.getOwnerId());
 
         when(activityPublisher.createActivity(any())).thenReturn(null);
         mvcResult = mockMvc

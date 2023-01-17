@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "27f8b309-fba4-4b27-9c46-3ff2cd4f4049",
+		"_postman_id": "dc575eba-e5a4-4aad-90d6-6fc479c4a5c0",
 		"name": "Notification",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "19926803"
@@ -13,7 +13,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"userId\": \"\",\r\n    \"targetId\": \"\",\r\n    \"activityId\": \"\",\r\n    \"type\": \"\",\r\n    \"position\": \"\"\r\n}",
+					"raw": "{\r\n    \"targetId\": \"\",\r\n    \"activityId\": \"\",\r\n    \"type\": \"\",\r\n    \"position\": \"\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -59,10 +59,10 @@
 							]
 						}
 					},
-					"_postman_previewlanguage": null,
-					"header": null,
+					"_postman_previewlanguage": "Text",
+					"header": [],
 					"cookie": [],
-					"body": null
+					"body": ""
 				}
 			]
 		},
@@ -72,14 +72,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8086//getNotifications/{{targetId}}",
+					"raw": "http://localhost:8086/getNotifications/{{targetId}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "8086",
 					"path": [
-						"",
 						"getNotifications",
 						"{{targetId}}"
 					]
