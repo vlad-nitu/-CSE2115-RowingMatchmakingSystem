@@ -20,13 +20,11 @@ public class NotificationPublisher {
     /**
      * Creates a notification for a matching.
      *
-     * @param targetId the id of the user who should recieve the message
-     * @param activityId the activity id of the match
-     * @param position the position chosen for the match
+     * @param notification the notification that should be sent
      */
-    public void notifyUser(String targetId, Long activityId, String position, String type) {
+    public void notifyUser(BaseNotification notification) {
         try {
-            BaseNotification notification = new BaseNotification(targetId, activityId, position, type);
+
             matchingUtils.postRequest("/notifyUser", notification);
         } catch (Exception e) {
             System.out.println(e.getMessage());

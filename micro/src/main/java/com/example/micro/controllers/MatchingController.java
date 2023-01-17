@@ -2,9 +2,9 @@ package com.example.micro.controllers;
 
 import com.example.micro.authentication.AuthManager;
 import com.example.micro.domain.Matching;
-import com.example.micro.publishers.ActivityPublisher;
-import com.example.micro.publishers.NotificationPublisher;
+import com.example.micro.publishers.CollectionPublisher;
 import com.example.micro.services.MatchingServiceImpl;
+import com.example.micro.utils.BaseNotification;
 import com.example.micro.utils.FunctionUtils;
 import com.example.micro.utils.Pair;
 import com.example.micro.utils.TimeSlot;
@@ -25,24 +25,23 @@ import java.util.Optional;
 public class MatchingController {
 
     private final transient MatchingServiceImpl matchingServiceImpl;
-    private final transient ActivityPublisher activityPublisher;
-    private final transient NotificationPublisher notificationPublisher;
+    private final transient CollectionPublisher collectionPublisher;
     private final transient AuthManager authManger;
 
     /**
-     * All arguments constructor, injects the main service component and all 3 publishers into controller.
+     * All args constructor, injects the main service component and all 3 publishers into controller.
      *
      * @param matchingServiceImpl   - matching service implementation
-     * @param activityPublisher     - for communication with Activity microservice through API Endpoints
-     * @param notificationPublisher - for communication with Notification microservice through API Endpoints
+     * @param collectionPublisher  - Publisher that contains both notificationPublisher
+     *                             (communication with Notification microservice through API Endpoints)
+     *                            and activityPublisher (for communication with Activity microservice through API Endpoints)
      */
-    public MatchingController(MatchingServiceImpl matchingServiceImpl, ActivityPublisher activityPublisher,
-                              NotificationPublisher notificationPublisher,
+    public MatchingController(MatchingServiceImpl matchingServiceImpl,
+                              CollectionPublisher collectionPublisher,
                               AuthManager authManager) {
         this.matchingServiceImpl = matchingServiceImpl;
-        this.activityPublisher = activityPublisher;
-        this.notificationPublisher = notificationPublisher;
         this.authManger = authManager;
+        this.collectionPublisher = collectionPublisher;
     }
 
     /**
@@ -62,9 +61,10 @@ public class MatchingController {
         }
 
         List<Long> selectedActivities = matchingServiceImpl.findActivitiesByUserId(userId);
-        List<TimeSlot> occTimeSlots = activityPublisher.getTimeSlots(selectedActivities);
+        List<TimeSlot> occTimeSlots = collectionPublisher.getActivityPublisher().getTimeSlots(selectedActivities);
         List<TimeSlot> newTimeSlots = FunctionUtils.filterTimeSlots(timeSlots, occTimeSlots);
-        List<Pair<Long, String>> possibleActivities = activityPublisher.getAvailableActivities(userId, newTimeSlots);
+        List<Pair<Long, String>> possibleActivities = collectionPublisher.getActivityPublisher()
+                .getAvailableActivities(userId, newTimeSlots);
         return ResponseEntity.ok(possibleActivities);
     }
 
@@ -85,7 +85,7 @@ public class MatchingController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        if (!activityPublisher.check(matching)) {
+        if (!collectionPublisher.getActivityPublisher().check(matching)) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -95,10 +95,11 @@ public class MatchingController {
 
         matching.setPending(true);
         Matching savedMatching = matchingServiceImpl.save(matching);
-        String targetId = activityPublisher.getOwnerId(matching.getActivityId());
-        notificationPublisher.notifyUser(targetId, matching.getActivityId(),
-                        matching.getPosition(),
-                        "notifyOwner");
+        String targetId = collectionPublisher.getActivityPublisher().getOwnerId(matching.getActivityId());
+        collectionPublisher.getNotificationPublisher().notifyUser(new BaseNotification(matching.getUserId(),
+                targetId, matching.getActivityId(),
+                matching.getPosition(),
+                "notifyOwner"));
         return ResponseEntity.ok(savedMatching);
     }
 
@@ -115,15 +116,9 @@ public class MatchingController {
     public ResponseEntity<Matching> chooseMatch(@Valid @RequestBody Matching matching,
                                                 @PathVariable String senderId,
                                                 @PathVariable String type) {
-
-        if (!authManger.getUserId().equals(senderId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        if (!senderId.equals(activityPublisher.getOwnerId(matching.getActivityId()))) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        if (!matchingServiceImpl.checkId(matching.getUserId(), matching.getActivityId(), matching.getPosition())) {
-            return ResponseEntity.badRequest().build();
+        ResponseEntity<Matching> res = securityCheck(matching, senderId);
+        if (res != null) {
+            return res;
         }
         if (type.equals("accept")) {
             return chooseMatchAccept(matching);
@@ -132,6 +127,19 @@ public class MatchingController {
             return chooseMatchDecline(matching);
         }
         return ResponseEntity.badRequest().build();
+    }
+
+    ResponseEntity<Matching> securityCheck(Matching matching, String senderId) {
+        if (!authManger.getUserId().equals(senderId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        if (!senderId.equals(collectionPublisher.getActivityPublisher().getOwnerId(matching.getActivityId()))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        if (!matchingServiceImpl.checkId(matching.getUserId(), matching.getActivityId(), matching.getPosition())) {
+            return ResponseEntity.badRequest().build();
+        }
+        return null;
     }
 
     /**
@@ -145,10 +153,11 @@ public class MatchingController {
         matchingServiceImpl.deleteById(matching.getUserId(), matching.getActivityId(), matching.getPosition());
         matching.setPending(false);
         Matching savedMatching = matchingServiceImpl.save(matching);
-        activityPublisher.takeAvailableSpot(matching.getActivityId(), matching.getPosition());
+        collectionPublisher.getActivityPublisher().takeAvailableSpot(matching.getActivityId(), matching.getPosition());
         // User is also the target
         String userId = matching.getUserId();
-        notificationPublisher.notifyUser(userId, matching.getActivityId(), matching.getPosition(), "notifyUser");
+        collectionPublisher.getNotificationPublisher().notifyUser(new BaseNotification(userId, userId,
+                matching.getActivityId(), matching.getPosition(), "notifyUser"));
         return ResponseEntity.ok(savedMatching);
     }
 
@@ -199,7 +208,7 @@ public class MatchingController {
             return ResponseEntity.badRequest().build();
         }
         String position = matching.get().getPosition();
-        activityPublisher.unenroll(userIdActivityIdPair.getSecond(), position);
+        collectionPublisher.getActivityPublisher().unenroll(userIdActivityIdPair.getSecond(), position);
         matchingServiceImpl.deleteById(userId, activityId, position);
         return ResponseEntity.ok(userIdActivityIdPair);
     }
@@ -212,7 +221,7 @@ public class MatchingController {
      */
     @PostMapping("/deleteMatchingByActivityId/{activityId}")
     public ResponseEntity<Matching> deleteMatchingByActivityId(@PathVariable Long activityId) {
-        String ownerId = activityPublisher.getOwnerId(activityId);
+        String ownerId = collectionPublisher.getActivityPublisher().getOwnerId(activityId);
         if (!authManger.getUserId().equals(ownerId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
