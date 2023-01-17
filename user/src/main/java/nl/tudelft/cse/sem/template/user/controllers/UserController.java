@@ -53,10 +53,16 @@ public class UserController {
         if (foundUser.isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with the given ID already exists!");
         }
-        return validateId(user).getStatusCode().value() == 200 ?
-                ResponseEntity.ok(userService.save(user)) : validateId(user);
+        return validateId(user).getStatusCode().value() == 200
+               ? ResponseEntity.ok(userService.save(user)) : validateId(user);
     }
 
+    /**
+     * Method used to handle userId validation more elegantly.
+     *
+     * @param user whose ID is to be validated
+     * @return ResponseEntity indicating the results of the validation
+     */
     public ResponseEntity validateId(User user) {
         if (!user.getUserId().equals(authManager.getUserId())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided userId does not match your userId! Use "
