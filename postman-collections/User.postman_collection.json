@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "38a3f217-de44-4786-b236-71658e4430b7",
+		"_postman_id": "037f48eb-8a87-4ca5-b33e-5640fd9589bd",
 		"name": "User",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "19926803"
@@ -59,10 +59,10 @@
 							]
 						}
 					},
-					"_postman_previewlanguage": null,
-					"header": null,
+					"_postman_previewlanguage": "Text",
+					"header": [],
 					"cookie": [],
-					"body": null
+					"body": ""
 				}
 			]
 		},
@@ -261,10 +261,10 @@
 							]
 						}
 					},
-					"_postman_previewlanguage": null,
-					"header": null,
+					"_postman_previewlanguage": "Text",
+					"header": [],
 					"cookie": [],
-					"body": null
+					"body": ""
 				},
 				{
 					"name": "competition",
@@ -293,10 +293,10 @@
 							]
 						}
 					},
-					"_postman_previewlanguage": null,
-					"header": null,
+					"_postman_previewlanguage": "Text",
+					"header": [],
 					"cookie": [],
-					"body": null
+					"body": ""
 				}
 			]
 		},
@@ -325,12 +325,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8086/getNotifications",
+					"raw": "http://localhost:8085/getNotifications",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8086",
+					"port": "8085",
 					"path": [
 						"getNotifications"
 					]
@@ -393,10 +393,10 @@
 							]
 						}
 					},
-					"_postman_previewlanguage": null,
-					"header": null,
+					"_postman_previewlanguage": "Text",
+					"header": [],
 					"cookie": [],
-					"body": null
+					"body": ""
 				},
 				{
 					"name": "decline",
@@ -425,10 +425,10 @@
 							]
 						}
 					},
-					"_postman_previewlanguage": null,
-					"header": null,
+					"_postman_previewlanguage": "Text",
+					"header": [],
 					"cookie": [],
-					"body": null
+					"body": ""
 				}
 			]
 		},
@@ -487,10 +487,10 @@
 							]
 						}
 					},
-					"_postman_previewlanguage": null,
-					"header": null,
+					"_postman_previewlanguage": "Text",
+					"header": [],
 					"cookie": [],
-					"body": null
+					"body": ""
 				}
 			]
 		},
@@ -547,10 +547,10 @@
 							]
 						}
 					},
-					"_postman_previewlanguage": null,
-					"header": null,
+					"_postman_previewlanguage": "Text",
+					"header": [],
 					"cookie": [],
-					"body": null
+					"body": ""
 				}
 			]
 		},
@@ -629,10 +629,10 @@
 							]
 						}
 					},
-					"_postman_previewlanguage": null,
-					"header": null,
+					"_postman_previewlanguage": "Text",
+					"header": [],
 					"cookie": [],
-					"body": null
+					"body": ""
 				}
 			]
 		}
