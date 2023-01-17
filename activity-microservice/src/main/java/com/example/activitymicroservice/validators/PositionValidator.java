@@ -2,16 +2,16 @@ package com.example.activitymicroservice.validators;
 
 import com.example.activitymicroservice.domain.Activity;
 import com.example.activitymicroservice.publishers.UserPublisher;
+import com.example.activitymicroservice.utils.ActivityContext;
 
 import java.io.InvalidObjectException;
 
 public class PositionValidator extends BaseValidator {
     @Override
-    public boolean handle(Activity activity, UserPublisher userPublisher,
-                          String position, String userId) throws InvalidObjectException {
-        if (!userPublisher.getPositions(userId).contains(position)) {
+    public boolean handle(ActivityContext context) throws InvalidObjectException {
+        if (!context.getUserPublisher().getPositions(context.getUserId()).contains(context.getPosition())) {
             throw new InvalidObjectException("Position is not available or does not exist");
         }
-        return super.checkNext(activity, userPublisher, position, userId);
+        return super.checkNext(context);
     }
 }

@@ -1,5 +1,3 @@
-
-
 package com.example.activitymicroservice.controllers;
 
 import com.example.activitymicroservice.authentication.AuthManager;
@@ -9,6 +7,7 @@ import com.example.activitymicroservice.domain.Training;
 import com.example.activitymicroservice.publishers.MatchingPublisher;
 import com.example.activitymicroservice.publishers.UserPublisher;
 import com.example.activitymicroservice.services.ActivityService;
+import com.example.activitymicroservice.utils.ActivityContext;
 import com.example.activitymicroservice.utils.InputValidation;
 import com.example.activitymicroservice.utils.Pair;
 import com.example.activitymicroservice.utils.TimeSlot;
@@ -154,7 +153,8 @@ public class ActivityController {
         // here we use a helper method "getValidator" to lower the cyclomatic complexitiy of this method
         Validator validator = getValidator(activity, position);
         try {
-            boolean isValid = validator.handle(activity, userPublisher, position, userId);
+            ActivityContext context = new ActivityContext(activity, userPublisher, position, userId);
+            boolean isValid = validator.handle(context);
             return ResponseEntity.ok(isValid);
         } catch (InvalidObjectException e) {
             return ResponseEntity.ok(false);
@@ -225,7 +225,8 @@ public class ActivityController {
                     validator = training;
                 }
                 try {
-                    validator.handle(activity, userPublisher, position, userId);
+                    ActivityContext context = new ActivityContext(activity, userPublisher, position, userId);
+                    validator.handle(context);
                     list.add(new Pair<>(activity.getActivityId(), position));
                 } catch (Exception e) {
                     continue;
@@ -339,7 +340,3 @@ public class ActivityController {
 
 
 }
-
-
-
-
