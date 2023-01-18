@@ -3,7 +3,9 @@ package nl.tudelft.cse.sem.template.user.controllers;
 import nl.tudelft.cse.sem.template.user.authentication.AuthManager;
 import nl.tudelft.cse.sem.template.user.domain.User;
 import nl.tudelft.cse.sem.template.user.services.UserService;
-import nl.tudelft.cse.sem.template.user.utils.*;
+import nl.tudelft.cse.sem.template.user.utils.InputValidation;
+import nl.tudelft.cse.sem.template.user.utils.Pair;
+import nl.tudelft.cse.sem.template.user.utils.TimeSlot;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -47,26 +49,28 @@ public class UserController {
      */
     @PostMapping("/createUser")
     public ResponseEntity createUser(@Valid @RequestBody User user) {
-        if (!InputValidation.userIdValidation(user.getUserId())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("userId must not include special characters nor spaces!");
-        }
-        if (!InputValidation.userGenderValidation(user.getGender())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided gender is invalid!");
-        }
-        if (!InputValidation.validatePositions(user.getPositions())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("One of the positions that you provided is not valid!");
-        }
-        if (!user.getUserId().equals(authManager.getUserId())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided userId does not match your userId! Use "
-                    + authManager.getUserId() + " as the userId.");
-        }
         Optional<User> foundUser = userService.findUserById(user.getUserId());
         if (foundUser.isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with the given ID already exists!");
         }
-        return ResponseEntity.ok(userService.save(user));
+        return validateId(user).getStatusCode().value() == 200
+               ? ResponseEntity.ok(userService.save(user)) : validateId(user);
+    }
+
+    /**
+     * Method used to handle userId validation more elegantly.
+     *
+     * @param user whose ID is to be validated
+     * @return ResponseEntity indicating the results of the validation
+     */
+    public ResponseEntity validateId(User user) {
+        if (!user.getUserId().equals(authManager.getUserId())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided userId does not match your userId! Use "
+                    + authManager.getUserId() + " as the userId.");
+        }
+        Pair<Boolean, String> validated = InputValidation.validate(user.getPositions(), user.getGender());
+        return  validated == null ? ResponseEntity.status(HttpStatus.OK).body("") :
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validated.getSecond());
     }
 
     /**
