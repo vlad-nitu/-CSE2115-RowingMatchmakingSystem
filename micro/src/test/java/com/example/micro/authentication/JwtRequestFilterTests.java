@@ -15,13 +15,17 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 public class JwtRequestFilterTests {
+    private final PrintStream standardOut = System.err;
+    private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
     private transient JwtRequestFilter jwtRequestFilter;
 
     private transient HttpServletRequest mockRequest;
@@ -43,12 +47,22 @@ public class JwtRequestFilterTests {
         jwtRequestFilter = new JwtRequestFilter(mockJwtTokenVerifier);
 
         SecurityContextHolder.getContext().setAuthentication(null);
+
+        System.setErr(new PrintStream(outputStreamCaptor));
     }
 
+    /**
+     * Cleanup afterEach method.
+     *
+     * @throws ServletException - error thrown by `doFilter`
+     * @throws IOException      - error thrown by `doFilter`
+     */
     @AfterEach
     public void assertChainContinues() throws ServletException, IOException {
         verify(mockFilterChain).doFilter(mockRequest, mockResponse);
         verifyNoMoreInteractions(mockFilterChain);
+
+        System.setErr(standardOut);
     }
 
     @Test
@@ -163,5 +177,22 @@ public class JwtRequestFilterTests {
         // Assert
         assertThat(SecurityContextHolder.getContext().getAuthentication())
                 .isNull();
+    }
+
+    @Test
+    public void authorizationHeaderNullTest() throws ServletException, IOException {
+        // Arrange
+        String token = "randomtoken123";
+        String user = "user123";
+        when(mockRequest.getHeader("Authorization")).thenReturn(token);
+        when(mockJwtTokenVerifier.validateToken(token)).thenThrow(ExpiredJwtException.class);
+        when(mockJwtTokenVerifier.getUserIdFromToken(token)).thenReturn(user);
+
+        // Act
+        jwtRequestFilter.doFilterInternal(mockRequest, mockResponse, mockFilterChain);
+
+        // Assert
+        verify(mockFilterChain).doFilter(mockRequest, mockResponse);
+        assertThat(outputStreamCaptor.toString().trim()).isEqualTo("Invalid authorization header");
     }
 }
