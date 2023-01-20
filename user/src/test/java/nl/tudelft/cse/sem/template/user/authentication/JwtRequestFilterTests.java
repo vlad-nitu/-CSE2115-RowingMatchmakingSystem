@@ -15,7 +15,9 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,6 +32,9 @@ public class JwtRequestFilterTests {
 
     private transient JwtTokenVerifier mockJwtTokenVerifier;
 
+    private final PrintStream standardOut = System.out;
+    private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
+
     /**
      * Set up mocks.
      */
@@ -43,12 +48,14 @@ public class JwtRequestFilterTests {
         jwtRequestFilter = new JwtRequestFilter(mockJwtTokenVerifier);
 
         SecurityContextHolder.getContext().setAuthentication(null);
+        System.setErr(new PrintStream(outputStreamCaptor));
     }
 
     @AfterEach
     public void assertChainContinues() throws ServletException, IOException {
         verify(mockFilterChain).doFilter(mockRequest, mockResponse);
         verifyNoMoreInteractions(mockFilterChain);
+        System.setErr(standardOut);
     }
 
     @Test
@@ -114,7 +121,6 @@ public class JwtRequestFilterTests {
                 Arguments.of(ExpiredJwtException.class),
                 Arguments.of(IllegalArgumentException.class),
                 Arguments.of(JwtException.class)
-
         );
     }
 
