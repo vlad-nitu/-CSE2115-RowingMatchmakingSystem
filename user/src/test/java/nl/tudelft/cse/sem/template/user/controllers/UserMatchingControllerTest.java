@@ -158,6 +158,24 @@ public class UserMatchingControllerTest {
     }
 
     @Test
+    void delcineMatchTest() throws Exception {
+        BaseMatching baseMatching = new BaseMatching();
+        when(authManager.getUserId()).thenReturn(user.getUserId());
+        when(matchingPublisher.decideMatch(user.getUserId(), "decline", baseMatching)).thenReturn(baseMatching);
+        MvcResult mvcResult = mockMvc
+                .perform(post("/decideMatch/decline")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(baseMatching))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        BaseMatching obtained = objectMapper.readValue(contentAsString, BaseMatching.class);
+        assertThat(obtained).isEqualTo(baseMatching);
+    }
+
+    @Test
     void getUserActivities() throws Exception {
         List<Long> expected = List.of(1L, 2L);
         when(matchingPublisher.getUserActivities(null)).thenReturn(expected);
