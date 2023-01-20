@@ -195,4 +195,36 @@ public class JwtRequestFilterTests {
         verify(mockFilterChain).doFilter(mockRequest, mockResponse);
         assertThat(outputStreamCaptor.toString().trim()).isEqualTo("Invalid authorization header");
     }
+
+    @Test
+    public void errorExpired() throws ServletException, IOException {
+        // Arrange
+        String token = "Radu";
+        String user = "user123";
+        when(mockRequest.getHeader("Authorization")).thenReturn("Bearer " + token);
+        when(mockJwtTokenVerifier.validateToken(token)).thenReturn(true);
+        when(mockJwtTokenVerifier.getUserIdFromToken(token)).thenThrow(ExpiredJwtException.class);
+
+        // Act
+        jwtRequestFilter.doFilterInternal(mockRequest, mockResponse, mockFilterChain);
+
+        // Assert
+        assertThat(outputStreamCaptor.toString().trim()).isEqualTo("JWT token has expired.");
+    }
+
+    @Test
+    public void illegalToken() throws ServletException, IOException {
+        // Arrange
+        String token = "Radu";
+        String user = "user123";
+        when(mockRequest.getHeader("Authorization")).thenReturn("Bearer " + token);
+        when(mockJwtTokenVerifier.validateToken(token)).thenReturn(true);
+        when(mockJwtTokenVerifier.getUserIdFromToken(token)).thenThrow(IllegalArgumentException.class);
+
+        // Act
+        jwtRequestFilter.doFilterInternal(mockRequest, mockResponse, mockFilterChain);
+
+        // Assert
+        assertThat(outputStreamCaptor.toString().trim()).isEqualTo("Unable to parse JWT token");
+    }
 }
