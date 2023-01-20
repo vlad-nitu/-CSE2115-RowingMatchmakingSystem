@@ -21,6 +21,7 @@ import java.io.PrintStream;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.*;
 
 public class JwtRequestFilterTests {
@@ -32,7 +33,8 @@ public class JwtRequestFilterTests {
 
     private transient JwtTokenVerifier mockJwtTokenVerifier;
 
-    private final PrintStream standardOut = System.out;
+    // two extra attributes to receive the messages that are printed
+    private final PrintStream standardOut = System.err;
     private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
 
     /**
@@ -48,6 +50,8 @@ public class JwtRequestFilterTests {
         jwtRequestFilter = new JwtRequestFilter(mockJwtTokenVerifier);
 
         SecurityContextHolder.getContext().setAuthentication(null);
+
+
         System.setErr(new PrintStream(outputStreamCaptor));
     }
 
@@ -114,6 +118,7 @@ public class JwtRequestFilterTests {
         // Assert
         assertThat(SecurityContextHolder.getContext().getAuthentication())
                 .isNull();
+        assertNotEquals("", outputStreamCaptor.toString());
     }
 
     private static Stream<Arguments> tokenVerificationExceptionGenerator() {
