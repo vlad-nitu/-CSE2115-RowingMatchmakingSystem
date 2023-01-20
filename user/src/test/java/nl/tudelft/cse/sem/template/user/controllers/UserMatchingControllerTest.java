@@ -30,6 +30,7 @@ import java.util.Set;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -47,12 +48,13 @@ public class UserMatchingControllerTest {
     private UserMatchingController userMatchingController;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+
     private User user;
     private String userId;
     private Boolean competitive;
     private Character gender;
     private String certificate;
-    private  String email;
+    private String email;
     private String organization;
     private Set<String> positions;
     private Set<TimeSlot> timeSlots;
@@ -256,5 +258,29 @@ public class UserMatchingControllerTest {
                 .andReturn();
         contentAsString = mvcResult.getResponse().getContentAsString();
         assertThat(contentAsString).contains("Something went wrong!");
+    }
+
+    @Test
+    void chooseActivitySetUserId() throws Exception {
+
+        BaseMatching baseMatching = new BaseMatching();
+        baseMatching.setUserId("VladNitu");
+
+        when(authManager.getUserId()).thenReturn(user.getUserId());
+        when(matchingPublisher.chooseActivity(any())).thenReturn(baseMatching);
+        MvcResult mvcResult = mockMvc
+                .perform(post("/chooseActivity")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(baseMatching))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        BaseMatching obtained = objectMapper.readValue(contentAsString, BaseMatching.class);
+        assertThat(obtained).isEqualTo(baseMatching);
+
+        baseMatching.setUserId("LotteKremer");
+        verify(matchingPublisher).chooseActivity(baseMatching); // verify userId has changed
     }
 }
