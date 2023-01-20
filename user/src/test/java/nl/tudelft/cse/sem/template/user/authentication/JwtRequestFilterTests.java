@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class JwtRequestFilterTests {
@@ -55,6 +56,10 @@ public class JwtRequestFilterTests {
         System.setErr(new PrintStream(outputStreamCaptor));
     }
 
+    /**
+     * Method to make sure that after each test the chain can continue and the
+     * System.err.println() is correctly printing into the console again.
+     */
     @AfterEach
     public void assertChainContinues() throws ServletException, IOException {
         verify(mockFilterChain).doFilter(mockRequest, mockResponse);
@@ -118,7 +123,11 @@ public class JwtRequestFilterTests {
         // Assert
         assertThat(SecurityContextHolder.getContext().getAuthentication())
                 .isNull();
-        assertNotEquals("", outputStreamCaptor.toString());
+        String errorMessage1 = "JWT token has expired.";
+        String errorMessage2 = "Unable to parse JWT token";
+        String outputMessage = outputStreamCaptor.toString().trim();
+        assertTrue(outputMessage.equals(errorMessage2)
+                || outputMessage.equals(errorMessage1));
     }
 
     private static Stream<Arguments> tokenVerificationExceptionGenerator() {
