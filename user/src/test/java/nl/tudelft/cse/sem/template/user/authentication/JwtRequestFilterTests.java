@@ -21,7 +21,6 @@ import java.io.PrintStream;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
@@ -166,6 +165,10 @@ public class JwtRequestFilterTests {
         // Assert
         assertThat(SecurityContextHolder.getContext().getAuthentication())
                 .isNull();
+
+        String errorMessage = "Invalid authorization header";
+        String outputMessage = outputStreamCaptor.toString().trim();
+        assertTrue(outputMessage.equals(errorMessage));
     }
 
     @Test
@@ -183,5 +186,9 @@ public class JwtRequestFilterTests {
         // Assert
         assertThat(SecurityContextHolder.getContext().getAuthentication())
                 .isNull();
+
+        String errorMessage = "Invalid authorization header";
+        String outputMessage = outputStreamCaptor.toString().trim();
+        assertTrue(outputMessage.equals(errorMessage));
     }
 }
