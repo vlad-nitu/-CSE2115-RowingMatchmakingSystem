@@ -11,7 +11,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.*;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,8 +49,10 @@ class UserServiceTest {
     @Test
     void saveTest() {
         User user = new User();
-        userService.save(user);
+        when(userService.save(any())).thenReturn(user);
+        User output = userService.save(user);
         verify(userRepository, times(1)).save(user);
+        assertNotNull(output);
     }
 
     @Test
@@ -98,7 +102,7 @@ class UserServiceTest {
     @Test
     void findPositionsByIdTest() {
         Optional<User> expected = Optional.of(new User("id", true, 'f', "organisation",
-                "certificate", "test@domain.com", new HashSet<>(), new HashSet<>()));
+                "certificate", "test@domain.com", Set.of("cox"), new HashSet<>()));
         when(userRepository.findById("id")).thenReturn(expected);
         assertThat(userService.findPositionsById("id")).isEqualTo(expected.get().getPositions());
         when(userRepository.findById("")).thenReturn(Optional.empty());
