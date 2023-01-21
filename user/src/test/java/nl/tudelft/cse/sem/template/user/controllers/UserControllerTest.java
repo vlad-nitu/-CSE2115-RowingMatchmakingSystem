@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -415,5 +416,27 @@ public class UserControllerTest {
                 )
                 .andExpect(status().isOk());
         verify(userService).save(any());
+    }
+
+    @Test
+    void changeTimeSlotSetTimeslots() throws Exception {
+        when(authManager.getUserId()).thenReturn("userId");
+        TimeSlot timeSlot = new TimeSlot(LocalDateTime.of(2004, 12, 1, 23, 15),
+                LocalDateTime.of(2004, 12, 1, 23, 15));
+        Set<TimeSlot> times = Set.of(timeSlot);
+        when(userService.findUserById("userId")).thenReturn(Optional.of(user));
+        when(userService.save(user)).thenReturn(user);
+        MvcResult mvcResult = mockMvc
+                .perform(post("/changeTimeSlot/userId")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(times))
+                )
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        verify(userService).save(any());
+        User obtained = objectMapper.readValue(contentAsString, User.class);
+        Set<TimeSlot> changedTimes = obtained.getTimeSlots();
+        assertEquals(changedTimes, times);
     }
 }
