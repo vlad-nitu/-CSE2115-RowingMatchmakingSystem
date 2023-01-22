@@ -15,10 +15,13 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class JwtRequestFilterTests {
@@ -29,6 +32,10 @@ public class JwtRequestFilterTests {
     private transient FilterChain mockFilterChain;
 
     private transient JwtTokenVerifier mockJwtTokenVerifier;
+
+    // two extra attributes to receive the messages that are printed
+    private final PrintStream standardOut = System.err;
+    private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
 
     /**
      * Set up mocks.
@@ -43,12 +50,20 @@ public class JwtRequestFilterTests {
         jwtRequestFilter = new JwtRequestFilter(mockJwtTokenVerifier);
 
         SecurityContextHolder.getContext().setAuthentication(null);
+
+
+        System.setErr(new PrintStream(outputStreamCaptor));
     }
 
+    /**
+     * Method to make sure that after each test the chain can continue and the
+     * System.err.println() is correctly printing into the console again.
+     */
     @AfterEach
     public void assertChainContinues() throws ServletException, IOException {
         verify(mockFilterChain).doFilter(mockRequest, mockResponse);
         verifyNoMoreInteractions(mockFilterChain);
+        System.setErr(standardOut);
     }
 
     @Test
@@ -107,6 +122,11 @@ public class JwtRequestFilterTests {
         // Assert
         assertThat(SecurityContextHolder.getContext().getAuthentication())
                 .isNull();
+        String errorMessage1 = "JWT token has expired.";
+        String errorMessage2 = "Unable to parse JWT token";
+        String outputMessage = outputStreamCaptor.toString().trim();
+        assertTrue(outputMessage.equals(errorMessage2)
+                || outputMessage.equals(errorMessage1));
     }
 
     private static Stream<Arguments> tokenVerificationExceptionGenerator() {
@@ -114,7 +134,6 @@ public class JwtRequestFilterTests {
                 Arguments.of(ExpiredJwtException.class),
                 Arguments.of(IllegalArgumentException.class),
                 Arguments.of(JwtException.class)
-
         );
     }
 
@@ -146,6 +165,10 @@ public class JwtRequestFilterTests {
         // Assert
         assertThat(SecurityContextHolder.getContext().getAuthentication())
                 .isNull();
+
+        String errorMessage = "Invalid authorization header";
+        String outputMessage = outputStreamCaptor.toString().trim();
+        assertTrue(outputMessage.equals(errorMessage));
     }
 
     @Test
@@ -163,5 +186,9 @@ public class JwtRequestFilterTests {
         // Assert
         assertThat(SecurityContextHolder.getContext().getAuthentication())
                 .isNull();
+
+        String errorMessage = "Invalid authorization header";
+        String outputMessage = outputStreamCaptor.toString().trim();
+        assertTrue(outputMessage.equals(errorMessage));
     }
 }
