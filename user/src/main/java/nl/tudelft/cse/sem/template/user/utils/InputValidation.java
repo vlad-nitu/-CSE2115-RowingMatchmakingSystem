@@ -10,7 +10,7 @@ public class InputValidation {
     private static Set<String> validPositions = Set.of("cox",
             "coach",
             "port side rower",
-            "starboard side rower",
+            //"starboard side rower",
             "sculling rower");
 
     private static final Set<Character> possibleGenders = Set.of('M', 'm', 'F', 'f');
