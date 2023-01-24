@@ -130,8 +130,18 @@ public class UserActivityControllerTest {
     void createActivityCatchMutantTest() throws Exception {
         BaseActivity baseActivity = new BaseActivity();
         baseActivity.setOwnerId("valid");
+
         when(authManager.getUserId()).thenReturn("valid");
-        when(activityPublisher.createActivity(any())).thenReturn(baseActivity);
+        // Initialise expectedBaseActivity object in order to force
+        // `activityPublisher.createActivity` to return expected result
+        // after setting the type of `baseActivity` (which was sent via HTTP Post request) to "training"
+        BaseActivity expectedBaseActivity = new BaseActivity();
+        expectedBaseActivity.setOwnerId("valid");
+        expectedBaseActivity.setType("training");
+
+        when(activityPublisher.createActivity(expectedBaseActivity)).thenReturn(expectedBaseActivity);
+
+
         MvcResult mvcResult = mockMvc
                 .perform(post("/createActivity/training")
                         .contentType(MediaType.APPLICATION_JSON)

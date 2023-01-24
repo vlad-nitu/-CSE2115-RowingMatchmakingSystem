@@ -11,6 +11,7 @@ import java.util.Set;
  */
 @NoArgsConstructor
 @Getter
+@EqualsAndHashCode
 public class BaseActivity {
     private Long activityId;
     @Setter private String ownerId;
