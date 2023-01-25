@@ -40,23 +40,27 @@ class NotificationDatabaseServiceTest {
     @Test
     void findNotificationsByTargetId() {
         Notification notification = new Notification("other", 1L, "request", "cox");
-        notificationDatabaseService.findNotificationsByTargetId(notification.getTargetId());
+        when(notificationRepository.findNotificationsByTargetId("other")).thenReturn(List.of(notification));
+        List<Notification> res = notificationDatabaseService.findNotificationsByTargetId(notification.getTargetId());
         verify(notificationRepository, times(1)).findNotificationsByTargetId(notification.getTargetId());
-        verify(notificationRepository, never()).findNotificationsByTargetId("some");
+        assertThat(res).containsExactly(notification);
     }
 
     @Test
     void removeNotificationsByTargetId() {
         Notification notification = new Notification("other", 1L, "request", "cox");
-        notificationDatabaseService.removeNotificationsByTargetId(notification.getTargetId());
+        when(notificationRepository.removeNotificationsByTargetId("other")).thenReturn(List.of(notification));
+        List<Notification> res = notificationDatabaseService.removeNotificationsByTargetId(notification.getTargetId());
         verify(notificationRepository, times(1)).removeNotificationsByTargetId(notification.getTargetId());
-        verify(notificationRepository, never()).removeNotificationsByTargetId("some");
+        assertThat(res).containsExactly(notification);
     }
 
     @Test
     void save() {
         Notification notification = new Notification("other", 1L, "request", "cox");
-        notificationDatabaseService.save(notification);
+        when(notificationDatabaseService.save(notification)).thenReturn(notification);
+        Notification res = notificationDatabaseService.save(notification);
         verify(notificationRepository, times(1)).save(notification);
+        assertThat(res).isEqualTo(notification);
     }
 }

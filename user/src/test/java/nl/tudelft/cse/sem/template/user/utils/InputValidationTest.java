@@ -12,10 +12,18 @@ class InputValidationTest {
     @Test
     void userValidation() {
         char genderValidM = 'M';
-        Set<String> validPositions = Set.of("coach");
+        Set<String> validPositions = Set.of("cox",
+                "coach",
+                "port side rower",
+                "starboard side rower",
+                "sculling rower");
         assertNull(InputValidation.validate(validPositions, genderValidM));
-        char genderValidf = 'f';
-        assertNull(InputValidation.validate(validPositions, genderValidf));
+
+        Set<Character> validGenders = Set.of('M', 'm', 'F', 'f');
+        for (Character gender : validGenders) {
+            assertNull(InputValidation.validate(Set.of("coach"),  gender));
+        }
+
         char genderInvalid = 'N';
         assertEquals(InputValidation.validate(validPositions, genderInvalid).getSecond(), "The provided gender is invalid!");
         Set<String> invalidPositions = Set.of("invalid");
