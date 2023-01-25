@@ -125,4 +125,34 @@ public class UserActivityControllerTest {
         assertThat(contentAsString).contains("The provided ownerId does not match your userId! Use valid as the ownerId.");
 
     }
+
+    @Test
+    void createActivityCatchMutantTest() throws Exception {
+        BaseActivity baseActivity = new BaseActivity();
+        baseActivity.setOwnerId("valid");
+
+        when(authManager.getUserId()).thenReturn("valid");
+        // Initialise expectedBaseActivity object in order to force
+        // `activityPublisher.createActivity` to return expected result
+        // after setting the type of `baseActivity` (which was sent via HTTP Post request) to "training"
+        BaseActivity expectedBaseActivity = new BaseActivity();
+        expectedBaseActivity.setOwnerId("valid");
+        expectedBaseActivity.setType("training");
+
+        when(activityPublisher.createActivity(expectedBaseActivity)).thenReturn(expectedBaseActivity);
+
+
+        MvcResult mvcResult = mockMvc
+                .perform(post("/createActivity/training")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(baseActivity))
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        BaseActivity obtained = objectMapper.readValue(contentAsString, BaseActivity.class);
+        assertThat(obtained.getOwnerId()).isEqualTo(baseActivity.getOwnerId());
+        assertThat(obtained.getType()).isEqualTo("training");
+    }
 }

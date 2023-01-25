@@ -156,4 +156,8 @@ public class ActivityService {
         activityRepository.save(oldActivity);
         return true;
     }
+
+    public LocalDateTime getCheckTime() {
+        return checkTime;
+    }
 }

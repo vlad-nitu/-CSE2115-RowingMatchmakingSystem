@@ -7,6 +7,7 @@ import com.example.activitymicroservice.domain.Competition;
 import com.example.activitymicroservice.publishers.UserPublisher;
 import com.example.activitymicroservice.utils.ActivityContext;
 import com.example.activitymicroservice.utils.ActivityUtils;
+import lombok.Getter;
 import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,6 +47,7 @@ public class GenderValidatorTest {
         position = "cox";
         competition = new Competition();
         competition.setGender('M');
+        competition.setCompetitive(true);
         genderValidator = new GenderValidator();
         context = new ActivityContext(competition, userPublisher, position, userId);
     }
@@ -59,6 +61,19 @@ public class GenderValidatorTest {
     @Test
     void handleIncorrect() {
         when(userPublisher.getGender(userId)).thenReturn('F');
+        assertThatThrownBy(() -> genderValidator.handle(context))
+                .isInstanceOf(InvalidObjectException.class);
+    }
+
+    @Test
+    void handleCorrectButReturnFalse() throws InvalidObjectException {
+        when(userPublisher.getGender(userId)).thenReturn('M');
+
+        // Create a Validator to be tested next
+        CompetitivenessValidator competitivenessValidator = new CompetitivenessValidator();
+        when(userPublisher.getCompetitiveness(userId)).thenReturn(false);
+        genderValidator.setNext(competitivenessValidator);
+
         assertThatThrownBy(() -> genderValidator.handle(context))
                 .isInstanceOf(InvalidObjectException.class);
     }

@@ -6,17 +6,22 @@ import com.example.activitymicroservice.domain.Training;
 import com.example.activitymicroservice.repositories.ActivityRepository;
 import com.example.activitymicroservice.utils.Pair;
 import com.example.activitymicroservice.utils.TimeSlot;
+import org.apache.tomcat.jni.Local;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.checkerframework.checker.units.qual.A;
+import org.checkerframework.checker.units.qual.C;
 import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.parameters.P;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,11 +39,16 @@ class ActivityServiceTest {
 
     @Mock
     private ActivityRepository activityRepository;
+
+    @Mock
     private ActivityService activityService;
+
+    Activity training;
 
     @BeforeEach
     void setUp() {
         activityService = new ActivityService(activityRepository);
+        training = new Training();
     }
 
     @Test
@@ -85,6 +95,12 @@ class ActivityServiceTest {
     }
 
     @Test
+    public void returnNullSaveTest() {
+        when(activityService.save(training)).thenReturn(training);
+        assertThat(activityService.save(training) != null).isTrue();
+    }
+
+    @Test
     public void getActivitiesByTimeSlotTest() {
         Activity activity1 = new Training();
         Activity activity2 = new Competition();
@@ -105,6 +121,29 @@ class ActivityServiceTest {
                 .isEqualTo(1);
         assertThat(activityService.getActivitiesByTimeSlot(List.of(activity1, activity2), timeSlotSet).get(0))
                 .isEqualTo(activity1);
+    }
+
+
+    @Test
+    public void getActivitiesByTimeSlotTestForMutation() {
+        Activity activity1 = new Training();
+        Activity activity2 = new Competition();
+        activity1.setTimeSlot(new TimeSlot(
+                LocalDateTime.of(2023, 12, 1, 23, 15),
+                LocalDateTime.of(2024, 11, 2, 15, 00)
+        ));
+        activity2.setTimeSlot(new TimeSlot(
+                LocalDateTime.of(2003, 12, 1, 23, 15),
+                LocalDateTime.of(2004, 11, 2, 15, 00)
+        ));
+        List<TimeSlot> timeSlotSet = List.of(
+                new TimeSlot(
+                        LocalDateTime.of(2023, 11, 1, 23, 15),
+                        LocalDateTime.of(2024, 11, 2, 15, 00)
+                ));
+        activityService.getActivitiesByTimeSlot(List.of(activity1, activity2), timeSlotSet);
+        Duration duration = Duration.between(LocalDateTime.now(), activityService.getCheckTime());
+        assertThat(duration.getSeconds() > 5400).isTrue();
     }
 
     @Test
@@ -130,6 +169,15 @@ class ActivityServiceTest {
         doNothing().when(activityRepository).deleteById(1L);
         activityRepository.deleteById(1L);
         verify(activityRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    public void testDeleteActivityById() {
+        training.setActivityId(1L);
+        doNothing().when(activityRepository).deleteById(1L);
+        activityRepository.deleteById(1L);
+        when(activityRepository.existsById(training.getActivityId())).thenReturn(false);
+        assertFalse(activityRepository.existsById(training.getActivityId()));
     }
 
     @Test
@@ -176,7 +224,7 @@ class ActivityServiceTest {
     }
 
     @Test
-    public void editActivityServiceTestTrue() {
+    public void editActivityServiceTestCertificate() {
         Activity activity = new Training();
         Activity activity1 = new Training();
         activity1.setCertificate("B4");
@@ -185,4 +233,61 @@ class ActivityServiceTest {
         assertThat(activity.getCertificate()).isEqualTo("B4");
     }
 
+    @Test
+    public void editActivityServiceTestFalse1() {
+        Activity activity = new Competition();
+        Activity activity1 = new Training();
+        assertThat(activityService.editActivityService(activity, activity1)).isFalse();
+    }
+
+    @Test
+    public void editActivityServiceTestGender() {
+        Activity activity = new Competition();
+        Activity activity1 = new Competition();
+        ((Competition) activity1).setGender('M');
+        when(activityRepository.save(activity)).thenReturn(activity);
+        assertThat(activityService.editActivityService(activity, activity1)).isTrue();
+        assertThat(((Competition) activity).getGender()).isEqualTo('M');
+    }
+
+    @Test
+    public void editActivityServiceTestOrganisation() {
+        Activity activity = new Competition();
+        Activity activity1 = new Competition();
+        ((Competition) activity1).setOrganisation("SEM33A");
+        when(activityRepository.save(activity)).thenReturn(activity);
+        assertThat(activityService.editActivityService(activity, activity1)).isTrue();
+        assertThat(((Competition) activity).getOrganisation()).isEqualTo("SEM33A");
+    }
+
+    @Test
+    public void editActivityServiceTestCompetitive() {
+        Activity activity = new Competition();
+        Activity activity1 = new Competition();
+        ((Competition) activity1).setCompetitive(true);
+        when(activityRepository.save(activity)).thenReturn(activity);
+        assertThat(activityService.editActivityService(activity, activity1)).isTrue();
+        assertThat(((Competition) activity).isCompetitive()).isTrue();
+    }
+
+    @Test
+    public void editActivityServiceTestTimeSlot() {
+        Activity activity = new Training();
+        Activity activity1 = new Training();
+        TimeSlot timeSlot = new TimeSlot();
+        activity1.setTimeSlot(timeSlot);
+        when(activityRepository.save(activity)).thenReturn(activity);
+        assertThat(activityService.editActivityService(activity, activity1)).isTrue();
+        assertThat(activity.getTimeSlot()).isEqualTo(timeSlot);
+    }
+
+    @Test
+    public void editActivityServiceTestPositions() {
+        Activity activity = new Training();
+        Activity activity1 = new Training();
+        activity1.setPositions(List.of("cox", "coach"));
+        when(activityRepository.save(activity)).thenReturn(activity);
+        assertThat(activityService.editActivityService(activity, activity1)).isTrue();
+        assertThat(activity.getPositions()).isEqualTo(List.of("cox", "coach"));
+    }
 }
